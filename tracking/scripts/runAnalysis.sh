@@ -21,7 +21,7 @@ do
 #======YOUR ANALYSIS PROCESSOR=====#
 
 
-INFILE=Marlin_Reco_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio
+INFILE=../Results/RecoFiles/Marlin_Reco_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio
 
 #======================================================================
 
@@ -31,6 +31,8 @@ Marlin Diagnostics.xml \
     --MyAIDAProcessor.FileName=analysis_FullTrks_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
     --global.MaxRecordNumber=1000 \
     --global.SkipNEvents=0
+
+mv analysis_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.root ../Results/Analysis
 
 #======================================================================
 #======================================================================

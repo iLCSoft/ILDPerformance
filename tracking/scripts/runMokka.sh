@@ -13,8 +13,8 @@ for j in {1..8}
 do
 
 
-rm -f ../steer/sim.steer
-cat >  ../steer/sim.steer << EOF   
+rm -f sim.steer
+cat >  sim.steer << EOF   
 
 /Mokka/init/detectorModel ILD_o1_v05
 
@@ -54,8 +54,8 @@ cat >  ../steer/sim.steer << EOF
 EOF
 #=================================================
 
-rm -rf ../steer/muons
-cat >  ../steer/muons << EOF   
+rm -rf muons
+cat >  muons << EOF   
 
 /generator/generator particleGun
 /gun/position 0 0 0
@@ -70,6 +70,8 @@ EOF
 #=================================================
 
 Mokka -U ../steer/sim.steer
+
+mv MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio ../Results/SimFiles
 
 done
 

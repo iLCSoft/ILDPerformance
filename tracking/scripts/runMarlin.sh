@@ -19,35 +19,22 @@ do
 #======MARLIN=====#
 #======MARLIN=====#
 
-INFILE=MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio
+INFILE=../Results/SimFiles/MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio
 
 echo $INFILE
 
 #=================================================
 
-Marlin ../steer/stdreco_tracking.xml \
+Marlin stdreco_tracking.xml \
     --global.LCIOInputFiles=$INFILE \
     --global.GearXMLFile=GearOutput.xml \
     --MyLCIOOutputProcessor.LCIOOutputFile=Marlin_Reco_FullTrks_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio \
     --global.MaxRecordNumber=1000 \
     --global.SkipNEvents=0 
 
-#======YOUR ANALYSIS PROCESSOR=====#
+mv Marlin_Reco_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio ../Results/RecoFiles
 
 
-INFILE=Marlin_Reco_FullTrks_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio
-
-#======================================================================
-
-Marlin ../steer/Diagnostics.xml \
-    --global.LCIOInputFiles=$INFILE \
-    --global.GearXMLFile=GearOutput.xml \
-    --MyAIDAProcessor.FileName=analysis_FullTrks_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
-    --global.MaxRecordNumber=1000 \
-    --global.SkipNEvents=0
-
-#======================================================================
-#======================================================================
 
 done
 

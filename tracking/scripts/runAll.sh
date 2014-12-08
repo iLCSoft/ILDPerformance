@@ -75,10 +75,12 @@ EOF
 
 Mokka -U sim.steer
 
+mv MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio ../Results/SimFiles
+
 #======MARLIN=====#
 #======MARLIN=====#
 
-INFILE=MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio
+INFILE=../Results/SimFiles/MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio
 
 echo $INFILE
 
@@ -91,10 +93,12 @@ Marlin stdreco_tracking.xml \
     --global.MaxRecordNumber=1000 \
     --global.SkipNEvents=0 
 
+mv Marlin_Reco_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio ../Results/RecoFiles
+
 #======YOUR ANALYSIS PROCESSOR=====#
 
 
-INFILE=Marlin_Reco_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio
+INFILE=../Results/RecoFiles/Marlin_Reco_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio
 
 #======================================================================
 
@@ -106,6 +110,8 @@ Marlin Diagnostics.xml \
 #    --MCProcessor.TracksMCTruthLinkCollectionName=MCTruthMarlinTrkTracksLink \
     --global.MaxRecordNumber=1000 \
     --global.SkipNEvents=0
+
+mv analysis_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.root ../Results/Analysis
 
 #======================================================================
 #======================================================================
