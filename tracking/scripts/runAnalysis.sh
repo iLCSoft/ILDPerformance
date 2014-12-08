@@ -1,5 +1,5 @@
-unset MARLIN_DLL
-. /afs/desy.de/project/ilcsoft/sw/x86_64_gcc41_sl5/v01-17-06/init_ilcsoft.sh
+#unset MARLIN_DLL
+#. /afs/desy.de/project/ilcsoft/sw/x86_64_gcc41_sl5/v01-17-06/init_ilcsoft.sh
 
 set -A PolarAngles 10 20 40 85
 set -A y_dir 0.173 0.342 0.643 0.996
