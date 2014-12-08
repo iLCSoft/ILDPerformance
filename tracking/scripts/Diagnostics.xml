@@ -1,0 +1,99 @@
+<!--
+      Example steering file to run a standard reconstruction on the 3 ttbar events 
+      simulated with Mokka in this example dierectory.
+
+      Works with ilcsoft v01-16 (DBD production release)
+
+      Defines the standard reconstruction for ILD.
+-->
+
+
+ <marlin>
+   
+   <execute>
+     <processor name="MyAIDAProcessor"/>
+     <processor name="MyRecoMCTruthLinker"/>
+     <processor name="MyDiagnostics"/>
+   </execute>
+
+   <global> 
+      <parameter name="LCIOInputFiles"> test.slcio </parameter>
+      <parameter name="GearXMLFile" value="GearOutput.xml"/>
+      <parameter name="MaxRecordNumber" value="0"/>
+      <parameter name="SkipNEvents" value="0"/>
+      <parameter name="SupressCheck" value="false"/>
+      <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT"> MESSAGE </parameter>
+      <parameter name="RandomSeed" value="1234567890" />
+   </global>
+
+
+ 
+ <processor name="MyAIDAProcessor" type="AIDAProcessor">
+ <!--Processor that handles AIDA files. Creates on directory per processor.  Processors only need to create and fill the histograms, clouds and tuples. Needs to be the first ActiveProcessor-->
+  <!-- compression of output file 0: false >0: true (default) -->
+  <parameter name="Compress" type="int" value="1"/>
+  <!-- filename without extension-->
+  <parameter name="FileName" type="string" value="Results/ildperf"/>
+  <!-- type of output file xml (default) or root ( only OpenScientist)-->
+  <parameter name="FileType" type="string" value="root "/>
+</processor>
+
+
+ <processor name="MyRecoMCTruthLinker" type="RecoMCTruthLinker">
+ <!--links RecontructedParticles to the MCParticle based on number of hits used-->
+  <!--Name of the MCParticle input collection-->
+  <parameter name="MCParticleCollection" type="string" lcioInType="MCParticle"> MCParticle </parameter>
+  <!--Name of the ReconstructedParticles input collection-->
+  <parameter name="RecoParticleCollection" type="string" lcioInType="ReconstructedParticle"> PandoraPFOs </parameter>
+  <!--Name of the  SimCalorimeterHit - CalorimeterHit relation-->
+  <parameter name="SimCalorimeterHitRelationName" type="string" lcioInType="LCRelation"> RelationCaloHit </parameter>
+  <!--Name of the Tracks input collection-->
+  <parameter name="TrackCollection" type="string" lcioInType="Track"> MarlinTrkTracks </parameter>
+  <!--Name of the trackMCTruthLink output collection - not created if empty()-->
+  <parameter name="TrackMCTruthLinkName" type="string" lcioOutType="LCRelation"> MarlinTrkTracksMCTruthLink </parameter>
+  <!--Name of the MCParticle to Track relation output collection - not created if empty()-->
+  <parameter name="MCTruthTrackLinkName" type="string" lcioOutType="LCRelation"> MCTruthMarlinTrkTracksLink </parameter>
+   <!--Name of the skimmed MCParticle  output collection-->
+  <parameter name="MCParticlesSkimmedName" type="string" lcioOutType="MCParticle"> MCParticlesSkimmed </parameter>
+  <!--Name of the RecoMCTruthLink output collection-->
+  <parameter name="RecoMCTruthLinkName" type="string" lcioOutType="LCRelation"> RecoMCTruthLink </parameter>
+  <!--PDG codes of particles of which the daughters will be kept in the skimmmed MCParticle collection-->
+  <parameter name="KeepDaughtersPDG" type="IntVec"> 22 111 310 13 211 321</parameter>
+  <!--true: use relations for TrackerHits, false : use getRawHits -->
+  <parameter name="UseTrackerHitRelations" type="bool">true </parameter>
+  <!--If Using Particle Gun Ignore Gen Stat-->
+  <parameter name="UsingParticleGun" type="bool"> true </parameter>
+  <!--Names of the SimTrackerHits input collection-->
+  <parameter name="SimTrackerHitCollections" type="StringVec" lcioInType="SimTrackerHit">VXDCollection SITCollection FTD_PIXELCollection FTD_STRIPCollection TPCCollection SETCollection  </parameter>
+  <!--Name of the lcrelation collections, that link the TrackerHits to their SimTrackerHits. -->
+  <parameter name="TrackerHitsRelInputCollections" type="StringVec" lcioInType="LCRelation">VXDTrackerHitRelations SITSpacePointRelations FTDPixelTrackerHitRelations FTDSpacePointRelations TPCTrackerHitRelations SETSpacePointRelations  </parameter>
+  <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+  <parameter name="Verbosity" type="string"> DEBUG4 </parameter>
+  </processor>
+
+ <processor name="MyDiagnostics" type="Diagnostics">
+  <!--Name of the FullLDC track collection-->
+  <parameter name="MarlinTrkTracks" type="string" lcioInType="Track"> MarlinTrkTracks </parameter>
+  <!--Name of the TPC track collection-->
+  <parameter name="SeedTracks" type="string" lcioInType="Track"> CATracks </parameter>
+  <!--Name of the Silicon track collection-->
+  <parameter name="SiTracks" type="string" lcioInType="Track"> SiTracks </parameter>
+  <!--true - reco relation collection-->
+  <parameter name="MCTracksTruthLinkCollectionName" type="string" lcioInType="Track"> MCTruthMarlinTrkTracksLink </parameter>
+  <!--reco - true relation collection-->
+  <parameter name="TracksMCTruthLinkCollectionName" type="string" lcioInType="Track"> MarlinTrkTracksMCTruthLink </parameter>
+  <!--Name of the MCParticle input collection-->
+  <parameter name="MCParticleCollection" type="string" lcioInType="MCParticle"> MCParticle </parameter>
+  <!--Enables cuts to define the examined track sample-->
+  <parameter name="TrkEffOn" type="bool"> true </parameter>
+  <!--If we want to apply a cut on the minimum TPC hits-->
+  <parameter name="CutOnTPChits" type="int"> 10 </parameter>
+  <!--If we want to apply a cut on the minimum transverse momentum-->
+  <parameter name="CutOnPt" type="float"> 0.3 </parameter>
+  <parameter name="SimTrackerHitCollections" type="StringVec" lcioInType="SimTrackerHit"> VXDCollection SITCollection TPCCollection </parameter>
+  <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+  <parameter name="Verbosity" type="string"> DEBUG4 </parameter>
+</processor>
+
+  
+</marlin>

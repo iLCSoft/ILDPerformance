@@ -18,8 +18,8 @@ do
 
 #======MOKKA=====#
 #======MOKKA=====#
-rm -f ../steer/sim.steer
-cat >  ../steer/sim.steer << EOF   
+rm -f sim.steer
+cat >  sim.steer << EOF   
 
 /Mokka/init/detectorModel ILD_o1_v05
 
@@ -58,8 +58,8 @@ cat >  ../steer/sim.steer << EOF
 EOF
 #=================================================
 
-rm -rf ../steer/muons
-cat >  ../steer/muons << EOF   
+rm -rf muons
+cat >  muons << EOF   
 
 /generator/generator particleGun
 /gun/position 0 0 0
@@ -73,7 +73,7 @@ cat >  ../steer/muons << EOF
 EOF
 #=================================================
 
-Mokka -U ../steer/sim.steer
+Mokka -U sim.steer
 
 #======MARLIN=====#
 #======MARLIN=====#
@@ -84,9 +84,9 @@ echo $INFILE
 
 #=================================================
 
-Marlin ../steer/stdreco_tracking.xml \
+Marlin stdreco_tracking.xml \
     --global.LCIOInputFiles=$INFILE \
-    --global.GearXMLFile=../steer/GearOutput.xml \
+    --global.GearXMLFile=GearOutput.xml \
     --MyLCIOOutputProcessor.LCIOOutputFile=Marlin_Reco_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio \
     --global.MaxRecordNumber=1000 \
     --global.SkipNEvents=0 
@@ -98,7 +98,7 @@ INFILE=Marlin_Reco_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio
 
 #======================================================================
 
-Marlin ../steer/Diagnostics.xml \
+Marlin Diagnostics.xml \
     --global.LCIOInputFiles=$INFILE \
     --global.GearXMLFile=GearOutput.xml \
     --MyAIDAProcessor.FileName=analysis_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
