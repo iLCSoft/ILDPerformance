@@ -23,7 +23,7 @@ void PtResolutionOne(){
     zeros[ll] = 0;
   }
   for(int unsigned i = 0; i < SIZE; i++){
-    TFile *f = new TFile(Form("../Results/Analysis/analysis_FullTrks_MuonsAngle_85_Mom_%d.root",Mom[i]), "read");
+    TFile *f = new TFile(Form("../Results/Analysis/analysis_MuonsAngle_85_Mom_%d.root",Mom[i]), "read");
     TTree *EvalTree = (TTree*)f->Get("MyRecoMCTruthLinker/EvalTree");
 
 
