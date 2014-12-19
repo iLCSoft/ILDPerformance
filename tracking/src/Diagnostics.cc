@@ -1,6 +1,7 @@
 #include "Diagnostics.h"
 
 #include <UTIL/LCRelationNavigator.h>
+#include "TROOT.h"
 
 
 //------------------------------------------------------------------------------------------------------------
@@ -140,6 +141,8 @@ void Diagnostics::init() {
   _bField = Global::GEAR->getBField().at( gear::Vector3D(0., 0., 0.) ).z();    //The B field in z direction
 
   ghostCounter = 0 ;
+
+  gROOT->ProcessLine("#include <vector>");
 
 }
 
