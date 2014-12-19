@@ -192,13 +192,24 @@ void Diagnostics::processEvent( LCEvent * evt ) {
     EvalTree->Branch("ghostCosTheta",&ghostCosTheta) ;
     EvalTree->Branch("siTrksCosTheta",&siTrksCosTheta) ;
     EvalTree->Branch("MarlinTrkHits",&MarlinTrkHits) ;
-
-
+    /*
+    EvalTree->Branch("residualOmega",&residualOmega) ;
+    EvalTree->Branch("residualD0",&residualD0) ;
+    EvalTree->Branch("residualZ0",&residualZ0) ;
+    EvalTree->Branch("residualPhi",&residualPhi) ;
+    EvalTree->Branch("residualTanLambda",&residualTanLambda) ;
+    */
     OmegaPull = new TH1F("OmegaPull","Omega pull",100,-10,10);
     PhiPull = new TH1F("PhiPull","Phi pull",100,-10,10);
     TanLambdaPull = new TH1F("TanLambdaPull","TanLambda",100,-10,10);
     d0pull = new TH1F("d0pull","d0 pull",100,-10,10);
     z0pull = new TH1F("z0pull","z0",100,-10,10); 
+
+    OmegaResidual = new TH1F("OmegaResidual","Omega Residual",100,-10,10);
+    PhiResidual = new TH1F("PhiResidual","Phi Residual",100,-10,10);
+    TanLambdaResidual = new TH1F("TanLambdaResidual","TanLambda Residual",100,-10,10);
+    d0Residual = new TH1F("d0Residual","d0 Residual",100,-10,10);
+    z0Residual = new TH1F("z0Residual","z0 Residual",100,-10,10); 
 
     //double bins[nBins+1] = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 0.8, 1.0, 2., 5.0 , 10. , 20. , 50. , 100. , 300. , 500. } ;
     double bins[nBins+1] = { 0.01, 0.1, 0.2, 0.3, 0.5 , 0.7 , 1.0 , 2., 5.0 , 10. , 20. , 50. , 100. , 300.  } ;
@@ -207,6 +218,7 @@ void Diagnostics::processEvent( LCEvent * evt ) {
     hist_pt_f  = new TH1F( "hist_pt_f", "Pt distribution of found tracks", nBins , bins ) ;
     
     pulls = new TCanvas("pulls","Track par. pulls",800,800);
+    residuals =  new TCanvas("residuals","Track par. residuals",800,800);
     eff = new TCanvas("eff","Trk Eff",800,800);
 
     myfunc = new TF1("myfunc","gaus(0)");
@@ -622,6 +634,11 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	  TanLambdaPull->Fill((rec_tanlambda-tLmcp)/(sqrt(rec_tanlambda_err)));
 	  d0pull->Fill((rec_d0-d0mcp)/(sqrt(rec_d0_err)));
 	  z0pull->Fill((rec_z0-z0mcp)/(sqrt(rec_z0_err)));
+	  OmegaResidual->Fill(rec_omega-ommcp);
+	  PhiResidual->Fill(rec_phi-phmcp);
+	  TanLambdaResidual->Fill(rec_tanlambda-tLmcp);
+	  d0Residual->Fill(rec_d0-d0mcp);
+	  z0Residual->Fill(rec_z0-z0mcp);
 	  PtMCP.push_back(p2.rho());
 	  PtReco.push_back(recoPt);
 	  hist_pt_f->Fill(ptmcp);
@@ -716,6 +733,30 @@ void Diagnostics::end(){
   gStyle->SetOptFit(1111);
 
   pulls->Write();
+
+  residuals->Divide(3,2);
+  residuals->cd(1);
+  OmegaResidual->Draw();
+  //OmegaResidual->Fit("gaus");
+  gStyle->SetOptFit(1111);
+  residuals->cd(2);
+  PhiResidual->Draw();
+  //PhiResidual->Fit("gaus");
+  gStyle->SetOptFit(1111);
+  residuals->cd(3);
+  TanLambdaResidual->Draw();
+  //TanLambdaResidual->Fit("gaus");
+  gStyle->SetOptFit(1111);
+  residuals->cd(4);
+  d0Residual->Draw();
+  //d0Residual->Fit("gaus");
+  gStyle->SetOptFit(1111);
+  residuals->cd(5);
+  z0Residual->Draw();
+  //z0Residual->Fit("gaus");
+  gStyle->SetOptFit(1111);
+
+  residuals->Write();
 
   eff->cd();
   gPad->SetLogx() ;

@@ -104,12 +104,19 @@ class Diagnostics : public Processor {
   TH1F *d0pull; 
   TH1F *z0pull; 
 
+  TH1F *OmegaResidual; 
+  TH1F *PhiResidual; 
+  TH1F *TanLambdaResidual; 
+  TH1F *d0Residual; 
+  TH1F *z0Residual; 
+
   static const int nBins = 13 ;
 
   TH1F *hist_pt_t ;
   TH1F *hist_pt_f ;
 
   TCanvas *pulls;
+  TCanvas *residuals;
   TCanvas *eff;
 
   TF1 *myfunc ;
