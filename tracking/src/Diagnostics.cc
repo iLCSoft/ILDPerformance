@@ -205,11 +205,11 @@ void Diagnostics::processEvent( LCEvent * evt ) {
     d0pull = new TH1F("d0pull","d0 pull",100,-10,10);
     z0pull = new TH1F("z0pull","z0",100,-10,10); 
 
-    OmegaResidual = new TH1F("OmegaResidual","Omega Residual",100,-10,10);
-    PhiResidual = new TH1F("PhiResidual","Phi Residual",100,-10,10);
-    TanLambdaResidual = new TH1F("TanLambdaResidual","TanLambda Residual",100,-10,10);
-    d0Residual = new TH1F("d0Residual","d0 Residual",100,-10,10);
-    z0Residual = new TH1F("z0Residual","z0 Residual",100,-10,10); 
+    OmegaResidual = new TH1F("OmegaResidual","Omega Residual",50,-0.00001,0.00001);
+    PhiResidual = new TH1F("PhiResidual","Phi Residual",50,-0.005,0.005);
+    TanLambdaResidual = new TH1F("TanLambdaResidual","TanLambda Residual",50,-0.005,0.005);
+    d0Residual = new TH1F("d0Residual","d0 Residual",50,-0.1,0.1);
+    z0Residual = new TH1F("z0Residual","z0 Residual",50,-0.1,0.1); 
 
     //double bins[nBins+1] = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 0.8, 1.0, 2., 5.0 , 10. , 20. , 50. , 100. , 300. , 500. } ;
     double bins[nBins+1] = { 0.01, 0.1, 0.2, 0.3, 0.5 , 0.7 , 1.0 , 2., 5.0 , 10. , 20. , 50. , 100. , 300.  } ;
@@ -737,24 +737,18 @@ void Diagnostics::end(){
   residuals->Divide(3,2);
   residuals->cd(1);
   OmegaResidual->Draw();
-  //OmegaResidual->Fit("gaus");
-  gStyle->SetOptFit(1111);
+
   residuals->cd(2);
   PhiResidual->Draw();
-  //PhiResidual->Fit("gaus");
-  gStyle->SetOptFit(1111);
+
   residuals->cd(3);
   TanLambdaResidual->Draw();
-  //TanLambdaResidual->Fit("gaus");
-  gStyle->SetOptFit(1111);
+
   residuals->cd(4);
   d0Residual->Draw();
-  //d0Residual->Fit("gaus");
-  gStyle->SetOptFit(1111);
+
   residuals->cd(5);
   z0Residual->Draw();
-  //z0Residual->Fit("gaus");
-  gStyle->SetOptFit(1111);
 
   residuals->Write();
 
