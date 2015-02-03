@@ -72,12 +72,8 @@
   </processor>
 
  <processor name="MyDiagnostics" type="Diagnostics">
-  <!--Name of the FullLDC track collection-->
-  <parameter name="MarlinTrkTracks" type="string" lcioInType="Track"> MarlinTrkTracks </parameter>
-  <!--Name of the TPC track collection-->
-  <parameter name="SeedTracks" type="string" lcioInType="Track"> CATracks </parameter>
-  <!--Name of the Silicon track collection-->
-  <parameter name="SiTracks" type="string" lcioInType="Track"> SiTracks </parameter>
+  <!--Name of the studied track collection-->
+  <parameter name="StudiedTracks" type="string" lcioInType="Track"> MarlinTrkTracks </parameter>
   <!--true - reco relation collection-->
   <parameter name="MCTracksTruthLinkCollectionName" type="string" lcioInType="Track"> MCTruthMarlinTrkTracksLink </parameter>
   <!--reco - true relation collection-->
@@ -86,10 +82,8 @@
   <parameter name="MCParticleCollection" type="string" lcioInType="MCParticle"> MCParticle </parameter>
   <!--Enables cuts to define the examined track sample-->
   <parameter name="TrkEffOn" type="bool"> true </parameter>
-  <!--If we want to apply a cut on the minimum TPC hits-->
-  <parameter name="CutOnTPChits" type="int"> 10 </parameter>
-  <!--If we want to apply a cut on the minimum transverse momentum-->
-  <parameter name="CutOnPt" type="float"> 0.3 </parameter>
+  <!--Should be true when we study a simulated physics sample-->
+  <parameter name="PhysSampleOn" type="bool"> false </parameter>
   <parameter name="SimTrackerHitCollections" type="StringVec" lcioInType="SimTrackerHit"> VXDCollection SITCollection TPCCollection </parameter>
   <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
   <parameter name="Verbosity" type="string"> DEBUG4 </parameter>

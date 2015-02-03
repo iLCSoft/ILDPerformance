@@ -28,7 +28,7 @@ INFILE=../Results/RecoFiles/Marlin_Reco_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j
 Marlin Diagnostics.xml \
     --global.LCIOInputFiles=$INFILE \
     --global.GearXMLFile=GearOutput.xml \
-    --MyAIDAProcessor.FileName=analysis_FullTrks_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
+    --MyAIDAProcessor.FileName=analysis_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
     --global.MaxRecordNumber=1000 \
     --global.SkipNEvents=0
 
@@ -41,6 +41,8 @@ done
 
 done
 
+
+root ../macros/Plots.C
 
 
 

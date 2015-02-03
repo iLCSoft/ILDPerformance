@@ -121,6 +121,8 @@ done
 done
 
 
+#==========YOUR ROOT MACRO==============#
 
+root ../macros/Plots.C
 
 

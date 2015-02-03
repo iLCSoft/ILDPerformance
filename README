@@ -5,12 +5,89 @@
 # collection of scripts and steering files for creating 
 # canonical ILD performance plots
 #
+# authors: Yorgos Voutsinas, Alonso Guerrero Llorente
+#
 ###################################################################
 
 
- 1) Tracking resolution:
+BUILD instructions:
 
-   ... to be done ...
+mkdir build; cd build
+cmake -C $ILCSOFT/ILCSoft.cmake .. ; make install
 
 
+1) Resolution plots
+
+Run the runAll.sh
+
+./tracking/scripts/runAll.sh
+
+This scripts simulates single muon tracks, at 4 different polar angles and 8 different momenta
+using Mokka particle gun. Then it reconstructs them using the std reconstruction and then,
+runs a Diagnostics processor which writes down information to a root tree.
+The produced 32 root files are stored at tracking/Results/Analysis.
+Finally runs a root macro, which initiates a ROOT GUI where the user can plot IP and momentum
+resolution.
+
+
+If one wants to modify the detector configuration, he has to edit the mokka section of the runAll.sh
+
+
+The user can reproduce the resolution plots by running
+the corresponding macros located at tracking/macros.
+
+
+By default is the full tracks (MarlinTrkTrack collection) which are studied.
+To change to another track collection, the Diagnostics.xml steerin file has to be edited.
+In particular, the parameter TrackCollection of the RecoMCTruthLinker processor and the parameter
+StudiedTracks of the Diagnostics processor need to be changed.
+These two parameters need to be consistent.
+
+
+It is not needed to run the whole simulation-reconstruction chain again in order to examine a different track collection.
+One can simply run the runAnalysis.sh scripts, which reads the already reconstructed lcio files
+(provided of course that the relevant track collection has been econstructed)
+
+
+One can separately run the simulation, reconstruction and analysis steps by using the scripts that are
+loated in directory tracking/scripts.
+
+
+
+
+2) Tracking pattern recognition
+
+The Diagnostics processor can be used in order to study the efficiency and fake hit rate of a tracking algorithm.
+Script PatRec.sh runs the Diagnostics processor over a reconstructed lcio file. 
+The user has to provide the name and path of the reconstructed file by editing the PatRec.sh and modifying the
+INFILE variable.
+
+To run analysis on a physics sample, the processor parameter PhysSampleOn should be set to true.
+
+Again, are the full tracks the ones that are studied by default. To change that, the user needs to follow same the instructions
+given above.
+
+
+The PatRec.sh will initialise a root session where with the help of a GUI the user can plot what he wants.
+All plots and relevant info is stored in the root file.
+
+
+
+
+3) Track fitting
+
+
+The PatRec.sh script can provide useful information for track fitting as well.
+Assigning a single tracks file to the INFILE variable, the user can plot the track parameter
+residuals and pulls.
+
+
+
+4) Track - hit residuals
+
+
+On going... 
+
+
+ 
 

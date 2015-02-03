@@ -14,7 +14,7 @@
 using namespace std;
 
 #define SIZE_M 8
-#define SIZE_PA 3
+#define SIZE_PA 2
 
 //TGraph *Muon_plot[SIZE_PA];
 
@@ -23,7 +23,7 @@ double sigma[SIZE_M][SIZE_PA], error_sigma[SIZE_M][SIZE_PA];
 int Mom[SIZE_M] = {1, 3, 5, 10, 15, 25, 50, 100};
 float Momentum[SIZE_M] = {1, 3, 5, 10, 15, 25, 50, 100}; 
 float zeros[SIZE_M];
-int PA[SIZE_PA] = {20, 40, 85};
+int PA[SIZE_PA] = {40, 85};
 float LimAxis;
 int color, marker;
 

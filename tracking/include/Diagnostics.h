@@ -160,14 +160,11 @@ class Diagnostics : public Processor {
   std::string _recoToTrue ;
   std::string _mcParticleCollectionName ;
   StringVec   _simTrkHitCollectionNames ;
-  std::string _seedTrackColName ;
   std::string _trackColName ;
-  std::string _siTrackColName ;
   std::string _sitSpacePoints ;
   std::string _sitTrkHitRelations ;
   std::string _vxdTrackerHits ;
   std::string _vxdTrkHitRelations ;
-  std::string _cleoColName ;
 
   int nEvt ;
   int OutSitBkgHit ;
@@ -180,6 +177,8 @@ class Diagnostics : public Processor {
   float _bField ;
 
   bool _trkEffOn ;
+
+  bool _physSampleOn ;
 
 } ;
 

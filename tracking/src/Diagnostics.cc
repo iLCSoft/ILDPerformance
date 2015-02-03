@@ -97,33 +97,19 @@ Diagnostics::Diagnostics() : Processor("Diagnostics") {
 			   std::string("VXDTrackerHits")  ) ;
 
   registerInputCollection( LCIO::TRACK,
-			   "MarlinTrkTracks" , 
+			   "StudiedTracks" , 
 			   "Name of the FullLDC track collection"  ,
 			   _trackColName ,
 			   std::string("MarlinTrkTracks") ) ;  
 
-  registerInputCollection( LCIO::TRACK,
-			   "ClupatraTracks" , 
-			   "Name of the Clupatra track collection"  ,
-			   _cleoColName ,
-			   std::string("ClupatraTracks") ) ;  
-
-
-  registerInputCollection( LCIO::TRACK,
-			   "SeedTracks" , 
-			   "Name of the TPC track collection"  ,
-			   _seedTrackColName ,
-			   std::string("SeedTracks") ) ;
-
-  registerInputCollection( LCIO::TRACK,
-			   "SiTracks" , 
-			   "Name of the Silicon track collection"  ,
-			   _siTrackColName ,
-			   std::string("SiTracks") ) ;
-
   registerProcessorParameter("TrkEffOn",
                              "Enables cuts to define the examined track sample",
                              _trkEffOn,
+                             bool(false));
+
+  registerProcessorParameter("PhysSampleOn",
+                             "Enable when we run diagnostics to a simulated physics sample",
+                             _physSampleOn,
                              bool(false));
 
 }
@@ -143,6 +129,7 @@ void Diagnostics::init() {
   ghostCounter = 0 ;
 
   gROOT->ProcessLine("#include <vector>");
+  //TApplication theApp("tapp", 0, 0);
 
 }
 
@@ -161,19 +148,19 @@ void Diagnostics::processEvent( LCEvent * evt ) {
     EvalTree->Branch("GhostsPt",&GhostsPt) ;
     EvalTree->Branch("SiTrksPt",&SiTrksPt) ;
     EvalTree->Branch("ghostTrkChi2OverNdof",&ghostTrkChi2OverNdof);
-    EvalTree->Branch("SiTrkChi2OverNdof",&SiTrkChi2OverNdof);
-    EvalTree->Branch("CluChi2OverNdof",&CluChi2OverNdof);
+    //EvalTree->Branch("SiTrkChi2OverNdof",&SiTrkChi2OverNdof);
+    //EvalTree->Branch("CluChi2OverNdof",&CluChi2OverNdof);
     EvalTree->Branch("foundTrkChi2OverNdof",&foundTrkChi2OverNdof);
     EvalTree->Branch("PtMCP",&PtMCP) ;
     EvalTree->Branch("InvWgt",&InvWgt) ;
     EvalTree->Branch("Wgt",&Wgt) ;
     EvalTree->Branch("TrackSiHits",&TrackSiHits) ;
-    EvalTree->Branch("SiHitsSiTrk",&SiHitsSiTrk) ;
+    //EvalTree->Branch("SiHitsSiTrk",&SiHitsSiTrk) ;
     EvalTree->Branch("VXDHits",&VXDHits) ;
     EvalTree->Branch("SITHits",&SITHits) ;
     EvalTree->Branch("MarlinTracks",&MarlinTracks,"MarlinTracks/I") ;
-    EvalTree->Branch("SeedTracks",&SeedTracks,"SeedTracks/I") ;
-    EvalTree->Branch("SiliconTracks",&SiliconTracks,"SiliconTracks/I") ;
+    //EvalTree->Branch("SeedTracks",&SeedTracks,"SeedTracks/I") ;
+    //EvalTree->Branch("SiliconTracks",&SiliconTracks,"SiliconTracks/I") ;
     EvalTree->Branch("trueD0",&trueD0) ;
     EvalTree->Branch("trueZ0",&trueZ0) ;
     EvalTree->Branch("recoD0",&recoD0) ;
@@ -190,7 +177,7 @@ void Diagnostics::processEvent( LCEvent * evt ) {
     EvalTree->Branch("recoTanLambda",&recoTanLambda) ;
     EvalTree->Branch("recoTanLambdaError",&recoTanLambdaError) ;
     EvalTree->Branch("ghostCosTheta",&ghostCosTheta) ;
-    EvalTree->Branch("siTrksCosTheta",&siTrksCosTheta) ;
+    //EvalTree->Branch("siTrksCosTheta",&siTrksCosTheta) ;
     EvalTree->Branch("MarlinTrkHits",&MarlinTrkHits) ;
     /*
     EvalTree->Branch("residualOmega",&residualOmega) ;
@@ -230,32 +217,21 @@ void Diagnostics::processEvent( LCEvent * evt ) {
   trueD0.clear();    trueZ0.clear();  trueOmega.clear();   truePhi.clear();  trueTanLambda.clear();
   recoD0.clear();    recoZ0.clear();  recoOmega.clear();   recoPhi.clear();  recoTanLambda.clear();
   recoD0Error.clear();    recoZ0Error.clear();  recoOmegaError.clear();   recoPhiError.clear();  recoTanLambdaError.clear();
-  GhostsPt.clear();  SiTrksPt.clear();  SiHitsSiTrk.clear();
-  foundTrkChi2OverNdof.clear();    SiTrkChi2OverNdof.clear();    ghostTrkChi2OverNdof.clear();  ghostCosTheta.clear();
-  siTrksCosTheta.clear();  MarlinTrkHits.clear();   CluChi2OverNdof.clear();
-  VXDHits.clear();  SITHits.clear();
+  GhostsPt.clear();  
+  foundTrkChi2OverNdof.clear();    ghostTrkChi2OverNdof.clear();  ghostCosTheta.clear();
+  MarlinTrkHits.clear();   VXDHits.clear();  SITHits.clear();
 
   typedef std::map< Track* , int> SiTrackMap;
-  SiTrackMap TrackMap ;
+  //SiTrackMap TrackMap ;
   SiTrackMap MarlinTrkMap ;
 
-  int flagTrack = 0; int flagSeedTrack = 0; int flagSiTrack = 0; int flagTrueReco = 0;  int flagSiRel = 0;
-  int flagRecoToTrue = 0 ; int  flagTrueToReco = 0 ;   int flagCleo = 0 ;
+  int flagTrack = 0; int flagTrueReco = 0;  int flagSiRel = 0; int flagRecoToTrue = 0 ; int  flagTrueToReco = 0 ;   
 
   const StringVec*  colNames = evt->getCollectionNames() ;
   for( StringVec::const_iterator it = colNames->begin() ; it != colNames->end() ; it++ ){
 
     if  ( _trackColName == *it )
       flagTrack = 1 ;
-
-    if  ( _seedTrackColName == *it )
-      flagSeedTrack = 1 ;
-
-    if  ( _siTrackColName == *it )
-      flagSiTrack = 1 ;
-
-    if ( _cleoColName == *it )
-      flagCleo = 1 ;
 
     if  ( _trueToReco  == *it )
       flagTrueReco = 1 ; 
@@ -286,60 +262,7 @@ void Diagnostics::processEvent( LCEvent * evt ) {
   }
 
 
-  if ( flagCleo == 1 ){
-    LCCollection* CluTrks = evt->getCollection( _cleoColName );
-    int ClupatraTracks = CluTrks->getNumberOfElements();
-
-    for ( int ii = 0; ii < ClupatraTracks; ii++ ) {
-
-      Track *CluRecoTrack = dynamic_cast<Track*>( CluTrks->getElementAt( ii ) ) ;
-      double TPCTrkChi2 = CluRecoTrack->getChi2();
-      double TPCTrkNdf = CluRecoTrack->getNdf();
-
-      //int ClupaHits = ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[6] + ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[7];
-
-      if (TPCTrkNdf<0){
-	streamlog_out(DEBUG4) << " No of TPC hits (pat.rec.) " << CluRecoTrack->getSubdetectorHitNumbers()[7] << " No of TPC hits used in fit " << CluRecoTrack->getSubdetectorHitNumbers()[6] << std::endl ;
-      }
-
-       CluChi2OverNdof.push_back( TPCTrkNdf ) ; 
-
-    }
-  }
-
-  
-  if ( flagSeedTrack == 1 ) {
-    LCCollection* SeedTrks = evt->getCollection( _seedTrackColName );
-    SeedTracks = SeedTrks->getNumberOfElements();
-  }
-  
-  if ( flagSiTrack == 1 ) {
-
-    LCCollection* SiTrks = evt->getCollection( _siTrackColName );
-    SiliconTracks = SiTrks->getNumberOfElements();
-
-    for ( int ii = 0; ii < SiliconTracks; ii++ ) {
-      Track *SiRecoTrack = dynamic_cast<Track*>( SiTrks->getElementAt( ii ) ) ;
-      streamlog_out(DEBUG2) << " checking track " << SiRecoTrack << std::endl ;
-      SiTrksPt.push_back( fabs(((3.0/10000.0)*_bField) / SiRecoTrack->getOmega())) ;
-      SiHitsSiTrk.push_back(SiRecoTrack->getSubdetectorHitNumbers()[0] + SiRecoTrack->getSubdetectorHitNumbers()[2]);
-
-      double SiTrkChi2 = SiRecoTrack->getChi2();
-      double SiTrkNdf = SiRecoTrack->getNdf();
-
-      SiTrkChi2OverNdof.push_back( SiTrkChi2/SiTrkNdf ) ; 
-      //else { streamlog_out(DEBUG4) << " What da heel wazzit? " << std::endl ; }
-
-      double Si_Tracks_Cos_Theta = cos ( atan ( (1.0 / SiRecoTrack->getTanLambda()))) ;
-      siTrksCosTheta.push_back( Si_Tracks_Cos_Theta ) ;
-
-      TrackMap[SiRecoTrack] ++ ;
-
-    }
-  }
-  
-
-  for( SiTrackMap::iterator ii=TrackMap.begin(); ii!=TrackMap.end(); ++ii) {
+  for( SiTrackMap::iterator ii=MarlinTrkMap.begin(); ii!=MarlinTrkMap.end(); ++ii) {
     //cout << " Iteration over whole silicon track sample " << (*ii).first << ": " << (*ii).second << endl;
   }
 
@@ -447,8 +370,12 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	streamlog_out( DEBUG ) <<  lcshort( mcp ) << std::endl ;
       
       if ( _trkEffOn ) {
+
+	if ( _physSampleOn ){
 	
-	//APPLY_CUT( DEBUG, cut,  mcp->getGeneratorStatus() == 1   ) ;   // no documentation lines
+	  APPLY_CUT( DEBUG, cut,  mcp->getGeneratorStatus() == 1   ) ;   // no documentation lines
+
+	}
 	
 	gear::Vector3D v( mcp->getVertex()[0], mcp->getVertex()[1], mcp->getVertex()[2] );
 	gear::Vector3D e( mcp->getEndpoint()[0], mcp->getEndpoint()[1], mcp->getEndpoint()[2] );
@@ -708,6 +635,7 @@ void Diagnostics::check( LCEvent * evt ) {
 
 void Diagnostics::end(){ 
 
+  //TApplication theApp("tapp", 0, 0);
   // Writing a canvas with the pulls of the track parameters
 
   pulls->Divide(3,2);
@@ -767,6 +695,16 @@ void Diagnostics::end(){
   eff->Write();
 
   streamlog_out(DEBUG4) << " Number of ghosts being related to an MCParticle " << ghostCounter << std::endl ;
+  /*
+  TApplication theApp("tapp", 0, 0);
 
+  TControlBar bar2("vertical");
+  bar2.AddButton("Residuals","residuals->Draw()", "...  >>Residuals<<");
+  bar2.Show();
+  theApp.Run();
+  //theApp.SetReturnFromRun(true);
+  */
 }
+
+
 
