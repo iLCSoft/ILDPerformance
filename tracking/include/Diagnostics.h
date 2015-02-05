@@ -177,8 +177,14 @@ class Diagnostics : public Processor {
   float _bField ;
 
   bool _trkEffOn ;
-
   bool _physSampleOn ;
+  double _pCut ;
+  double _ptCut ;
+  double _originCut ;
+  double _cosTheta ;
+  double _minPurity ;
+  int _minSiHits ;
+  bool _reqInnVXDHit ;
 
 } ;
 

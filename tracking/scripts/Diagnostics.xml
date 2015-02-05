@@ -83,7 +83,21 @@
   <!--Enables cuts to define the examined track sample-->
   <parameter name="TrkEffOn" type="bool"> true </parameter>
   <!--Should be true when we study a simulated physics sample-->
-  <parameter name="PhysSampleOn" type="bool"> false </parameter>
+  <parameter name="PhysSampleOn" type="bool"> true </parameter>
+  <!--Maximum costheta of examined MCParticles sample-->
+  <parameter name="CosThetaCut" type="double"> 0.9 </parameter>
+  <!--Minimum momentum of examined MCParticles sample (in GeV)-->
+  <parameter name="PCut" type="double"> 0.3 </parameter>
+  <!--Minimum transverse momentum of examined MCParticles sample (in GeV)-->
+  <parameter name="PTCut" type="double"> 0.3 </parameter>
+  <!--Maximum distance from IP of examined MCParticles sample (in mm)-->
+  <parameter name="DistFromIP" type="double"> 10.0 </parameter>
+  <!--ratio of hits belonging to the dominant MC particle to total number of track hits-->
+  <parameter name="RequiredPurity" type="double"> 0.74 </parameter>
+  <!--minimum required hits on Si detectors in order to consider the track found-->
+  <parameter name="RequiredSiHits" type="int"> 4 </parameter>
+  <!--Requirement that the innermost VXD hit should be found-->
+  <parameter name="ReqInnVXDHit" type="bool"> false </parameter>
   <parameter name="SimTrackerHitCollections" type="StringVec" lcioInType="SimTrackerHit"> VXDCollection SITCollection TPCCollection </parameter>
   <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
   <parameter name="Verbosity" type="string"> DEBUG4 </parameter>

@@ -68,7 +68,7 @@ cat >  muons << EOF
 /gun/momentum ${Mom[j]}
 /gun/particle mu-
 
-/run/beamOn 1000
+/run/beamOn 500
 
 EOF
 #=================================================

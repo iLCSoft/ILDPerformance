@@ -112,6 +112,41 @@ Diagnostics::Diagnostics() : Processor("Diagnostics") {
                              _physSampleOn,
                              bool(false));
 
+  registerProcessorParameter("CosThetaCut",
+                             "Maximum costheta of examined MCParticles sample",
+                             _cosTheta,
+                             double(0.9));
+
+  registerProcessorParameter("PCut",
+                             "Minimum momentum of examined MCParticles sample (in GeV)",
+                             _pCut,
+                             double(0.3));
+
+  registerProcessorParameter("PTCut",
+                             "Minimum transverse momentum of examined MCParticles sample (in GeV)",
+                             _ptCut,
+                             double(0.3));
+
+  registerProcessorParameter("DistFromIP",
+                             "Maximum distance from IP of examined MCParticles sample (in mm)",
+                             _originCut,
+                             double(10.0));
+
+  registerProcessorParameter("RequiredPurity",
+                             "ratio of hits belonging to the dominant MC particle to total number of track hits",
+                             _minPurity,
+                             double(0.74));
+
+  registerProcessorParameter("RequiredSiHits",
+                             "minimum required hits on Si detectors in order to consider the track found",
+                             _minSiHits,
+                             int(4));
+
+  registerProcessorParameter("ReqInnVXDHit",
+                             "Requirement that the innermost VXD hit should be found",
+                             _reqInnVXDHit,
+                             bool(false));
+
 }
 
 
@@ -381,7 +416,7 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	gear::Vector3D e( mcp->getEndpoint()[0], mcp->getEndpoint()[1], mcp->getEndpoint()[2] );
 	gear::Vector3D p( mcp->getMomentum()[0], mcp->getMomentum()[1], mcp->getMomentum()[2] );
       
-	APPLY_CUT( DEBUG, cut, v.r() < 10.   ) ;   // start at IP+/-10cm
+	APPLY_CUT( DEBUG, cut, v.r() < _originCut   ) ;   // start at IP+/-10cm
 	
 	// ==== vzeros =========
 	// APPLY_CUT( DEBUG, cut, v.rho() > 100.   ) ;   // non prompt track
@@ -394,11 +429,11 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	
 	//APPLY_CUT( DEBUG, cut, e.rho()==0.0  || e.rho() > 400.   ) ; // end at rho > 40 cm
 	
-	//APPLY_CUT( DEBUG, cut, p.rho() > 0.3 ) ; //FIXME 1. Gev <->  pt> 100 MeV
+	//APPLY_CUT( DEBUG, cut, p.rho() > _pCut ) ; //FIXME 1. Gev <->  pt> 100 MeV
 	
-	//APPLY_CUT( DEBUG, cut, pt > 0.3 ) ; 
+	//APPLY_CUT( DEBUG, cut, pt > _ptCut ) ; 
 	
-	APPLY_CUT( DEBUG, cut, fabs( cos( p.theta() ) )  < 0.9  ) ; //FIXME 0.9 <=> .99  //  | cos( theta ) | > 0.99
+	APPLY_CUT( DEBUG, cut, fabs( cos( p.theta() ) )  < _cosTheta  ) ; //FIXME 0.9 <=> .99  //  | cos( theta ) | > 0.99
 
 	APPLY_CUT( DEBUG, cut, !(mcp->isDecayedInTracker())) ;
 	
@@ -491,10 +526,15 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	//______________________________________________________________________________
 	
 	if ( _trkEffOn ) {
-	  if ( testFromWgt[jj] > 0.74 && SiHits > 3 ) { foundFlag = 1; }
+
+	  if ( _reqInnVXDHit ){
+	    if ( testFromWgt[jj] > _minPurity && SiHits >= _minSiHits && IPFlag==1 ) { foundFlag = 1; }
+	  }
+	  else {
+	  if ( testFromWgt[jj] > _minPurity && SiHits >= _minSiHits ) { foundFlag = 1; }
+	  }
 	  //if ( testWgt[jj] > 0.74 ) { foundFlag = 1; }  // For testing SIT track segment reconstruction efficiency
 	}
-	
 	else {
 	  if ( testFromWgt[jj] > 0.74 ) { foundFlag = 1; }
 	}
