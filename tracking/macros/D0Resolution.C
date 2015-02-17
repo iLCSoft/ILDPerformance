@@ -14,7 +14,7 @@
 using namespace std;
 
 #define SIZE_M 8
-#define SIZE_PA 2
+#define SIZE_PA 3
 
 //TGraph *Muon_plot[SIZE_PA];
 
@@ -23,7 +23,7 @@ double sigma[SIZE_M][SIZE_PA], error_sigma[SIZE_M][SIZE_PA];
 int Mom[SIZE_M] = {1, 3, 5, 10, 15, 25, 50, 100};
 float Momentum[SIZE_M] = {1, 3, 5, 10, 15, 25, 50, 100}; 
 float zeros[SIZE_M];
-int PA[SIZE_PA] = {40, 85};
+int PA[SIZE_PA] = {20, 40, 85};
 float LimAxis;
 int color, marker;
 
@@ -36,7 +36,9 @@ void D0Resolution(){
 
       TFile *f = new TFile(Form("../Results/Analysis/analysis_MuonsAngle_%d_Mom_%d.root",PA[ii],Mom[i]), "read");
       TTree *EvalTree = (TTree*)f->Get("MyRecoMCTruthLinker/EvalTree");
-    
+
+      printf( " I am studying file analysis_MuonsAngle_%d_Mom_%d.root ",PA[ii],Mom[i]);    
+
       vector<float> *recoD0;
       vector<float> *trueD0; 
 	
@@ -52,7 +54,7 @@ void D0Resolution(){
       }
       else{
 	if (Mom[i] == 1 && PA[ii] == 20){
-	  LimAxis = 2.0;
+	  LimAxis = 1.0;
 	}
 	else{
 	    LimAxis = 0.07;
@@ -71,8 +73,8 @@ void D0Resolution(){
       
       h1->Fit("gaus");
       TF1 *fit1 = (TF1*)h1->GetFunction("gaus");
-      sigma[i][ii] = 1000*(fit1->GetParameter(2));
-      error_sigma[i][ii] =  1000*(fit1->GetParError(2));
+      sigma[i][ii] = (fit1->GetParameter(2));
+      error_sigma[i][ii] =  (fit1->GetParError(2));
 
       //std::cout << " angle " << PA[ii] << " momentum " << Mom[i] << " sigma " << sigma[i][ii] << std::endl ;
       
@@ -80,7 +82,7 @@ void D0Resolution(){
     }//loop for each .root files, here I have collected sigma and its error
   }//polar angle loop
 
-  /*   
+    
   float sigma20[SIZE_M];
   float error20[SIZE_M];
   float r_error20[SIZE_M];
@@ -89,22 +91,22 @@ void D0Resolution(){
     error20[kk] = error_sigma[kk][0];
     r_error20[kk] = 100*(error_sigma[kk][0]/sigma[kk][0]);
   }  
-  */
+  
 
   float sigma40[SIZE_M];
   float error40[SIZE_M];
   float r_error40[SIZE_M];
   for(int kk=0; kk < SIZE_M; kk++){
-    sigma40[kk] = sigma[kk][0];
-    error40[kk] = error_sigma[kk][0];
+    sigma40[kk] = sigma[kk][1];
+    error40[kk] = error_sigma[kk][1];
   }
 
   float sigma85[SIZE_M];
   float error85[SIZE_M];
   float r_error85[SIZE_M];
   for(int kk=0; kk < SIZE_M; kk++){
-    sigma85[kk] = sigma[kk][1];
-    error85[kk] = error_sigma[kk][1];
+    sigma85[kk] = sigma[kk][2];
+    error85[kk] = error_sigma[kk][2];
   }
 
 
@@ -120,10 +122,10 @@ void D0Resolution(){
   Muon_plot40 -> SetMarkerSize(1);
   Muon_plot40 -> GetXaxis() -> SetTitle("p_{T} (GeV)");
   Muon_plot40 -> GetYaxis() -> SetTitle("#sigma_{d0}(#mum)");
-  Muon_plot40 -> SetMinimum( pow(10,-2) );
-  Muon_plot40 -> SetMaximum( 100.0 );
+  Muon_plot40 -> SetMinimum( pow(10,-3) );
+  Muon_plot40 -> SetMaximum( 0.5 );
   Muon_plot40 -> Draw("AP");
-  /*  
+    
   //c_two->cd(1);
   TGraphErrors *Muon_plot20 = new TGraphErrors(SIZE_M, Momentum, sigma20, zeros, error20);
   Muon_plot20 -> SetTitle("Distance Resolution");
@@ -133,7 +135,7 @@ void D0Resolution(){
   Muon_plot20 -> GetXaxis() -> SetTitle("p_{T} (GeV)");
   Muon_plot20 -> GetYaxis() -> SetTitle("#sigma_{d0}(#mum)");
   Muon_plot20 -> Draw("P");
-  */
+  
   //c_two->cd(1);
   TGraphErrors *Muon_plot85 = new TGraphErrors(SIZE_M, Momentum, sigma85, zeros, error85 );
   Muon_plot85 -> SetTitle("Impact Parameter Resolution");
@@ -150,7 +152,7 @@ void D0Resolution(){
 
   TLegend *leg = new TLegend(0.6,0.7,0.75,0.95);
   //leg->SetHeader("Polar Angles"); //name of the legend
-  //leg->AddEntry(Muon_plot20,"#theta = 20^{o}","p");
+  leg->AddEntry(Muon_plot20,"#theta = 20^{o}","p");
   leg->AddEntry(Muon_plot40,"#theta = 40^{o}","p");
   leg->AddEntry(Muon_plot85,"#theta = 85^{o}","p");
   leg->Draw();

@@ -81,7 +81,7 @@
   <!--Name of the MCParticle input collection-->
   <parameter name="MCParticleCollection" type="string" lcioInType="MCParticle"> MCParticle </parameter>
   <!--Enables cuts to define the examined track sample-->
-  <parameter name="TrkEffOn" type="bool"> true </parameter>
+  <parameter name="TrkEffOn" type="bool"> false </parameter>
   <!--Should be true when we study a simulated physics sample-->
   <parameter name="PhysSampleOn" type="bool"> false </parameter>
   <!--Maximum costheta of examined MCParticles sample-->
