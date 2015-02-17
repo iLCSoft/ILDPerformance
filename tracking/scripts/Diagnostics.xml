@@ -83,7 +83,7 @@
   <!--Enables cuts to define the examined track sample-->
   <parameter name="TrkEffOn" type="bool"> true </parameter>
   <!--Should be true when we study a simulated physics sample-->
-  <parameter name="PhysSampleOn" type="bool"> true </parameter>
+  <parameter name="PhysSampleOn" type="bool"> false </parameter>
   <!--Maximum costheta of examined MCParticles sample-->
   <parameter name="CosThetaCut" type="double"> 0.9 </parameter>
   <!--Minimum momentum of examined MCParticles sample (in GeV)-->
