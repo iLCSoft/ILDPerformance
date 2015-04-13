@@ -1,0 +1,107 @@
+<!--
+      Example steering file to run a standard reconstruction on the 3 ttbar events 
+      simulated with Mokka in this example dierectory.
+
+      Works with ilcsoft v01-16 (DBD production release)
+
+      Defines the standard reconstruction for ILD.
+-->
+
+
+ <marlin>
+   
+   <execute>
+     <processor name="MyAIDAProcessor"/>
+     <processor name="MyRecoMCTruthLinker"/>
+     <processor name="MyDiagnostics"/>
+   </execute>
+
+   <global> 
+      <parameter name="LCIOInputFiles">forCHEP_pt5.slcio  </parameter>
+      <parameter name="GearXMLFile" value="/nfs/dust/ilc/user/voutsina/nbuilds/2015-03-12/sl6-nb_debug/lcgeo/HEAD/example/gear_SimpleILD_DD4hep.xml"/>
+      <parameter name="MaxRecordNumber" value="0"/>
+      <parameter name="SkipNEvents" value="0"/>
+      <parameter name="SupressCheck" value="false"/>
+      <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT"> MESSAGE </parameter>
+      <parameter name="RandomSeed" value="1234567890" />
+   </global>
+
+
+ 
+ <processor name="MyAIDAProcessor" type="AIDAProcessor">
+ <!--Processor that handles AIDA files. Creates on directory per processor.  Processors only need to create and fill the histograms, clouds and tuples. Needs to be the first ActiveProcessor-->
+  <!-- compression of output file 0: false >0: true (default) -->
+  <parameter name="Compress" type="int" value="1"/>
+  <!-- filename without extension-->
+  <parameter name="FileName" type="string" value="forCHEP_pt5"/>
+  <!-- type of output file xml (default) or root ( only OpenScientist)-->
+  <parameter name="FileType" type="string" value="root "/>
+</processor>
+
+
+ <processor name="MyRecoMCTruthLinker" type="RecoMCTruthLinker">
+ <!--links RecontructedParticles to the MCParticle based on number of hits used-->
+  <!--Name of the MCParticle input collection-->
+  <parameter name="MCParticleCollection" type="string" lcioInType="MCParticle"> MCParticle </parameter>
+  <!--Name of the ReconstructedParticles input collection-->
+  <parameter name="RecoParticleCollection" type="string" lcioInType="ReconstructedParticle"> PandoraPFOs </parameter>
+  <!--Name of the  SimCalorimeterHit - CalorimeterHit relation-->
+  <parameter name="SimCalorimeterHitRelationName" type="string" lcioInType="LCRelation"> RelationCaloHit </parameter>
+  <!--Name of the Tracks input collection-->
+  <parameter name="TrackCollection" type="string" lcioInType="Track"> SiTracks </parameter>
+  <!--Name of the trackMCTruthLink output collection - not created if empty()-->
+  <parameter name="TrackMCTruthLinkName" type="string" lcioOutType="LCRelation"> SiTracksMCTruthLink </parameter>
+  <!--Name of the MCParticle to Track relation output collection - not created if empty()-->
+  <parameter name="MCTruthTrackLinkName" type="string" lcioOutType="LCRelation"> MCTruthSiTracksLink </parameter>
+   <!--Name of the skimmed MCParticle  output collection-->
+  <parameter name="MCParticlesSkimmedName" type="string" lcioOutType="MCParticle"> MCParticlesSkimmed </parameter>
+  <!--Name of the RecoMCTruthLink output collection-->
+  <parameter name="RecoMCTruthLinkName" type="string" lcioOutType="LCRelation"> RecoMCTruthLink </parameter>
+  <!--PDG codes of particles of which the daughters will be kept in the skimmmed MCParticle collection-->
+  <parameter name="KeepDaughtersPDG" type="IntVec"> 22 111 310 13 211 321</parameter>
+  <!--true: use relations for TrackerHits, false : use getRawHits -->
+  <parameter name="UseTrackerHitRelations" type="bool">true </parameter>
+  <!--If Using Particle Gun Ignore Gen Stat-->
+  <parameter name="UsingParticleGun" type="bool"> true </parameter>
+  <!--Names of the SimTrackerHits input collection-->
+  <parameter name="SimTrackerHitCollections" type="StringVec" lcioInType="SimTrackerHit">VXDCollection SITCollection FTD_PIXELCollection FTD_STRIPCollection TPCCollection SETCollection  </parameter>
+  <!--Name of the lcrelation collections, that link the TrackerHits to their SimTrackerHits. -->
+  <parameter name="TrackerHitsRelInputCollections" type="StringVec" lcioInType="LCRelation">VXDTrackerHitRelations SITSpacePointRelations FTDPixelTrackerHitRelations FTDSpacePointRelations TPCTrackerHitRelations SETSpacePointRelations  </parameter>
+  <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+  <parameter name="Verbosity" type="string"> DEBUG4 </parameter>
+  </processor>
+
+ <processor name="MyDiagnostics" type="Diagnostics">
+  <!--Name of the studied track collection-->
+  <parameter name="StudiedTracks" type="string" lcioInType="Track"> SiTracks </parameter>
+  <!--true - reco relation collection-->
+  <parameter name="MCTracksTruthLinkCollectionName" type="string" lcioInType="Track"> MCTruthSiTracksLink </parameter>
+  <!--reco - true relation collection-->
+  <parameter name="TracksMCTruthLinkCollectionName" type="string" lcioInType="Track"> SiTracksMCTruthLink </parameter>
+  <!--Name of the MCParticle input collection-->
+  <parameter name="MCParticleCollection" type="string" lcioInType="MCParticle"> MCParticle </parameter>
+  <!--Enables cuts to define the examined track sample-->
+  <parameter name="TrkEffOn" type="bool"> false </parameter>
+  <!--Should be true when we study a simulated physics sample-->
+  <parameter name="PhysSampleOn" type="bool"> false </parameter>
+  <!--Maximum costheta of examined MCParticles sample-->
+  <parameter name="CosThetaCut" type="double"> 0.9 </parameter>
+  <!--Minimum momentum of examined MCParticles sample (in GeV)-->
+  <parameter name="PCut" type="double"> 0.3 </parameter>
+  <!--Minimum transverse momentum of examined MCParticles sample (in GeV)-->
+  <parameter name="PTCut" type="double"> 0.3 </parameter>
+  <!--Maximum distance from IP of examined MCParticles sample (in mm)-->
+  <parameter name="DistFromIP" type="double"> 10.0 </parameter>
+  <!--ratio of hits belonging to the dominant MC particle to total number of track hits-->
+  <parameter name="RequiredPurity" type="double"> 0.74 </parameter>
+  <!--minimum required hits on Si detectors in order to consider the track found-->
+  <parameter name="RequiredSiHits" type="int"> 4 </parameter>
+  <!--Requirement that the innermost VXD hit should be found-->
+  <parameter name="ReqInnVXDHit" type="bool"> false </parameter>
+  <parameter name="SimTrackerHitCollections" type="StringVec" lcioInType="SimTrackerHit"> VXDCollection SITCollection TPCCollection </parameter>
+  <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+  <parameter name="Verbosity" type="string"> DEBUG4 </parameter>
+</processor>
+
+  
+</marlin>
