@@ -26,14 +26,13 @@
       <parameter name="RandomSeed" value="1234567890" />
    </global>
 
-
  
  <processor name="MyAIDAProcessor" type="AIDAProcessor">
  <!--Processor that handles AIDA files. Creates on directory per processor.  Processors only need to create and fill the histograms, clouds and tuples. Needs to be the first ActiveProcessor-->
   <!-- compression of output file 0: false >0: true (default) -->
   <parameter name="Compress" type="int" value="1"/>
   <!-- filename without extension-->
-  <parameter name="FileName" type="string" value="Results/ildperf"/>
+  <parameter name="FileName" type="string" value="higgsino_ca_badtrks_test"/>
   <!-- type of output file xml (default) or root ( only OpenScientist)-->
   <parameter name="FileType" type="string" value="root "/>
 </processor>
@@ -68,7 +67,7 @@
   <!--Name of the lcrelation collections, that link the TrackerHits to their SimTrackerHits. -->
   <parameter name="TrackerHitsRelInputCollections" type="StringVec" lcioInType="LCRelation">VXDTrackerHitRelations SITSpacePointRelations FTDPixelTrackerHitRelations FTDSpacePointRelations TPCTrackerHitRelations SETSpacePointRelations  </parameter>
   <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
-  <parameter name="Verbosity" type="string"> DEBUG4 </parameter>
+  <parameter name="Verbosity" type="string"> SILENT </parameter>
   </processor>
 
  <processor name="MyDiagnostics" type="Diagnostics">
@@ -81,9 +80,11 @@
   <!--Name of the MCParticle input collection-->
   <parameter name="MCParticleCollection" type="string" lcioInType="MCParticle"> MCParticle </parameter>
   <!--Enables cuts to define the examined track sample-->
-  <parameter name="TrkEffOn" type="bool"> false </parameter>
+  <parameter name="TrkEffOn" type="bool"> true </parameter>
+  <!--To study the Silicon tracking efficiency-->
+  <parameter name="SiTrkEffOn" type="bool"> false </parameter>
   <!--Should be true when we study a simulated physics sample-->
-  <parameter name="PhysSampleOn" type="bool"> false </parameter>
+  <parameter name="PhysSampleOn" type="bool"> true </parameter>
   <!--Maximum costheta of examined MCParticles sample-->
   <parameter name="CosThetaCut" type="double"> 0.9 </parameter>
   <!--Minimum momentum of examined MCParticles sample (in GeV)-->
@@ -100,7 +101,7 @@
   <parameter name="ReqInnVXDHit" type="bool"> false </parameter>
   <parameter name="SimTrackerHitCollections" type="StringVec" lcioInType="SimTrackerHit"> VXDCollection SITCollection TPCCollection </parameter>
   <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
-  <parameter name="Verbosity" type="string"> DEBUG4 </parameter>
+  <parameter name="Verbosity" type="string"> MESSAGE </parameter>
 </processor>
 
   

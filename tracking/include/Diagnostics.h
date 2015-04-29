@@ -55,73 +55,6 @@ class Diagnostics : public Processor {
   
  public:
  
-  // declaration of trees
-  TTree *EvalTree ;
-  vector<int> foundTrk;
-  vector<int> TrackSiHits;
-  vector<int> SiHitsSiTrk ;
-  vector<int> MarlinTrkHits ;
-  vector<int> VXDHits ;
-  vector<int> SITHits ;
-  vector<float> foundTrkChi2OverNdof ;
-  vector<float> ghostTrkChi2OverNdof ;
-  vector<float> CluChi2OverNdof ;
-  vector<float> SiTrkChi2OverNdof ;
-  vector<float> PtReco;
-  vector<float> GhostsPt;
-  vector<float> SiTrksPt;
-  vector<float> PtMCP;
-  vector<float> Wgt;
-  vector<float> InvWgt;
-  vector<float> trueD0;
-  vector<float> trueZ0;
-  vector<float> trueOmega;
-  vector<float> truePhi;
-  vector<float> trueTanLambda;
-  vector<float> recoD0;
-  vector<float> recoZ0;
-  vector<float> recoD0Error;
-  vector<float> recoZ0Error;
-  vector<float> recoOmega;
-  vector<float> recoPhi;
-  vector<float> recoTanLambda;
-  vector<float> recoD0error;
-  vector<float> recoZ0error;
-  vector<float> recoOmegaError;
-  vector<float> recoPhiError;
-  vector<float> recoTanLambdaError;
-  vector<float> ghostCosTheta;
-  vector<float> siTrksCosTheta;
-
-
-  int MarlinTracks;
-  int SeedTracks;
-  int SiliconTracks;
-
-  TH1F *OmegaPull; 
-  TH1F *PhiPull; 
-  TH1F *TanLambdaPull; 
-  TH1F *d0pull; 
-  TH1F *z0pull; 
-
-  TH1F *OmegaResidual; 
-  TH1F *PhiResidual; 
-  TH1F *TanLambdaResidual; 
-  TH1F *d0Residual; 
-  TH1F *z0Residual; 
-
-  static const int nBins = 13 ;
-
-  TH1F *hist_pt_t ;
-  TH1F *hist_pt_f ;
-
-  TCanvas *pulls;
-  TCanvas *residuals;
-  TCanvas *eff;
-
-  TF1 *myfunc ;
-
-  TGraphAsymmErrors *gpt;
 
   virtual Processor*  newProcessor() { return new Diagnostics ; }
   
@@ -165,6 +98,9 @@ class Diagnostics : public Processor {
   std::string _sitTrkHitRelations ;
   std::string _vxdTrackerHits ;
   std::string _vxdTrkHitRelations ;
+  std::string _BCALParticleCollectionName ;
+  std::string _BCALClusterCollectionName ;
+  std::string _pandoraPFOs ;
 
   int nEvt ;
   int OutSitBkgHit ;
@@ -176,7 +112,8 @@ class Diagnostics : public Processor {
 
   float _bField ;
 
-  bool _trkEffOn ;
+  bool _trkEffOn ; 
+  bool _siTrkEffOn ;
   bool _physSampleOn ;
   double _pCut ;
   double _ptCut ;
@@ -185,6 +122,83 @@ class Diagnostics : public Processor {
   double _minPurity ;
   int _minSiHits ;
   bool _reqInnVXDHit ;
+
+ private:
+
+  // declaration of trees
+  TTree *EvalTree ;
+  vector<int> foundTrk;
+  vector<int> TrackSiHits;
+  vector<int> SiHitsSiTrk ;
+  vector<int> MarlinTrkHits ;
+  vector<float> BadTrksD0 ;
+  vector<float> BadTrksZ0 ;
+  vector<int> VXDHits ;
+  vector<int> SITHits ;
+  vector<int> ghost_hits;
+  vector<float> foundTrkChi2OverNdof ;
+  vector<float> ghostTrkChi2OverNdof ;
+  vector<float> CluChi2OverNdof ;
+  vector<float> SiTrkChi2OverNdof ;
+  vector<float> PtReco;
+  vector<float> GhostsPt;
+  vector<float> SiTrksPt;
+  vector<float> PtMCP;
+  vector<float> Wgt;
+  vector<float> InvWgt;
+  vector<float> trueD0;
+  vector<float> trueZ0;
+  vector<float> trueOmega;
+  vector<float> truePhi;
+  vector<float> trueTanLambda;
+  vector<float> recoD0;
+  vector<float> recoZ0;
+  vector<float> recoD0Error;
+  vector<float> recoZ0Error;
+  vector<float> recoOmega;
+  vector<float> recoPhi;
+  vector<float> recoTanLambda;
+  vector<float> recoD0error;
+  vector<float> recoZ0error;
+  vector<float> recoOmegaError;
+  vector<float> recoPhiError;
+  vector<float> recoTanLambdaError;
+  vector<float> ghostCosTheta;
+  vector<float> siTrksCosTheta;
+
+
+  int MarlinTracks;
+  int SeedTracks;
+  int SiliconTracks;
+  int BCalParts;
+  int BCalCls;
+  int pfos ;
+
+  TH1F *OmegaPull; 
+  TH1F *PhiPull; 
+  TH1F *TanLambdaPull; 
+  TH1F *d0pull; 
+  TH1F *z0pull; 
+
+  TH1F *OmegaResidual; 
+  TH1F *PhiResidual; 
+  TH1F *TanLambdaResidual; 
+  TH1F *d0Residual; 
+  TH1F *z0Residual; 
+
+  static const int nBins = 13 ;
+
+  TH1F *hist_pt_t ;
+  TH1F *hist_pt_f ;
+
+  TCanvas *pulls;
+  TCanvas *residuals;
+  TCanvas *eff;
+
+  TF1 *myfunc ;
+
+  TGraphAsymmErrors *gpt;
+
 
 } ;
 

@@ -68,8 +68,9 @@ Again, are the full tracks the ones that are studied by default. To change that,
 given above.
 
 
-The track is considered as found if >= 75% of the track hits belong to the dominant MC particle && the track has at least 4 silicon (VXD - SIT) hits.
-This is filter focusing on silicon tracking studies. The user can change the definiton of found track, as well as the composition of the 
+The track is considered as found if >= 75% of the track hits belong to the dominant MC particle. If one wants to focus on Silicon tracking, one 
+needs to set the processor parameter SiTrkEffOn as true. Then the track is considered as found if >= 75% of the track hits belong to the dominant MC 
+particle && the track has at least 4 silicon (VXD - SIT) hits. The user can change the definiton of found track, as well as the composition of the 
 studied MCParticle subsample by modifying the corresponding processor parameters in the steering file Diagnostics.xml
 
 

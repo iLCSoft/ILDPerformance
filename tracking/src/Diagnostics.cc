@@ -72,6 +72,27 @@ Diagnostics::Diagnostics() : Processor("Diagnostics") {
 			   _mcParticleCollectionName ,
 			   std::string("MCParticle") ) ;
 
+  // Additions for higgsino analysis
+
+  registerInputCollection( LCIO::RECONSTRUCTEDPARTICLE,
+			   "BCALParticles" , 
+			   "Name of the BCALParticles input collection"  ,
+			   _BCALParticleCollectionName ,
+			   std::string("BCALParticles") ) ;
+
+  registerInputCollection( LCIO::CLUSTER,
+			   "BCALCLusters" , 
+			   "Name of the BCAL clusters input collection"  ,
+			   _BCALClusterCollectionName ,
+			   std::string("BCALCLusters") ) ;
+
+
+  registerInputCollection( LCIO::RECONSTRUCTEDPARTICLE,
+                            "PFOs" , 
+                            "particle flow objects"  ,
+                            _pandoraPFOs ,
+                            std::string("PandoraPFOs") ) ;
+
 
   StringVec exampleSimHits ;
   exampleSimHits.push_back("VXDCollection") ;
@@ -105,6 +126,11 @@ Diagnostics::Diagnostics() : Processor("Diagnostics") {
   registerProcessorParameter("TrkEffOn",
                              "Enables cuts to define the examined track sample",
                              _trkEffOn,
+                             bool(false));
+
+  registerProcessorParameter("SiTrkEffOn",
+                             "Enables cuts to define the examined track sample",
+                             _siTrkEffOn,
                              bool(false));
 
   registerProcessorParameter("PhysSampleOn",
@@ -179,6 +205,9 @@ void Diagnostics::processEvent( LCEvent * evt ) {
   if( isFirstEvent() ) { 
     EvalTree = new TTree("EvalTree","EvalTree");
     EvalTree->Branch("foundTrk",&foundTrk) ;
+    EvalTree->Branch("BCalParts",&BCalParts,"BCalParts/I") ;
+    EvalTree->Branch("BCalCls",&BCalCls,"BCalCls/I") ;
+    EvalTree->Branch("pfos",&pfos,"pfos/I") ;
     EvalTree->Branch("PtReco",&PtReco) ;
     EvalTree->Branch("GhostsPt",&GhostsPt) ;
     EvalTree->Branch("SiTrksPt",&SiTrksPt) ;
@@ -193,6 +222,7 @@ void Diagnostics::processEvent( LCEvent * evt ) {
     //EvalTree->Branch("SiHitsSiTrk",&SiHitsSiTrk) ;
     EvalTree->Branch("VXDHits",&VXDHits) ;
     EvalTree->Branch("SITHits",&SITHits) ;
+    EvalTree->Branch("ghost_hits",&ghost_hits) ;
     EvalTree->Branch("MarlinTracks",&MarlinTracks,"MarlinTracks/I") ;
     //EvalTree->Branch("SeedTracks",&SeedTracks,"SeedTracks/I") ;
     //EvalTree->Branch("SiliconTracks",&SiliconTracks,"SiliconTracks/I") ;
@@ -214,6 +244,8 @@ void Diagnostics::processEvent( LCEvent * evt ) {
     EvalTree->Branch("ghostCosTheta",&ghostCosTheta) ;
     //EvalTree->Branch("siTrksCosTheta",&siTrksCosTheta) ;
     EvalTree->Branch("MarlinTrkHits",&MarlinTrkHits) ;
+    EvalTree->Branch("BadTrksD0",&BadTrksD0) ;
+    EvalTree->Branch("BadTrksZ0",&BadTrksZ0) ;
     /*
     EvalTree->Branch("residualOmega",&residualOmega) ;
     EvalTree->Branch("residualD0",&residualD0) ;
@@ -255,12 +287,15 @@ void Diagnostics::processEvent( LCEvent * evt ) {
   GhostsPt.clear();  
   foundTrkChi2OverNdof.clear();    ghostTrkChi2OverNdof.clear();  ghostCosTheta.clear();
   MarlinTrkHits.clear();   VXDHits.clear();  SITHits.clear();
+  BadTrksZ0.clear();  BadTrksD0.clear(); ghost_hits.clear();
+
 
   typedef std::map< Track* , int> SiTrackMap;
   //SiTrackMap TrackMap ;
   SiTrackMap MarlinTrkMap ;
 
-  int flagTrack = 0; int flagTrueReco = 0;  int flagSiRel = 0; int flagRecoToTrue = 0 ; int  flagTrueToReco = 0 ;   
+  int flagTrack = 0; int flagTrueReco = 0;  int flagSiRel = 0; int flagRecoToTrue = 0 ; int  flagTrueToReco = 0 ;
+  int  flagBCALPart = 0 ;     int  flagBCALCluster = 0 ;   int flagPFO = 0 ;
 
   const StringVec*  colNames = evt->getCollectionNames() ;
   for( StringVec::const_iterator it = colNames->begin() ; it != colNames->end() ; it++ ){
@@ -280,6 +315,15 @@ void Diagnostics::processEvent( LCEvent * evt ) {
     if  ( _trueToReco == *it )
       flagTrueToReco = 1 ;
 
+    if (  _BCALParticleCollectionName == *it )
+      flagBCALPart = 1 ;
+
+    if (  _BCALClusterCollectionName == *it )
+      flagBCALCluster = 1 ;
+
+    if ( _pandoraPFOs  == *it )
+      flagPFO = 1 ;
+
   }
 
 
@@ -292,14 +336,27 @@ void Diagnostics::processEvent( LCEvent * evt ) {
       Track *MarlinRecoTrack = dynamic_cast<Track*>( MarlinTrks->getElementAt( ii ) ) ;
       MarlinTrkMap[MarlinRecoTrack] ++ ;
       MarlinTrkHits.push_back(MarlinRecoTrack->getTrackerHits().size());
-
+      //BadTrksD0.push_back(MarlinRecoTrack->getD0());
+      //BadTrksZ0.push_back(MarlinRecoTrack->getZ0());
     }
   }
 
 
-  for( SiTrackMap::iterator ii=MarlinTrkMap.begin(); ii!=MarlinTrkMap.end(); ++ii) {
-    //cout << " Iteration over whole silicon track sample " << (*ii).first << ": " << (*ii).second << endl;
+  if (flagBCALPart == 1 ){
+    LCCollection* BCalParty = evt->getCollection( _BCALParticleCollectionName );
+    BCalParts = BCalParty->getNumberOfElements();
   }
+
+  if (flagBCALCluster == 1 ){
+    LCCollection* BCalClassy = evt->getCollection( _BCALParticleCollectionName );
+    BCalCls = BCalClassy->getNumberOfElements();
+  }
+  
+  if (flagPFO == 1 ){
+    LCCollection* Particles = evt->getCollection( _pandoraPFOs );
+    pfos = Particles->getNumberOfElements();
+  }
+  
 
   if ( flagRecoToTrue == 1 && flagTrueToReco == 1 ){   // condition for the existence of the relation collections
     
@@ -415,7 +472,7 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	gear::Vector3D v( mcp->getVertex()[0], mcp->getVertex()[1], mcp->getVertex()[2] );
 	gear::Vector3D e( mcp->getEndpoint()[0], mcp->getEndpoint()[1], mcp->getEndpoint()[2] );
 	gear::Vector3D p( mcp->getMomentum()[0], mcp->getMomentum()[1], mcp->getMomentum()[2] );
-      
+      	
 	APPLY_CUT( DEBUG, cut, v.r() < _originCut   ) ;   // start at IP+/-10cm
 	
 	// ==== vzeros =========
@@ -443,7 +500,7 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	
 	//....
 	
-      } 
+	} 
       
       if( cut ) {
 	mcpTracks.push_back( mcp ) ;
@@ -525,7 +582,7 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	}
 	//______________________________________________________________________________
 	
-	if ( _trkEffOn ) {
+	if ( _siTrkEffOn ) {
 
 	  if ( _reqInnVXDHit ){
 	    if ( testFromWgt[jj] > _minPurity && SiHits >= _minSiHits && IPFlag==1 ) { foundFlag = 1; }
@@ -533,10 +590,10 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	  else {
 	  if ( testFromWgt[jj] > _minPurity && SiHits >= _minSiHits ) { foundFlag = 1; }
 	  }
-	  //if ( testWgt[jj] > 0.74 ) { foundFlag = 1; }  // For testing SIT track segment reconstruction efficiency
 	}
 	else {
-	  if ( testFromWgt[jj] > 0.74 ) { foundFlag = 1; }
+	  if ( testFromWgt[jj] > _minPurity ) { foundFlag = 1; }
+	  std::cout << " I use that cut " << std::endl;
 	}
 	
 	HelixClass helix ;
@@ -580,6 +637,7 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	  double rec_tanlambda_err = ((Track*)trkvec[jj])->getCovMatrix()[14] ;
 	  float recoPt = fabs(((3.0/10000.0)*_bField)/(((Track*)trkvec[jj])->getOmega())) ;
 	  float recoP = recoPt * sqrt(1+(((Track*)trkvec[jj])->getTanLambda())*(((Track*)trkvec[jj])->getTanLambda()));
+
 	  
 	  trueD0.push_back(d0mcp);
 	  trueZ0.push_back(z0mcp);
@@ -638,22 +696,32 @@ void Diagnostics::processEvent( LCEvent * evt ) {
       {
 	cout << " Found silicon tracks " << (*ii).first << ": " << (*ii).second << endl;
 	if ( (*ii).second == 1 ) {
-	  GhostsPt.push_back( fabs(((3.0/10000.0)*_bField) / ((*ii).first)->getOmega())) ;
+
 	  const EVENT::LCObjectVec& mcprelvec = nav.getRelatedFromObjects((*ii).first);
 
 	  double ghost_Cos_Theta = cos ( atan ( (1.0 / ((*ii).first)->getTanLambda()))) ;
-	  ghostCosTheta.push_back( ghost_Cos_Theta ) ;
 
-	  streamlog_out(DEBUG4) << " Adding to the ghosts - bkg track list, track " <<  (*ii).first << " with momentum " << fabs(((3.0/10000.0)*_bField) / ((*ii).first)->getOmega()) << " being related to " << mcprelvec.size() << " MCParticles "  << std::endl ;
+	  TrackerHitVec ghostTrkHits = ((*ii).first)->getTrackerHits();
+	  ghost_hits.push_back(ghostTrkHits.size());
 
-	  double ghostTrkChi2 = ((*ii).first)->getChi2();
-	  double ghostTrkNdf = ((*ii).first)->getNdf();
-	  
-	  if ( ghostTrkNdf != 0 ) { ghostTrkChi2OverNdof.push_back( ghostTrkChi2/ghostTrkNdf ) ; }
+	  if (ghost_Cos_Theta < _cosTheta ) {
+	    streamlog_out(DEBUG4) << " Adding to the ghosts - bkg track list, track " <<  (*ii).first << " with momentum " << fabs(((3.0/10000.0)*_bField) / ((*ii).first)->getOmega()) << " & no of hits " <<  ghostTrkHits.size() << " being related to " << mcprelvec.size() << " MCParticles "  << std::endl ;
+	    
+	    GhostsPt.push_back( fabs(((3.0/10000.0)*_bField) / ((*ii).first)->getOmega())) ;
+	    ghostCosTheta.push_back( ghost_Cos_Theta ) ;
 
-	  ghostCounter++ ;
-
-	}
+	    double ghostTrkChi2 = ((*ii).first)->getChi2();
+	    double ghostTrkNdf = ((*ii).first)->getNdf();
+	    BadTrksD0.push_back(((*ii).first)->getD0());
+	    BadTrksZ0.push_back(((*ii).first)->getZ0());
+	    
+	    
+	    if ( ghostTrkNdf != 0 ) { ghostTrkChi2OverNdof.push_back( ghostTrkChi2/ghostTrkNdf ) ; }
+	    
+	    ghostCounter++ ;
+	    
+	  }
+        }
       }
     
   }  // condition for the existence of the relation collections
