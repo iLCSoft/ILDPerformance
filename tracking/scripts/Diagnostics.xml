@@ -32,7 +32,7 @@
   <!-- compression of output file 0: false >0: true (default) -->
   <parameter name="Compress" type="int" value="1"/>
   <!-- filename without extension-->
-  <parameter name="FileName" type="string" value="higgsino_ca_badtrks_test"/>
+  <parameter name="FileName" type="string" value="analysis_output"/>
   <!-- type of output file xml (default) or root ( only OpenScientist)-->
   <parameter name="FileType" type="string" value="root "/>
 </processor>
@@ -67,7 +67,7 @@
   <!--Name of the lcrelation collections, that link the TrackerHits to their SimTrackerHits. -->
   <parameter name="TrackerHitsRelInputCollections" type="StringVec" lcioInType="LCRelation">VXDTrackerHitRelations SITSpacePointRelations FTDPixelTrackerHitRelations FTDSpacePointRelations TPCTrackerHitRelations SETSpacePointRelations  </parameter>
   <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
-  <parameter name="Verbosity" type="string"> SILENT </parameter>
+  <parameter name="Verbosity" type="string"> MESSAGE </parameter>
   </processor>
 
  <processor name="MyDiagnostics" type="Diagnostics">
@@ -84,9 +84,9 @@
   <!--To study the Silicon tracking efficiency-->
   <parameter name="SiTrkEffOn" type="bool"> false </parameter>
   <!--Should be true when we study a simulated physics sample-->
-  <parameter name="PhysSampleOn" type="bool"> true </parameter>
+  <parameter name="PhysSampleOn" type="bool"> false </parameter>
   <!--Maximum costheta of examined MCParticles sample-->
-  <parameter name="CosThetaCut" type="double"> 0.9 </parameter>
+  <parameter name="CosThetaCut" type="double"> 0.99 </parameter>
   <!--Minimum momentum of examined MCParticles sample (in GeV)-->
   <parameter name="PCut" type="double"> 0.3 </parameter>
   <!--Minimum transverse momentum of examined MCParticles sample (in GeV)-->
