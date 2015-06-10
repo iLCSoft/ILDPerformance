@@ -1,0 +1,15 @@
+####################################################################
+# ILDPerformance package
+#
+# georgios.voutsinas@desy.de
+# 
+####################################################################
+
+
+Release Notes:
+
+ --------
+| v00-01 |   - original version by Alonso & Yorgos...
+ --------
+
+ - see README file for description
