@@ -83,6 +83,7 @@ class Diagnostics : public Processor {
   virtual void end() ;
 
   
+  void angleInFixedRange(double& angle);
 
 
  protected:
@@ -198,7 +199,6 @@ class Diagnostics : public Processor {
   TF1 *myfunc ;
 
   TGraphAsymmErrors *gpt;
-
 
 } ;
 

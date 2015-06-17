@@ -259,7 +259,8 @@ void Diagnostics::processEvent( LCEvent * evt ) {
     d0pull = new TH1F("d0pull","d0 pull",100,-10,10);
     z0pull = new TH1F("z0pull","z0",100,-10,10); 
 
-    OmegaResidual = new TH1F("OmegaResidual","Omega Residual",50,-0.00001,0.00001);
+    //OmegaResidual = new TH1F("OmegaResidual","Omega Residual",50,-0.00001,0.00001);
+    OmegaResidual = new TH1F("OmegaResidual","Omega Residual",50,-0.001,0.001);
     PhiResidual = new TH1F("PhiResidual","Phi Residual",50,-0.005,0.005);
     TanLambdaResidual = new TH1F("TanLambdaResidual","TanLambda Residual",50,-0.005,0.005);
     d0Residual = new TH1F("d0Residual","d0 Residual",50,-0.1,0.1);
@@ -614,6 +615,7 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	helix.Initialize_VP( pos , mom, q,  _bField ) ;
 	double d0mcp = helix.getD0() ;
 	double phmcp = helix.getPhi0() ;
+	angleInFixedRange(phmcp);
 	double ommcp = helix.getOmega() ;
 	double z0mcp = helix.getZ0() ;
 	double tLmcp = helix.getTanLambda() ;
@@ -650,12 +652,22 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	  recoZ0error.push_back(((Track*)trkvec[jj])->getCovMatrix()[9]);
 	  recoOmega.push_back(((Track*)trkvec[jj])->getOmega());
 	  recoOmegaError.push_back(((Track*)trkvec[jj])->getCovMatrix()[5]);
-	  recoPhi.push_back(((Track*)trkvec[jj])->getPhi());
+
+	  //recoPhi.push_back(((Track*)trkvec[jj])->getPhi());
+	  double phi_angle = ((Track*)trkvec[jj])->getPhi();
+	  angleInFixedRange(phi_angle);
+	  recoPhi.push_back(phi_angle);
+
 	  recoPhiError.push_back(((Track*)trkvec[jj])->getCovMatrix()[2]);
 	  recoTanLambda.push_back(((Track*)trkvec[jj])->getTanLambda());
 	  recoTanLambdaError.push_back(((Track*)trkvec[jj])->getCovMatrix()[14]);
 	  OmegaPull->Fill((rec_omega-ommcp)/(sqrt(rec_omega_error)));
-	  PhiPull->Fill((rec_phi-phmcp)/(sqrt(rec_phi_error)));
+
+	  double dphi = rec_phi-phmcp;
+	  angleInFixedRange(dphi);
+	  PhiPull->Fill(dphi/(sqrt(rec_phi_error)));
+	  //PhiPull->Fill((rec_phi-phmcp)/(sqrt(rec_phi_error)));
+
 	  TanLambdaPull->Fill((rec_tanlambda-tLmcp)/(sqrt(rec_tanlambda_err)));
 	  d0pull->Fill((rec_d0-d0mcp)/(sqrt(rec_d0_err)));
 	  z0pull->Fill((rec_z0-z0mcp)/(sqrt(rec_z0_err)));
@@ -816,3 +828,11 @@ void Diagnostics::end(){
 
 
 
+void Diagnostics::angleInFixedRange(double& angle){
+  
+  while (angle <= -M_PI ) angle = angle + 2*M_PI;
+  while (angle >   M_PI ) angle = angle - 2*M_PI;
+  
+  return;
+}
+ 
