@@ -39,7 +39,8 @@ wrt = IOIMPL.LCFactory.getInstance().createLCWriter( )
 
 p = sys.argv[1]
 p = float(p)
-thetaAngle = sys.argv[2]
+theta = sys.argv[2]
+theta = float(theta)
 
 outfile=sys.argv[3]
 #"file_{}.dat".format(i)
@@ -52,8 +53,7 @@ pdg = 13
 #pdg = 211
 mass =  0.105658 
 charge = -1.
-theta = 85./180. * math.pi 
-#theta = 20./180. * math.pi 
+#theta = 85./180. * math.pi 
 
 decayLen = 1.e32 
 #=================================================

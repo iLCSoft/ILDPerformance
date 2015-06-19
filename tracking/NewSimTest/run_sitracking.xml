@@ -9,10 +9,15 @@
 <marlin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://ilcsoft.desy.de/marlin/marlin.xsd">
  <execute>
    <processor name="MyAIDAProcessor"/>
-   
+   <processor name="InitDD4hep"/>
+   <processor name="MySplitCollectionByLayer" />
+
+
    <!-- ========== track digitization and tracking  === -->
-   <processor name="VXDPlanarDigiProcessor"/>
-   <processor name="SITPlanarDigiProcessor"/>
+   <Xprocessor name="VXDPlanarDigiProcessor"/>
+   <Xprocessor name="SITPlanarDigiProcessor"/>
+   <processor name="VXDPlanarDigiProcessor_DD"/>
+   <processor name="SITPlanarDigiProcessor_DD"/>
    <Xprocessor name="SITSpacePointBuilder" />
    
    <processor name="MySiliconTracking_MarlinTrk"/> 
@@ -22,36 +27,46 @@
  </execute>
 
  <global>
-  <parameter name="LCIOInputFiles"> SIM_100.0_10_PixelSIT.slcio </parameter>
+  <parameter name="LCIOInputFiles"> SIM_100.0_90_SimpleILD.slcio </parameter>
   <!-- limit the number of processed records (run+evt): -->  
   <parameter name="MaxRecordNumber" value="0" />  
   <parameter name="SkipNEvents" value="0" />  
   <parameter name="SupressCheck" value="false" />  
-  <!--parameter name="GearXMLFile" value="gear_ILD_o1_v05_dd4hep.xml"/-->
   <parameter name="GearXMLFile" value="gear_SimpleILD_DD4hep.xml"/>
-  <!--parameter name="DD4hepXMLFile" value="../ILD/compact/ILD_o1_v05.xml"/-->
-  <parameter name="DD4hepXMLFile" value="../../../DD4hep/HEAD/examples/SimpleDetector/compact/Simple_ILD.xml"/>
-  <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT">ERROR DEBUG6 </parameter> 
+  <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT"> MESSAGE </parameter> 
   <parameter name="RandomSeed" value="1234567890" />
   <!-- optionally limit the collections that are read from the input file: -->  
   <!--parameter name="LCIOReadCollectionNames">MCParticle PandoraPFOs</parameter-->
  </global>
 
+ <processor name="InitDD4hep" type="InitializeDD4hep">
+ <!--InitializeDD4hep reads a compact xml file and initializes the DD4hep::LCDD object-->
+  <!--Name of the DD4hep compact xml file to load-->
+  <parameter name="DD4hepXMLFile" type="string"> $ILCSOFT/DD4hep/HEAD/examples/SimpleDetector/compact/Simple_ILD.xml </parameter>
+</processor>
 
  <processor name="MyLCIOOutputProcessor" type="LCIOOutputProcessor">
   <!--   standard output: full reconstruction keep all collections -->
   <parameter name="LCIOOutputFile" type="string" >
-       sitracks_outputfile.slcio
+       RECO_100.0_90_SimpleILD.slcio
   </parameter>
   <parameter name="LCIOWriteMode" type="string" value="WRITE_NEW"/>
   <!--parameter name="SplitFileSizekB" type="int" value="1992294"/-->
  </processor>
 
 
- <processor name="VXDPlanarDigiProcessor" type="DDPlanarDigiProcessor">
-  <!--ID of Sub-Detector from UTIL/ILDConf.h from lcio. Either for VXD, SIT or SET-->
-  <parameter name="Sub_Detector_ID" type="int">1 </parameter>
-  <!--PlanarDigiProcessor creates TrackerHits from SimTrackerHits, smearing them according to the input parameters.-->
+  <processor name="MySplitCollectionByLayer" type="SplitCollectionByLayer">
+    <!--split a hit collection based on the layer number of the hits -->
+    <!--Name of the input collection with hits-->
+    <parameter name="InputCollection" type="string">FTDCollection </parameter>
+    <!--Name of the output collection with start and end layer number-->
+    <parameter name="OutputCollections" type="StringVec">FTD_PIXELCollection 0 1 FTD_STRIPCollection 2 6  </parameter>
+    <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+    <!-- <parameter name="Verbosity" type="string">DEBUG </parameter> -->
+  </processor>
+
+ <processor name="VXDPlanarDigiProcessor" type="PlanarDigiProcessor">
+   <!--PlanarDigiProcessor creates TrackerHits from SimTrackerHits, smearing them according to the input parameters.-->
    <!--whether hits are 1D strip hits-->
    <parameter name="IsStrip" type="bool">false </parameter>
    <!--resolution in direction of u-->
@@ -69,16 +84,14 @@
  </processor>
  
 
- <processor name="SITPlanarDigiProcessor" type="DDPlanarDigiProcessor">
+ <processor name="SITPlanarDigiProcessor" type="PlanarDigiProcessor">
    <!--PlanarDigiProcessor creates TrackerHits from SimTrackerHits, smearing them according to the input parameters.-->
-  <!--ID of Sub-Detector from UTIL/ILDConf.h from lcio. Either for VXD, SIT or SET-->
-  <parameter name="Sub_Detector_ID" type="int">2 </parameter>
-  <!--whether hits are 1D strip hits-->
-  <parameter name="IsStrip" type="bool">false </parameter>
+   <!--whether hits are 1D strip hits-->
+   <parameter name="IsStrip" type="bool">true </parameter>
    <!--resolution in direction of u-->
    <parameter name="ResolutionU" type="float">0.007 </parameter>
    <!--resolution in direction of v-->
-   <parameter name="ResolutionV" type="float">0.007 </parameter>
+   <parameter name="ResolutionV" type="float">0 </parameter>
    <!--Name of the Input SimTrackerHit collection-->
    <parameter name="SimTrackHitCollectionName" type="string" lcioInType="SimTrackerHit">SITCollection </parameter>
    <!--Name of TrackerHit SimTrackHit relation collection-->
@@ -88,7 +101,6 @@
    <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
    <!--parameter name="Verbosity" type="string">DEBUG </parameter-->
  </processor>
-
 
  <processor name="SITSpacePointBuilder" type="SpacePointBuilder">
    <!--SpacePointBuilder combine si-strip measurements into 3D spacepoints (1TrackerHitPlanar+1TrackHitPlanar = 1 TrackerHit), that can be used by reconstruction-->
@@ -200,7 +212,7 @@
   <!--Run MarlinTrk Diagnostics. MarlinTrk must be compiled with MARLINTRK_DIAGNOSTICS_ON defined-->
   <parameter name="RunMarlinTrkDiagnostics" type="bool">false </parameter>
   <!--SIT Hit Collection Name-->
-  <parameter name="SITHitCollectionName" type="string" lcioInType="TrackerHit"> SITTrackerHits </parameter>
+  <parameter name="SITHitCollectionName" type="string" lcioInType="TrackerHit"> XXXXXSITTrackerHits SITSpacePoints </parameter>
   <!--Silicon track Collection Name-->
   <parameter name="SiTrackCollectionName" type="string" lcioOutType="Track">  SiTracks MarlinTrkTracks </parameter>
  <!--Smooth All Mesurement Sites in Fit-->
@@ -225,5 +237,68 @@
   <!-- type of output file xml (default) or root ( only OpenScientist)-->
   <parameter name="FileType" type="string" value="root "/>
 </processor>
+
+
+ <processor name="VXDPlanarDigiProcessor_DD" type="DDPlanarDigiProcessor">
+
+  <parameter name="SubDetectorName" type="string"> VXD </parameter>
+
+  <!--PlanarDigiProcessor creates TrackerHits from SimTrackerHits, smearing them according to the input parameters.-->
+   <!--whether hits are 1D strip hits-->
+   <parameter name="IsStrip" type="bool">false </parameter>
+   <!--resolution in direction of u-->
+   <parameter name="ResolutionU" type="float"> 0.0028 0.006 0.004 0.004 0.004 0.004 </parameter>
+   <!--resolution in direction of v-->
+   <parameter name="ResolutionV" type="float"> 0.0028 0.006 0.004 0.004 0.004 0.004  </parameter>
+   <!--Name of the Input SimTrackerHit collection-->
+   <parameter name="SimTrackHitCollectionName" type="string" lcioInType="SimTrackerHit">VXDCollection </parameter>
+   <!--Name of TrackerHit SimTrackHit relation collection-->
+   <parameter name="SimTrkHitRelCollection" type="string" lcioOutType="LCRelation">VXDTrackerHitRelations </parameter>
+   <!--Name of the TrackerHit output collection-->
+   <parameter name="TrackerHitCollectionName" type="string" lcioOutType="TrackerHitPlane">VXDTrackerHits </parameter>
+   <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+   <!-- <parameter name="Verbosity" type="string">DEBUG </parameter> -->
+ </processor>
+ 
+
+ <processor name="SITPlanarDigiProcessor_DD" type="DDPlanarDigiProcessor">
+   <!--PlanarDigiProcessor creates TrackerHits from SimTrackerHits, smearing them according to the input parameters.-->
+
+  <parameter name="SubDetectorName" type="string"> SIT </parameter>
+
+  <!--whether hits are 1D strip hits-->
+  <parameter name="IsStrip" type="bool">true </parameter>
+   <!--resolution in direction of u-->
+   <parameter name="ResolutionU" type="float">0.007 </parameter>
+   <!--resolution in direction of v-->
+   <parameter name="ResolutionV" type="float">0 </parameter>
+   <!--Name of the Input SimTrackerHit collection-->
+   <parameter name="SimTrackHitCollectionName" type="string" lcioInType="SimTrackerHit">SITCollection </parameter>
+   <!--Name of TrackerHit SimTrackHit relation collection-->
+   <parameter name="SimTrkHitRelCollection" type="string" lcioOutType="LCRelation">SITTrackerHitRelations </parameter>
+   <!--Name of the TrackerHit output collection-->
+   <parameter name="TrackerHitCollectionName" type="string" lcioOutType="TrackerHitPlane">SITTrackerHits </parameter>
+   <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+   <!--parameter name="Verbosity" type="string">DEBUG </parameter-->
+ </processor>
+
+
+
+  <processor name="MyFixCellIDs" type="FixCellIDs">
+    <!--fix CellID0 for old TrackerHits ...-->
+    <!--Name of the FTD TrackerHit collection-->
+    <parameter name="FTDCollectionName" type="string" lcioInType="TrackerHit">FTDCollection </parameter>
+    <!--Name of the SIT TrackerHit collection-->
+    <parameter name="SITCollectionName" type="string" lcioInType="TrackerHit">XXXSITCollection </parameter>
+    <!--Name of the SET TrackerHit collection-->
+    <parameter name="SETCollectionName" type="string" lcioInType="TrackerHit">XXXSETCollection </parameter>
+    <!--Name of the TPC TrackerHit collection-->
+    <parameter name="TPCCollectionName" type="string" lcioInType="TrackerHit">XXXAllTPCTrackerHits </parameter>
+    <!--Name of the VXD TrackerHit collection-->
+    <parameter name="VXDCollectionName" type="string" lcioInType="TrackerHit">VXDCollection </parameter>
+    <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+    <!--parameter name="Verbosity" type="string">DEBUG </parameter-->
+  </processor>
+
 
 </marlin>

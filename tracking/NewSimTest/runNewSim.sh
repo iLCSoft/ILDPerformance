@@ -40,7 +40,6 @@ python runNewSim.py $ILCSOFT/DD4hep/HEAD/examples/SimpleDetector/compact/Simple_
 
 Marlin run_sitracking.xml \
     --global.GearXMLFile=gear_SimpleILD_DD4hep.xml \
-    --global.DD4hepXMLFile=$ILCSOFT/DD4hep/HEAD/examples/SimpleDetector/compact/Simple_ILD.xml \
     --global.LCIOInputFiles=SIM_${Momenta[j]}_${PolarAngles[i]}_PixelSIT.slcio \
     --MyLCIOOutputProcessor.LCIOOutputFile=RECO_${Momenta[j]}_${PolarAngles[i]}_PixelSIT.slcio \
     --global.MaxRecordNumber=10 \
