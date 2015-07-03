@@ -28,6 +28,7 @@
 #include <marlinutil/HelixClass.h>
 
 #include <TTree.h>
+#include <TVector3.h>
 #include <TMath.h>
 #include <TH1F.h>
 #include <TF1.h>
@@ -83,7 +84,6 @@ class Diagnostics : public Processor {
   virtual void end() ;
 
   
-  void angleInFixedRange(double& angle);
 
 
  protected:
@@ -191,6 +191,8 @@ class Diagnostics : public Processor {
 
   TH1F *hist_pt_t ;
   TH1F *hist_pt_f ;
+  TH1F *hist_th_t ;
+  TH1F *hist_th_f ;
 
   TCanvas *pulls;
   TCanvas *residuals;
@@ -199,6 +201,8 @@ class Diagnostics : public Processor {
   TF1 *myfunc ;
 
   TGraphAsymmErrors *gpt;
+  TGraphAsymmErrors *gth;
+
 
 } ;
 

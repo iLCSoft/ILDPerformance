@@ -259,7 +259,6 @@ void Diagnostics::processEvent( LCEvent * evt ) {
     d0pull = new TH1F("d0pull","d0 pull",100,-10,10);
     z0pull = new TH1F("z0pull","z0",100,-10,10); 
 
-    //OmegaResidual = new TH1F("OmegaResidual","Omega Residual",50,-0.00001,0.00001);
     OmegaResidual = new TH1F("OmegaResidual","Omega Residual",50,-0.001,0.001);
     PhiResidual = new TH1F("PhiResidual","Phi Residual",50,-0.005,0.005);
     TanLambdaResidual = new TH1F("TanLambdaResidual","TanLambda Residual",50,-0.005,0.005);
@@ -271,6 +270,10 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 
     hist_pt_t  = new TH1F( "hist_pt_t", "Pt distributions of true tracks", nBins , bins ) ;
     hist_pt_f  = new TH1F( "hist_pt_f", "Pt distribution of found tracks", nBins , bins ) ;
+
+    hist_th_t  = new TH1F( "hist_th_t", "Cos theta distributions of true tracks", 21, -1., 1. ) ;
+    hist_th_f  = new TH1F( "hist_th_f", "Cos theta distribution of found tracks", 21, -1., 1. ) ;
+
     
     pulls = new TCanvas("pulls","Track par. pulls",800,800);
     residuals =  new TCanvas("residuals","Track par. residuals",800,800);
@@ -279,6 +282,7 @@ void Diagnostics::processEvent( LCEvent * evt ) {
     myfunc = new TF1("myfunc","gaus(0)");
 
     gpt = new TGraphAsymmErrors() ;
+    gth = new TGraphAsymmErrors() ;
   }
 
   foundTrk.clear();  PtReco.clear();  PtMCP.clear();  Wgt.clear();   InvWgt.clear();   TrackSiHits.clear();
@@ -528,9 +532,19 @@ void Diagnostics::processEvent( LCEvent * evt ) {
       double ptmcp = 0;    
       double pxmcp =  mcpTracks[ii]->getMomentum()[0]  ;
       double pymcp =  mcpTracks[ii]->getMomentum()[1]  ;
+      double pzmcp =  mcpTracks[ii]->getMomentum()[2]  ;
       ptmcp = sqrt( pxmcp*pxmcp + pymcp*pymcp ) ;
-      
+      double pmcp = sqrt( pxmcp*pxmcp + pymcp*pymcp + pzmcp*pzmcp ) ;
+
       hist_pt_t->Fill(ptmcp);
+
+      TVector3 p( pxmcp, pymcp,  pzmcp ) ;
+      double costhmcp  = fabs(cos( p.Theta() )) ;
+
+      if (fabs(mcpTracks[ii]->getCharge())<10.){
+	hist_th_t->Fill(costhmcp);
+      }
+
       
       streamlog_out(DEBUG4) << " Checking: pt mcp = " << ptmcp << " of particle " << mcpTracks[ii] << " no of tracks associated " << testFromWgt.size() << std::endl ;
       
@@ -615,7 +629,6 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	helix.Initialize_VP( pos , mom, q,  _bField ) ;
 	double d0mcp = helix.getD0() ;
 	double phmcp = helix.getPhi0() ;
-	angleInFixedRange(phmcp);
 	double ommcp = helix.getOmega() ;
 	double z0mcp = helix.getZ0() ;
 	double tLmcp = helix.getTanLambda() ;
@@ -652,22 +665,12 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	  recoZ0error.push_back(((Track*)trkvec[jj])->getCovMatrix()[9]);
 	  recoOmega.push_back(((Track*)trkvec[jj])->getOmega());
 	  recoOmegaError.push_back(((Track*)trkvec[jj])->getCovMatrix()[5]);
-
-	  //recoPhi.push_back(((Track*)trkvec[jj])->getPhi());
-	  double phi_angle = ((Track*)trkvec[jj])->getPhi();
-	  angleInFixedRange(phi_angle);
-	  recoPhi.push_back(phi_angle);
-
+	  recoPhi.push_back(((Track*)trkvec[jj])->getPhi());
 	  recoPhiError.push_back(((Track*)trkvec[jj])->getCovMatrix()[2]);
 	  recoTanLambda.push_back(((Track*)trkvec[jj])->getTanLambda());
 	  recoTanLambdaError.push_back(((Track*)trkvec[jj])->getCovMatrix()[14]);
 	  OmegaPull->Fill((rec_omega-ommcp)/(sqrt(rec_omega_error)));
-
-	  double dphi = rec_phi-phmcp;
-	  angleInFixedRange(dphi);
-	  PhiPull->Fill(dphi/(sqrt(rec_phi_error)));
-	  //PhiPull->Fill((rec_phi-phmcp)/(sqrt(rec_phi_error)));
-
+	  PhiPull->Fill((rec_phi-phmcp)/(sqrt(rec_phi_error)));
 	  TanLambdaPull->Fill((rec_tanlambda-tLmcp)/(sqrt(rec_tanlambda_err)));
 	  d0pull->Fill((rec_d0-d0mcp)/(sqrt(rec_d0_err)));
 	  z0pull->Fill((rec_z0-z0mcp)/(sqrt(rec_z0_err)));
@@ -680,6 +683,10 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	  PtReco.push_back(recoPt);
 	  hist_pt_f->Fill(ptmcp);
 
+	  //if (recoP>1.){
+	  //hist_th_f->Fill(cos ( atan ( (1.0 / rec_tanlambda )) ));
+	  hist_th_f->Fill(costhmcp);
+	    //}
 	  double foundTrkChi2 = ((Track*)trkvec[jj])->getChi2();
 	  double foundTrkNdf = ((Track*)trkvec[jj])->getNdf();
 	  
@@ -800,18 +807,30 @@ void Diagnostics::end(){
 
   residuals->Write();
 
-  eff->cd();
-  gPad->SetLogx() ;
 
+  eff->Divide(1,2);
+
+  eff->cd(1);
+  gPad->SetLogx() ;
   gpt->Divide( hist_pt_f , hist_pt_t , "v" ) ;
   gpt->SetMarkerColor( kRed ) ;
   gpt->SetLineColor( kRed ) ;
   gpt->GetYaxis()->SetTitle( "#epsilon_{trk}" );
   gpt->GetXaxis()->SetTitle( "p_{t}/GeV" );
   gpt->Draw("AP");
+  
+  eff->cd(2);
+  //gPad->SetLogx() ;
+  gth->Divide( hist_th_f , hist_th_t , "v" ) ;
+  gth->SetMarkerColor( kRed ) ;
+  gth->SetLineColor( kRed ) ;
+  gth->GetYaxis()->SetTitle( "#epsilon_{trk}" );
+  gth->GetXaxis()->SetTitle( "cos(#theta)" );
+  gth->Draw("AP");
+  
 
-
-  gpt->Write();
+  gpt->Write("gpt");
+  gth->Write("gth");
   eff->Write();
 
   streamlog_out(DEBUG4) << " Number of ghosts being related to an MCParticle " << ghostCounter << std::endl ;
@@ -828,11 +847,3 @@ void Diagnostics::end(){
 
 
 
-void Diagnostics::angleInFixedRange(double& angle){
-  
-  while (angle <= -M_PI ) angle = angle + 2*M_PI;
-  while (angle >   M_PI ) angle = angle - 2*M_PI;
-  
-  return;
-}
- 
