@@ -15,7 +15,14 @@ needs:
 cd scripts
 $MARLIN/bin/Marlin PIDTree.xml
 
-cd ../root
+[writes ../Results/analysis_output.root"]
+
+cd ../macros
 root -l
-. x
+. x plotPIDs.C("../Results/analysis_output.root");
+
+[plots PID efficiencies for the four algorthms,
+writes ../Results/PIDs_pdg[i]_cut[j].[eps,ps,pdf].
+cuts on true particle can be adjusted]
+
   
