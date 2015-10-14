@@ -9,6 +9,10 @@
 Release Notes:
 
  --------
+| v00-02 |   - Jenny added PID subdirectory 
+ --------
+ 
+ --------
 | v00-01 |   - original version by Alonso & Yorgos...
  --------
 

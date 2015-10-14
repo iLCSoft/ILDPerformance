@@ -1,0 +1,21 @@
+ILDPerformance/PID
+===================
+
+particle ID part of ILD performance
+J.List, Sept/Oct 2015
+
+needs:
+- a physics sample (best with jets) to test (DST)
+- insert path in scripts/PIDTree.xml 
+- if needed adjust collection names and/or name of output root tree 
+- matching GEAR file (scripts/GearOutput.xml is ILD_o1_v05)
+
+=================================================================
+
+cd scripts
+$MARLIN/bin/Marlin PIDTree.xml
+
+cd ../root
+root -l
+. x
+  
