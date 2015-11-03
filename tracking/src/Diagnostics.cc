@@ -192,6 +192,8 @@ void Diagnostics::init() {
   gROOT->ProcessLine("#include <vector>");
   //TApplication theApp("tapp", 0, 0);
 
+  PI = (double)acos((double)(-1.0));
+  TWOPI = (double)(2.0)*PI;
 }
 
 void Diagnostics::processRunHeader( LCRunHeader* run) { 
@@ -534,7 +536,6 @@ void Diagnostics::processEvent( LCEvent * evt ) {
       double pymcp =  mcpTracks[ii]->getMomentum()[1]  ;
       double pzmcp =  mcpTracks[ii]->getMomentum()[2]  ;
       ptmcp = sqrt( pxmcp*pxmcp + pymcp*pymcp ) ;
-      double pmcp = sqrt( pxmcp*pxmcp + pymcp*pymcp + pzmcp*pzmcp ) ;
 
       hist_pt_t->Fill(ptmcp);
 
@@ -651,7 +652,6 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	  double rec_tanlambda = ((Track*)trkvec[jj])->getTanLambda() ;
 	  double rec_tanlambda_err = ((Track*)trkvec[jj])->getCovMatrix()[14] ;
 	  float recoPt = fabs(((3.0/10000.0)*_bField)/(((Track*)trkvec[jj])->getOmega())) ;
-	  float recoP = recoPt * sqrt(1+(((Track*)trkvec[jj])->getTanLambda())*(((Track*)trkvec[jj])->getTanLambda()));
 
 	  
 	  trueD0.push_back(d0mcp);
@@ -665,6 +665,10 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	  recoZ0error.push_back(((Track*)trkvec[jj])->getCovMatrix()[9]);
 	  recoOmega.push_back(((Track*)trkvec[jj])->getOmega());
 	  recoOmegaError.push_back(((Track*)trkvec[jj])->getCovMatrix()[5]);
+
+	  double testPhi = ((Track*)trkvec[jj])->getPhi();
+	  if (testPhi<0) testPhi = testPhi+TWOPI;
+
 	  recoPhi.push_back(((Track*)trkvec[jj])->getPhi());
 	  recoPhiError.push_back(((Track*)trkvec[jj])->getCovMatrix()[2]);
 	  recoTanLambda.push_back(((Track*)trkvec[jj])->getTanLambda());

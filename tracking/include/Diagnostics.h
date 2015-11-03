@@ -203,6 +203,8 @@ class Diagnostics : public Processor {
   TGraphAsymmErrors *gpt;
   TGraphAsymmErrors *gth;
 
+  double PI;
+  double TWOPI;
 
 } ;
 
