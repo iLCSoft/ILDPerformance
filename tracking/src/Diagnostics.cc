@@ -669,17 +669,17 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	  double testPhi = ((Track*)trkvec[jj])->getPhi();
 	  if (testPhi<0) testPhi = testPhi+TWOPI;
 
-	  recoPhi.push_back(((Track*)trkvec[jj])->getPhi());
+	  recoPhi.push_back(testPhi);
 	  recoPhiError.push_back(((Track*)trkvec[jj])->getCovMatrix()[2]);
 	  recoTanLambda.push_back(((Track*)trkvec[jj])->getTanLambda());
 	  recoTanLambdaError.push_back(((Track*)trkvec[jj])->getCovMatrix()[14]);
 	  OmegaPull->Fill((rec_omega-ommcp)/(sqrt(rec_omega_error)));
-	  PhiPull->Fill((rec_phi-phmcp)/(sqrt(rec_phi_error)));
+	  PhiPull->Fill((testPhi-phmcp)/(sqrt(rec_phi_error)));
 	  TanLambdaPull->Fill((rec_tanlambda-tLmcp)/(sqrt(rec_tanlambda_err)));
 	  d0pull->Fill((rec_d0-d0mcp)/(sqrt(rec_d0_err)));
 	  z0pull->Fill((rec_z0-z0mcp)/(sqrt(rec_z0_err)));
 	  OmegaResidual->Fill(rec_omega-ommcp);
-	  PhiResidual->Fill(rec_phi-phmcp);
+	  PhiResidual->Fill(testPhi-phmcp);
 	  TanLambdaResidual->Fill(rec_tanlambda-tLmcp);
 	  d0Residual->Fill(rec_d0-d0mcp);
 	  z0Residual->Fill(rec_z0-z0mcp);
