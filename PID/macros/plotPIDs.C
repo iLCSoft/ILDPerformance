@@ -37,7 +37,7 @@ void plotPIDs(const char* _filename) {
   // cut:
   // 1: p > 1 GeV
   // 8: 1 GeV < p < 10 GeV
-  int icut = 1;
+  int icut = 9;
      
   // particles:
   // pdg = 0: all
@@ -77,7 +77,7 @@ void plotPIDs(const char* _filename) {
     }  
 
 
-    TString outfile = "../Results/PIDs";
+    TString outfile = "../Results/PIDs_n1n1hh";
     outfile += "_pdg";
     outfile += ipdg;
     outfile += "_cut";
@@ -125,6 +125,7 @@ void getPDGHistos (TH1F **hist, TTree *tree, int &pdg, int &itruecut) {
     case 6: cutname = "truePt";    cutmin = 0; cutmax = 1;    cuttitle = " with pt < 1 GeV";          break;
     case 7: cutname = "truePt";    cutmin = 1; cutmax = 10;   cuttitle = " with 1 GeV < pt < 10 GeV"; break; 
     case 8: cutname = "trueP";     cutmin = 1; cutmax = 10;   cuttitle = " with 1 GeV < p < 10 GeV";  break; 
+    case 9: cutname = "trueP";     cutmin = 3; cutmax = 1000000000; cuttitle = " with P > 3 GeV"; break;
   }
   //cout << "cutname = " << cutname << endl;
   

@@ -1,0 +1,30 @@
+ILDPerformance/pi0
+===================
+
+Test performance of pi0 / eta / eta' reconstruction
+J.List, Nov 2015
+
+needs:
+- a physics sample (best with jets) to test (DST)
+- insert path in scripts/pi0Tree.xml 
+- if needed adjust collection names and/or name of output root tree 
+- matching GEAR file (scripts/GearOutput.xml is ILD_o1_v05)
+- if needed adjust links to weight files of IsolatedLeptonTagging
+
+=================================================================
+
+cd scripts
+$MARLIN/bin/Marlin pi0Tree.xml
+
+[writes ../Results/pi0_output_e2e2h.root"]
+
+cd ../macros
+root -l
+
+. x plotERes.C("../Results/pi0_output_e2e2h.root");
+[plots energy resolutions for mesons before and after fit]
+
+  . x plotEffi.C("../Results/pi0_output_e2e2h.root");
+[plots efficiency of meson reconstruction]
+
+
