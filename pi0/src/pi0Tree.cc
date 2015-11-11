@@ -138,7 +138,7 @@ void Pi0Tree::processEvent( LCEvent * evt ) {
     const EVENT::MCParticleVec& daughters = mcp->getDaughters();
     // keep pi0/eta/phi which decays to gammagamma
     if (mcp->getPDG() == 111 || mcp->getPDG() == 221 || mcp->getPDG() == 331) {
-      if (daughters.size()>0 && daughters[0]->getPDG() == 22) keep = true; 
+      if (daughters.size() == 2 && daughters[0]->getPDG() == 22 && daughters[1]->getPDG() == 22) keep = true; 
     }
     
     if (keep) {   

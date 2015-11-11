@@ -54,12 +54,12 @@ void plotEffi(const char* _filename) {
     
   // ``findable'' mesons: both photons reconstructed as one photon each
   tree->Draw("pfoE>>h1","isTrue");
-  tree->Draw("trueE>>h2","weightToPhotons>1.5&&abs(cos(trueTheta))<0.995");
+  tree->Draw("trueE>>h2","isSeenAsPhotons==2&&weightToPhotons>1.5&&abs(cos(trueTheta))<0.995");
   h3->Divide(h1,h2,1,1,"B");
   h3->Fit("pol0","ME","",5.,50.);
   
   tree->Draw("pfoE>>h11","isTrue");
-  tree->Draw("trueE>>h12","weightToPhotons>1.5&&abs(cos(trueTheta))<0.995");
+  tree->Draw("trueE>>h12","isSeenAsPhotons==2&&weightToPhotons>1.5&&abs(cos(trueTheta))<0.995");
   h13->Divide(h11,h12,1,1,"B");
 
   
