@@ -37,6 +37,7 @@ void plotEffi(const char* _filename) {
   TH1F *h1 = new TH1F("h1","h1;E[GeV], seen", 10,0.,50.);  
   TH1F *h2 = new TH1F("h2","h2;E[GeV], all", 10,0.,50.);  
   TH1F *h3 = new TH1F("h3","h3;E_{#pi^{0}/#eta/#eta'} [GeV];efficiency", 10,0.,50.);  
+//  TH1F *h3 = new TH1F("h3","h3;E_{#pi^{0}cand.} [GeV];efficiency", 10,0.,50.);  
   h3->Sumw2();   
   h3->GetXaxis()->SetTitleOffset(1.2);
   h3->GetYaxis()->SetTitleOffset(0.75);
@@ -44,6 +45,7 @@ void plotEffi(const char* _filename) {
     
   TH1F *h11 = new TH1F("h11","h11;E[GeV], seen", 12,0.,12.);  
   TH1F *h12 = new TH1F("h12","h12;E[GeV], all", 12,0.,12.);  
+//  TH1F *h13 = new TH1F("h13","h13;E_{#pi^{0}cand.} [GeV];efficiency", 12,0.,12.);  
   TH1F *h13 = new TH1F("h13","h13;E_{#pi^{0}/#eta/#eta'} [GeV];efficiency", 12,0.,12.);  
   h13->Sumw2();  
   h13->GetXaxis()->SetTitleOffset(1.2);
@@ -52,12 +54,12 @@ void plotEffi(const char* _filename) {
     
   // ``findable'' mesons: both photons reconstructed as one photon each
   tree->Draw("pfoE>>h1","isTrue");
-  tree->Draw("trueE>>h2","isSeen==2&&abs(cos(trueTheta))<0.995");
+  tree->Draw("trueE>>h2","weightToPhotons>1.5&&abs(cos(trueTheta))<0.995");
   h3->Divide(h1,h2,1,1,"B");
   h3->Fit("pol0","ME","",5.,50.);
   
   tree->Draw("pfoE>>h11","isTrue");
-  tree->Draw("trueE>>h12","isSeen==2&&abs(cos(trueTheta))<0.995");
+  tree->Draw("trueE>>h12","weightToPhotons>1.5&&abs(cos(trueTheta))<0.995");
   h13->Divide(h11,h12,1,1,"B");
 
   

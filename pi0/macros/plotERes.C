@@ -46,15 +46,15 @@ void plotERes(const char* _filename) {
   c1->cd(1);
   tree->Draw("(pfoE-trueEofSeen)/trueEofSeen*100.>>h1","isTrue");
   h1->SetLineColor(1);
-  h1->SetMaximum(250);
+  h1->SetMaximum(300);
   h1->Fit("gaus","ME","",-15.,15.);
   c1->cd(2);
   tree->Draw("(recoE-trueEofSeen)/trueEofSeen*100.>>h2","isTrue");
   h2->SetLineColor(4);
-  h2->SetMaximum(250);
+  h2->SetMaximum(300);
   h2->Fit("gaus","ME","",-5.,5.);
   
-  TString outfile1 = "../Results/pi0_e2e2h_Eres_correctGGParticles";
+  TString outfile1 = "../Results/pi0cand_e2e2h_Eres_correctGGParticles";
   //cout << outfile << endl;
   c1->Print(TString(outfile1+".eps"));
   c1->Print(TString(outfile1+".ps"));
@@ -65,15 +65,15 @@ void plotERes(const char* _filename) {
   c2->cd(1);
   tree->Draw("(pfoE-trueEofSeen)/trueEofSeen*100.>>h3","");
   h3->SetLineColor(1);
-  h3->SetMaximum(350);
+  h3->SetMaximum(500);
   h3->Fit("gaus","ME","",-10.,10.);
   c2->cd(2);
   tree->Draw("(recoE-trueEofSeen)/trueEofSeen*100.>>h4","");
   h4->SetLineColor(4);
-  h4->SetMaximum(350);
+  h4->SetMaximum(500);
   h4->Fit("gaus","ME","",-5.,5.);
 
-  TString outfile2 = "../Results/pi0_e2e2h_Eres_allGGParticles";
+  TString outfile2 = "../Results/pi0cand_e2e2h_Eres_allGGParticles";
   //cout << outfile << endl;
   c2->Print(TString(outfile2+".eps"));
   c2->Print(TString(outfile2+".ps"));
@@ -84,15 +84,15 @@ void plotERes(const char* _filename) {
   c3->cd(1);
   tree->Draw("(pfoE-trueEofSeen)/trueEofSeen*100.>>h5","!isTrue");
   h5->SetLineColor(1);
-  h5->SetMaximum(350);
+  h5->SetMaximum(250);
   h5->Fit("gaus","ME","",-20.,20.);
   c3->cd(2);
   tree->Draw("(recoE-trueEofSeen)/trueEofSeen*100.>>h6","!isTrue");
   h6->SetLineColor(4);
-  h6->SetMaximum(350);
+  h6->SetMaximum(250);
   h6->Fit("gaus","ME","",-20.,20.);
 
-  TString outfile3 = "../Results/pi0_e2e2h_Eres_wrongGGParticles";
+  TString outfile3 = "../Results/pi0cand_e2e2h_Eres_wrongGGParticles";
   //cout << outfile << endl;
   c3->Print(TString(outfile3+".eps"));
   c3->Print(TString(outfile3+".ps"));

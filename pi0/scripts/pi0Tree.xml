@@ -117,6 +117,7 @@
   <parameter name="Reco2MCTruthLinkCollectionName" type="string" lcioInType="Track"> RecoMCTruthLink </parameter>
   <!--Name of the GammaGamma particle input collection-->
   <parameter name="GammaGammaParticleCollection" type="string" lcioInType="ReconstructedParticle"> GammaGammaParticles </parameter>
+  <!--parameter name="GammaGammaParticleCollection" type="string" lcioInType="ReconstructedParticle"> GammaGammaCandidatePi0s </parameter-->
   <!--Name of the MCParticle input collection-->
   <parameter name="MCParticleCollection" type="string" lcioInType="MCParticle"> MCParticlesSkimmed </parameter>
   <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->

@@ -79,6 +79,8 @@ void Pi0Tree::processEvent( LCEvent * evt ) {
     pi0Tree->Branch("truePDG",&truePDG) ;
     pi0Tree->Branch("trueMother",&trueMother) ;
     pi0Tree->Branch("isSeen",&isSeen) ;
+    pi0Tree->Branch("isSeenAsPhotons",&isSeenAsPhotons) ;
+    pi0Tree->Branch("weightToPhotons",&weightToPhotons) ;
     
     pi0Tree->Branch("nRecoPi0",&nRecoPi0,"nRecoPi0/I") ;
     pi0Tree->Branch("nTruePhotons",&nTruePhotons) ;
@@ -104,7 +106,9 @@ void Pi0Tree::processEvent( LCEvent * evt ) {
   truePDG.clear();  
   trueMother.clear();  
   isSeen.clear();  
-  
+  isSeenAsPhotons.clear();  
+  weightToPhotons.clear();  
+ 
   nRecoPi0 = 0;  
   isTrue.clear();  
   recoE.clear();  
@@ -161,7 +165,9 @@ void Pi0Tree::processEvent( LCEvent * evt ) {
       }
       
       int nseen = 0;
-    
+      int nseenphoton = 0;
+      double weightsum = 0;
+   
       for (int idaughter = 0; idaughter < daughters.size(); idaughter++) {
         MCParticle* mcd = daughters[idaughter];
         streamlog_out(DEBUG) << " get reco particle for daughter " << idaughter << std::endl;  
@@ -171,25 +177,34 @@ void Pi0Tree::processEvent( LCEvent * evt ) {
         //streamlog_out(DEBUG) << " recoweightvec has length " << recoweightvec.size() << std::endl;  
         double maxcaloweight = 0;
         int imaxcaloweight = -1;
+        // reconstructed at all?
+        if (recovec.size() > 0)  nseen++; 
         for (int irel = 0; irel < recovec.size(); irel++) {
+          ReconstructedParticle* dummy =  (ReconstructedParticle*) recovec.at(irel); 
           streamlog_out(DEBUG) << " irel " << irel << ", recoweight = " << int(recoweightvec.at(irel)) 
+                               << ", type = " << dummy->getType()
                                << ", recoweight%10000 (track) = " << int(recoweightvec.at(irel))%10000 
                                << ", recoweight/10000 (calo) = " << int(recoweightvec.at(irel))/10000 << std::endl;  
           double caloweight = double((int(recoweightvec.at(irel))/10000)/1000.);
-          if (caloweight > maxcaloweight) {
+          if (dummy->getType() == 22 && caloweight > maxcaloweight) {
             imaxcaloweight = irel;
             maxcaloweight = caloweight;
           }
         }
       
-        streamlog_out(MESSAGE) << " found reco particle for mcd at imaxcaloweight = " << imaxcaloweight << " with weight = " << maxcaloweight << std::endl ;
        
-        // option: sum weights instead? check whether we really have a photon?
-        nseen++;
+        // do we really have a photon?
+        if (maxcaloweight > 0.1) {
+          streamlog_out(MESSAGE) << " found reco photon for mcd at imaxcaloweight = " << imaxcaloweight << " with weight = " << maxcaloweight << std::endl ;
+          nseenphoton++;
+          weightsum += maxcaloweight;
+        }  
         
       }  // loop over daughters
       
       isSeen.push_back(nseen);
+      isSeenAsPhotons.push_back(nseenphoton);
+      weightToPhotons.push_back(weightsum);
     
     }  // if keep
     

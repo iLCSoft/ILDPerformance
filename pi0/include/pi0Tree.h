@@ -95,7 +95,9 @@ class Pi0Tree : public Processor {
   vector<int>    truePDG;
   vector<int>    trueMother;
   vector<double> daughtersSeen;  // found photons?  
-  vector<double> isSeen;  // found as GammaGamma candidate?
+  vector<double> isSeen;  // both photons point to PFOs ?
+  vector<double> isSeenAsPhotons;  // both photons point to photon PFOs?
+  vector<double> weightToPhotons;  // sum of weigths
 
   int    nRecoPi0;
   vector<int> nTruePhotons;      
