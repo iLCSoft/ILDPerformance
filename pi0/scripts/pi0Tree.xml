@@ -1,0 +1,127 @@
+<!--
+      Example steering file to run a standard reconstruction on the 3 ttbar events 
+      simulated with Mokka in this example dierectory.
+
+      Works with ilcsoft v01-16 (DBD production release)
+
+      Defines the standard reconstruction for ILD.
+-->
+
+
+ <marlin>
+   
+   <execute>
+     <processor name="MyAIDAProcessor"/>
+     <!-- ========== isolated lepton finding ============================ -->
+     <processor name="MyIsolatedLeptonTaggingProcessor"/>  
+     <!-- ========== GammaGammaCandidateFinder   ================= -->
+     <!--processor name="MyPi0Finder"/-->
+     <!--processor name="MyEtaFinder"/--> 
+     <!--processor name="MyEtaPrimeFinder"/-->  
+     
+     <processor name="MyGammaGammaSolutionFinder"/> 
+     <processor name="MyDistilledPFOCreator"/> 
+     <!-- ========== tree writing ============================ -->
+     <processor name="MyPi0Tree"/>
+   </execute>
+
+   <global>       
+      <parameter name="LCIOInputFiles"> 
+      /afs/desy.de/user/b/boehmej/afspool/boehmej/MarlinWorkdir6/ILDConfig/StandardConfig/current/rv01-17-09-pre_nooverlay.sv01-14-01-p00.mILD_o1_v05.E500-TDR_ws.I106519.Pe2e2h.eL.pR-00001-DST.slcio
+      </parameter>
+      <parameter name="GearXMLFile" value="GearOutput.xml"/>
+      <parameter name="MaxRecordNumber" value="0"/>
+      <parameter name="SkipNEvents" value="0"/>
+      <parameter name="SupressCheck" value="false"/>
+      <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT"> MESSAGE </parameter>
+      <parameter name="RandomSeed" value="1234567890" />
+   </global>
+
+ 
+ <processor name="MyAIDAProcessor" type="AIDAProcessor">
+ <!--Processor that handles AIDA files. Creates on directory per processor.  Processors only need to create and fill the histograms, clouds and tuples. Needs to be the first ActiveProcessor-->
+  <!-- compression of output file 0: false >0: true (default) -->
+  <parameter name="Compress" type="int" value="1"/>
+  <!-- filename without extension-->
+  <parameter name="FileName" type="string" value="../Results/pi0_output_e2e2h"/>
+  <!-- type of output file xml (default) or root ( only OpenScientist)-->
+  <parameter name="FileType" type="string" value="root "/>
+</processor>
+
+
+<!--################################################ -->
+ <processor name="MyIsolatedLeptonTaggingProcessor" type="IsolatedLeptonTaggingProcessor">
+ <!--IsolatedLeptonTaggingProcessor does whatever it does ...-->
+  <!--cosine of the larger cone-->
+  <parameter name="CosConeLarge" type="float">0.95 </parameter>
+  <!--cosine of the smaller cone-->
+  <parameter name="CosConeSmall" type="float">0.98 </parameter>
+  <!--Cut on the mva output of isolated electron selection-->
+  <parameter name="CutOnTheISOElectronMVA" type="float">0.5 </parameter>
+  <!--Cut on the mva output of isolated muon selection-->
+  <parameter name="CutOnTheISOMuonMVA" type="float">0.7 </parameter>
+  <!--Directory of Weights for the Isolated Electron MVA Classification-->
+  <parameter name="DirOfISOElectronWeights" type="string">e1e1h_gg_qqqq_250 </parameter>
+  <!--Directory of Weights for the Isolated Muon MVA Classification-->
+  <parameter name="DirOfISOMuonWeights" type="string">e2e2h_gg_qqqq_250 </parameter>
+  <!--Name of the PandoraPFOs collection-->
+  <parameter name="InputPandoraPFOsCollection" type="string" lcioInType="ReconstructedParticle">PandoraPFOs </parameter>
+  <!--flag to select one most like isolated lepton-->
+  <parameter name="IsSelectingOneIsoLep" type="bool"> false </parameter>
+  <!--Maximum d0 significance for electron-->
+  <parameter name="MaxD0SigForElectron" type="float">50 </parameter>
+  <!--Maximum D0 significance for muon-->
+  <parameter name="MaxD0SigForMuon" type="float">5 </parameter>
+  <!--Maximum ratio of energy in calorimeters over momentum for electron-->
+  <parameter name="MaxEOverPForElectron" type="float">1.3 </parameter>
+  <!--Maximum ratio of energy in calorimeters over momentum for muon-->
+  <parameter name="MaxEOverPForMuon" type="float">0.3 </parameter>
+  <!--Maximum Z0 significance for electron-->
+  <parameter name="MaxZ0SigForElectron" type="float">5 </parameter>
+  <!--Maximum Z0 significance for muon-->
+  <parameter name="MaxZ0SigForMuon" type="float">5 </parameter>
+  <!--minimum ratio of energy in calorimeters over momentum for electron-->
+  <parameter name="MinEOverPForElectron" type="float">0.5 </parameter>
+  <!--minimum ratio of energy in ecal over energy in ecal+hcal-->
+  <parameter name="MinEecalOverTotEForElectron" type="float">0.9 </parameter>
+  <!--Minimum energy in yoke for electron-->
+  <parameter name="MinEyokeForMuon" type="float">1.2 </parameter>
+  <!--Name of collection with the selected isolated lepton-->
+  <parameter name="OutputIsoLeptonsCollection" type="string" lcioOutType="ReconstructedParticle">ISOLeptons </parameter>
+  <!--Name of the new PFOs collection without isolated lepton-->
+  <parameter name="OutputPFOsWithoutIsoLepCollection" type="string" lcioOutType="ReconstructedParticle">PandoraPFOsWithoutIsoLep </parameter>
+  <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+  <!--parameter name="Verbosity" type="string">DEBUG </parameter-->
+ </processor>
+
+ <processor name="MyGammaGammaSolutionFinder" type="GammaGammaSolutionFinder">
+    <parameter name="InputParticleCollectionName1" value="GammaGammaCandidatePi0s" />
+    <parameter name="InputParticleCollectionName2" value="GammaGammaCandidateEtas" />
+    <parameter name="InputParticleCollectionName3" value="GammaGammaCandidateEtaPrimes" />
+    <parameter name="Printing" value="0" />
+    <parameter name="OutputParticleCollectionName" value="GammaGammaParticles" />
+ </processor>
+
+ <processor name="MyDistilledPFOCreator" type="DistilledPFOCreator">
+    <parameter name="InputParticleCollectionName1" value="PandoraPFOsWithoutIsoLep" />
+    <parameter name="InputParticleCollectionName2" value="GammaGammaParticles" />
+    <parameter name="Printing" value="0" />
+    <parameter name="OutputParticleCollectionName" value="DistilledPFOs" />
+ </processor>
+ 
+
+ <processor name="MyPi0Tree" type="Pi0Tree">
+  <!--true - reco relation collection-->
+  <parameter name="MCTruth2RecoLinkCollectionName" type="string" lcioInType="Track"> MCTruthRecoLink </parameter>
+  <!--reco - true relation collection-->
+  <parameter name="Reco2MCTruthLinkCollectionName" type="string" lcioInType="Track"> RecoMCTruthLink </parameter>
+  <!--Name of the GammaGamma particle input collection-->
+  <parameter name="GammaGammaParticleCollection" type="string" lcioInType="ReconstructedParticle"> GammaGammaParticles </parameter>
+  <!--Name of the MCParticle input collection-->
+  <parameter name="MCParticleCollection" type="string" lcioInType="MCParticle"> MCParticlesSkimmed </parameter>
+  <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+  <parameter name="Verbosity" type="string"> DEBUG </parameter>
+</processor>
+
+  
+</marlin>
