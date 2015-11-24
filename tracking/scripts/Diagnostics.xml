@@ -134,7 +134,7 @@
    <!--true: use relations for TrackerHits, false : use getRawHits -->
    <parameter name="UseTrackerHitRelations" type="bool"> true </parameter>
    <!--If Using Particle Gun Ignore Gen Stat-->
-   <parameter name="UsingParticleGun" type="bool"> false </parameter>
+   <parameter name="UsingParticleGun" type="bool"> true </parameter>
  </processor>
 
 
