@@ -1,16 +1,22 @@
 #unset MARLIN_DLL
 #. /afs/desy.de/project/ilcsoft/sw/x86_64_gcc41_sl5/v01-17-06/init_ilcsoft.sh
 
-set -A PolarAngles 10 20 40 85
-set -A y_dir 0.173 0.342 0.643 0.996
-set -A z_dir 0.985 0.94  0.766 0.087 
-set -A Mom 1 3 5 10 15 25 50 100
+##set -A PolarAngles 10 20 40 85
+##set -A y_dir 0.173 0.342 0.643 0.996
+##set -A z_dir 0.985 0.94  0.766 0.087 
+##set -A Mom 1 3 5 10 15 25 50 100
 
-for i in {1..4}
+# in bash it should read:
+PolarAngles=('10' '20' '40' '85')
+y_dir=('0.173' '0.342' '0.643' '0.996')
+z_dir=('0.985' '0.94'  '0.766' '0.087') 
+Mom=( '1' '3' '5' '10' '15' '25' '50' '100' )
+
+for i in {0..3}
 
 do
 
-for j in {1..8}
+for j in {0..7}
 
 do
 
@@ -25,7 +31,7 @@ cat >  sim.steer << EOF
 
 /Mokka/init/registerPlugin TrackingOnlyPlugin 
 
-/Mokka/init/mcRunNumber   20120516
+/Mokka/init/mcRunNumber   20151124
 /Mokka/init/randomSeed       420074712
 /Mokka/init/userInitString TIMEOUT_TO_RELAX_TMP 120
 /Mokka/init/userInitInt SLEEP_BEFORE_RETRY 5
@@ -75,7 +81,7 @@ EOF
 
 Mokka -U sim.steer
 
-mv MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio ../Results/SimFiles
+mv MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio ../Results/SimFiles/
 
 #======MARLIN=====#
 #======MARLIN=====#
@@ -106,10 +112,10 @@ Marlin Diagnostics.xml \
     --global.LCIOInputFiles=$INFILE \
     --global.GearXMLFile=GearOutput.xml \
     --MyAIDAProcessor.FileName=analysis_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
-#    --MCProcessor.TracksMCTruthLinkCollectionName=MarlinTrkTracksMCTruthLink \
-#    --MCProcessor.TracksMCTruthLinkCollectionName=MCTruthMarlinTrkTracksLink \
     --global.MaxRecordNumber=1000 \
     --global.SkipNEvents=0
+#    --MCProcessor.TracksMCTruthLinkCollectionName=MarlinTrkTracksMCTruthLink \
+#    --MCProcessor.TracksMCTruthLinkCollectionName=MCTruthMarlinTrkTracksLink \
 
 mv analysis_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.root ../Results/Analysis
 
