@@ -49,11 +49,14 @@ outfile=sys.argv[3]
 wrt.open( outfile , EVENT.LCIO.WRITE_NEW ) 
 
 genstat  = 1
-pdg = 13
+pdg = sys.argv[4]
+pdg = int(pdg)
 #pdg = 211
 mass =  0.105658 
-charge = -1.
-#theta = 85./180. * math.pi 
+#charge = -1.
+charge = sys.argv[5]
+charge = float(charge)
+theta = theta/180. * math.pi 
 
 decayLen = 1.e32 
 #=================================================
