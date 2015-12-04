@@ -12,11 +12,11 @@ y_dir=('0.173' '0.342' '0.643' '0.996')
 z_dir=('0.985' '0.94'  '0.766' '0.087') 
 Mom=( '1' '3' '5' '10' '15' '25' '50' '100' )
 
-for i in {0..3}
+for i in {1..4}
 
 do
 
-for j in {0..7}
+for j in {1..8}
 
 do
 
@@ -37,7 +37,7 @@ cat >  sim.steer << EOF
 /Mokka/init/userInitInt SLEEP_BEFORE_RETRY 5
 /Mokka/init/user consult
 /Mokka/init/dbPasswd consult
-/Mokka/init/lcioFilename MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio
+/Mokka/init/lcioFilename AntiMuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio
 /Mokka/init/physicsListName QGSP_BERT
 /Mokka/init/TPCCut 0.01 MeV
 /Mokka/init/rangeCut 0.1 mm
@@ -74,19 +74,19 @@ cat >  muons << EOF
 /gun/momentum ${Mom[j]}
 /gun/particle mu-
 
-/run/beamOn 1000
+/run/beamOn 100
 
 EOF
 #=================================================
 
 Mokka -U sim.steer
 
-mv MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio ../Results/SimFiles/
+mv AntiMuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio ../Results/SimFiles/
 
 #======MARLIN=====#
 #======MARLIN=====#
 
-INFILE=../Results/SimFiles/MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio
+INFILE=../Results/SimFiles/AntiMuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio
 
 echo $INFILE
 
@@ -95,29 +95,29 @@ echo $INFILE
 Marlin stdreco_tracking.xml \
     --global.LCIOInputFiles=$INFILE \
     --global.GearXMLFile=GearOutput.xml \
-    --MyLCIOOutputProcessor.LCIOOutputFile=Marlin_Reco_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio \
+    --MyLCIOOutputProcessor.LCIOOutputFile=Marlin_Reco_AntiMuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio \
     --global.MaxRecordNumber=1000 \
     --global.SkipNEvents=0 
 
-mv Marlin_Reco_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio ../Results/RecoFiles
+mv Marlin_Reco_AntiMuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio ../Results/RecoFiles
 
 #======YOUR ANALYSIS PROCESSOR=====#
 
 
-INFILE=../Results/RecoFiles/Marlin_Reco_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio
+INFILE=../Results/RecoFiles/Marlin_Reco_AntiMuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio
 
 #======================================================================
 
 Marlin Diagnostics.xml \
     --global.LCIOInputFiles=$INFILE \
     --global.GearXMLFile=GearOutput.xml \
-    --MyAIDAProcessor.FileName=analysis_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
+    --MyAIDAProcessor.FileName=analysis_AntiMuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
     --global.MaxRecordNumber=1000 \
     --global.SkipNEvents=0
 #    --MCProcessor.TracksMCTruthLinkCollectionName=MarlinTrkTracksMCTruthLink \
 #    --MCProcessor.TracksMCTruthLinkCollectionName=MCTruthMarlinTrkTracksLink \
 
-mv analysis_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.root ../Results/Analysis
+mv analysis_AntiMuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.root ../Results/Analysis
 
 #======================================================================
 #======================================================================
