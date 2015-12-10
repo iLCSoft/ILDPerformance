@@ -53,7 +53,7 @@
      <!-- XXXprocessor name="MyTruthTracker"/ -->
 
      <!-- ============ REFITTING ===================== -->
-     <processor name="MyRefitProcessor"/>
+     <!--processor name="MyRefitProcessor"/-->
      <!-- ============================================ -->
 
      <!-- ========== the post tracking patrec   ================= -->
