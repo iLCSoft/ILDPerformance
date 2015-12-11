@@ -171,8 +171,9 @@ void PIDTree::processEvent( LCEvent * evt ) {
       truePhi.push_back(p.phi());
       trueCharge.push_back(mcp->getCharge());
       truePDG.push_back(mcp->getPDG());
-      if (mcp->getParent(0)) {
-        trueMother.push_back(mcp->getParent(0)->getPDG());
+      streamlog_out(DEBUG) << " before getting parent " << std::endl;  
+      if (mcp->getParents()[0]) {
+        trueMother.push_back(mcp->getParents()[0]->getPDG());
       }  
       else {
         trueMother.push_back(-1);
