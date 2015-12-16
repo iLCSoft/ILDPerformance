@@ -109,13 +109,13 @@ void EnergyResolution::processEvent( LCEvent * evt ) {
     FloatVec testFromWgt = navRtT.getRelatedFromWeights(mcp);
     //std::cout << " Reco - truth relation weight " << testFromWgt.size() << std::endl;
 
-    for (int jj=0;jj<testFromWgt.size();jj++){
+    for (unsigned int jj=0;jj<testFromWgt.size();jj++){
       //std::cout << " Reco - truth relation weight " << testToWgt[jj] << std::endl;
-      int RECOPDG = ((ReconstructedParticle*)recovec[jj])->getType();
+      //int RECOPDG = ((ReconstructedParticle*)recovec[jj])->getType();
       //std::cout << " related monte carlo particle " << mcp->getPDG() << " and PFO " << RECOPDG << " with weight " << testFromWgt[jj] << std::endl ; 
       
       recoEnergy.push_back(((ReconstructedParticle*)recovec[jj])->getEnergy());
-      double trueEnergy = mcp->getEnergy();
+      //double trueEnergy = mcp->getEnergy();
 
     }
   }

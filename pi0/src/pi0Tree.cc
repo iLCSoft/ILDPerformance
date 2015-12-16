@@ -130,22 +130,46 @@ void Pi0Tree::processEvent( LCEvent * evt ) {
   // loop over MCParticles
   //----------------------------------------------------------------------------------------------------------------------------
   
+  int index_mcp = -1;   // Should be in synch with dumpevent utility
+
+  int nMCEta = 0;
+  int nMCEtaPrime = 0;
+  double ESum_MCP = 0.0;
+
+  int nRecoEta = 0;
+  int nRecoEtaPrime = 0;
+
   while( MCParticle* mcp = mcpIt.next()  ) {
     
     if (!mcp) continue; 
+    index_mcp++;
     
     bool keep = false;
     const EVENT::MCParticleVec& daughters = mcp->getDaughters();
-    // keep pi0/eta/phi which decays to gammagamma
+    // keep pi0/eta/etaprime which decays to gammagamma if production vertex within 10 cm of nominal interaction point
     if (mcp->getPDG() == 111 || mcp->getPDG() == 221 || mcp->getPDG() == 331) {
-      if (daughters.size() == 2 && daughters[0]->getPDG() == 22 && daughters[1]->getPDG() == 22) keep = true; 
+      if (daughters.size() == 2 && daughters[0]->getPDG() == 22 && daughters[1]->getPDG() == 22){
+          double rVertexSquared = 0.0;
+          for(int i=0; i<=2; i++){
+              rVertexSquared += pow(mcp->getVertex()[i],2);
+          }
+          if(rVertexSquared < 10000.0)keep = true;
+      }
     }
     
     if (keep) {   
     
-      streamlog_out(DEBUG) << "found mcparticle id = " << mcp->getPDG() << ", genstat = " << mcp->getGeneratorStatus() << std::endl;  
+      streamlog_out(DEBUG) << " Found GammaGamma decaying parent MCParticle " << "Index = " << index_mcp << " pdgID = " << mcp->getPDG() 
+                           << ", genstat = " << mcp->getGeneratorStatus() 
+                           << ", E = " << mcp->getEnergy() << std::endl;
+      streamlog_out(DEBUG) << " Momentum = " << mcp->getMomentum()[0] << " " << mcp->getMomentum()[1] << " " << mcp->getMomentum()[2] << std::endl;
+      streamlog_out(DEBUG) << " Vertex =   " << mcp->getVertex()[0] << " " << mcp->getVertex()[1] << " " << mcp->getVertex()[2] << std::endl;
+      streamlog_out(DEBUG) << " Endpoint = " << mcp->getEndpoint()[0] << " " << mcp->getEndpoint()[1] << " " << mcp->getEndpoint()[2] << std::endl;  
     
       nMCPi0++;
+      ESum_MCP += mcp->getEnergy();
+      if(mcp->getPDG() == 221)nMCEta++;
+      if(mcp->getPDG() == 331)nMCEtaPrime++;
     
       gear::Vector3D v( mcp->getVertex()[0], mcp->getVertex()[1], mcp->getVertex()[2] );
       gear::Vector3D e( mcp->getEndpoint()[0], mcp->getEndpoint()[1], mcp->getEndpoint()[2] );
@@ -168,8 +192,17 @@ void Pi0Tree::processEvent( LCEvent * evt ) {
       int nseenphoton = 0;
       double weightsum = 0;
    
-      for (int idaughter = 0; idaughter < daughters.size(); idaughter++) {
+      for (unsigned int idaughter = 0; idaughter < daughters.size(); idaughter++) {
+
         MCParticle* mcd = daughters[idaughter];
+
+        streamlog_out(DEBUG) << " Daughter MCParticle " << idaughter << " pdg ID = " << mcd->getPDG() 
+                             << ", genstat = " << mcd->getGeneratorStatus() 
+                             << ", E = " << mcd->getEnergy() << std::endl;
+        streamlog_out(DEBUG) << " Momentum = " << mcd->getMomentum()[0] << " " << mcd->getMomentum()[1] << " " << mcd->getMomentum()[2] << std::endl;
+        streamlog_out(DEBUG) << " Vertex =   " << mcd->getVertex()[0] << " " << mcd->getVertex()[1] << " " << mcd->getVertex()[2] << std::endl;
+        streamlog_out(DEBUG) << " Endpoint = " << mcd->getEndpoint()[0] << " " << mcd->getEndpoint()[1] << " " << mcd->getEndpoint()[2] << std::endl; 
+
         streamlog_out(DEBUG) << " get reco particle for daughter " << idaughter << std::endl;  
         const EVENT::LCObjectVec& recovec = mc2recoNav.getRelatedToObjects(mcd);
         streamlog_out(DEBUG) << " recovec has length " << recovec.size() << std::endl;  
@@ -179,7 +212,7 @@ void Pi0Tree::processEvent( LCEvent * evt ) {
         int imaxcaloweight = -1;
         // reconstructed at all?
         if (recovec.size() > 0)  nseen++; 
-        for (int irel = 0; irel < recovec.size(); irel++) {
+        for (unsigned int irel = 0; irel < recovec.size(); irel++) {
           ReconstructedParticle* dummy =  (ReconstructedParticle*) recovec.at(irel); 
           streamlog_out(DEBUG) << " irel " << irel << ", recoweight = " << int(recoweightvec.at(irel)) 
                                << ", type = " << dummy->getType()
@@ -209,6 +242,9 @@ void Pi0Tree::processEvent( LCEvent * evt ) {
     }  // if keep
     
   }  // loop over MCPs
+
+  streamlog_out(DEBUG) << " nMCGammaGammaParticles Found = " << nMCPi0 
+                       << " ( " << nMCPi0-nMCEta-nMCEtaPrime << " " << nMCEta << " " << nMCEtaPrime << " )" << " Esum = " << ESum_MCP << std::endl;
       
   streamlog_out(DEBUG) << " reco iterator and navigator " << std::endl;
   LCIterator<ReconstructedParticle> ggpIt( evt, _gammaGammaParticleCollectionName ) ;
@@ -220,11 +256,35 @@ void Pi0Tree::processEvent( LCEvent * evt ) {
   // loop over GammaGammaParticles
   //----------------------------------------------------------------------------------------------------------------------------
   
+  double ESum_Reco = 0.0;
+
+  double ESum_Reco_Correct = 0.0;
+  double ESum_Reco_MC_Correct = 0.0;
+  double ESum_Reco_Wrong = 0.0;
+
+  double ESum_Reco_MC_All = 0.0;
+
+  double ESum_Reco_Meas = 0.0;
+
+  int nCorrectPi0 = 0;
+  int nCorrectEta = 0;
+  int nCorrectEtaPrime = 0;
+
+//  double ESum_Reco_MC_Wrong = 0.0;
+
   while( ReconstructedParticle* ggp = ggpIt.next()  ) {
     
-    if (!ggp) continue; 
+    if (!ggp) continue;
+
+    streamlog_out(DEBUG) << " GammaGammaParticle " << nRecoPi0 << " type = " << ggp->getType() << " E = " << ggp->getEnergy() 
+                         << " GoodnessOfPid " << ggp->getGoodnessOfPID() << std::endl; 
+    streamlog_out(DEBUG) << " Momentum = " << ggp->getMomentum()[0] << " " << ggp->getMomentum()[1] << " " << ggp->getMomentum()[2] << std::endl; 
     
-    nRecoPi0++;
+    nRecoPi0++;     // this is currently a catch-all for all types ....
+    if(ggp->getType()==221)nRecoEta++;
+    if(ggp->getType()==331)nRecoEtaPrime++;
+
+    ESum_Reco += ggp->getEnergy();   // Fitted energy sum (regardless of whether the fit is correct
     
     //gear::Vector3D rp( ggp->getMomentum()[0], ggp->getMomentum()[1], ggp->getMomentum()[2] );
     recoE.push_back(ggp->getEnergy());
@@ -246,8 +306,18 @@ void Pi0Tree::processEvent( LCEvent * evt ) {
     double sumWeight = 0;
     MCParticle* mcgps[2];
 
-    for (int igamma = 0; igamma < gammas.size(); igamma++) {
+    for (unsigned int igamma = 0; igamma < gammas.size(); igamma++) {
+
+         streamlog_out(DEBUG) << " Gamma RP constituent of GGP " << igamma << " type = " << gammas[igamma]->getType() 
+                              << " Emeas = " << gammas[igamma]->getEnergy() << std::endl; 
+         streamlog_out(DEBUG) << " Momentum = " << gammas[igamma]->getMomentum()[0] << " " 
+                                                << gammas[igamma]->getMomentum()[1] << " " 
+                                                << gammas[igamma]->getMomentum()[2] << std::endl; 
+
+
+
       sumE += gammas[igamma]->getEnergy();
+      ESum_Reco_Meas += gammas[igamma]->getEnergy();    // Measured Energy Sum of the Photons that are fitted to GammaGammaParticles
       for (int i = 0; i < 3; i++) sumP[i] += gammas[igamma]->getMomentum()[i];        
       streamlog_out(DEBUG) << " get mc particle for gamma " << igamma << std::endl;  
       const EVENT::LCObjectVec& truevec = rec2mcNav.getRelatedToObjects(gammas[igamma]);
@@ -283,7 +353,7 @@ void Pi0Tree::processEvent( LCEvent * evt ) {
       }
         
       if (!isConversion) {  
-        for (int irel = 0; irel < truevec.size(); irel++) {
+        for (unsigned int irel = 0; irel < truevec.size(); irel++) {
           MCParticle* dummy =  (MCParticle*) truevec.at(irel); 
           streamlog_out(DEBUG) << " irel " << irel << ", trueweight = " << int(truthweightvec.at(irel)) 
                                << ", true PDG = " << dummy->getPDG()
@@ -327,9 +397,13 @@ void Pi0Tree::processEvent( LCEvent * evt ) {
       // found a correct photon or a conversion
       ntruephoton++; 
       sumWeight += maxweight;  
-      
       sumTrueE += mcg->getEnergy();
-      for (int i = 0; i < 3; i++) sumTrueP[i] += mcg->getMomentum()[i];        
+      for (int i = 0; i < 3; i++) sumTrueP[i] += mcg->getMomentum()[i]; 
+
+      streamlog_out(DEBUG) << " Gamma MCParticle of GGP " << igamma  
+                           << " Etrue = " << mcg->getEnergy() << std::endl;
+
+      ESum_Reco_MC_All += mcg->getEnergy();
 
       // get parent   
       mcgps[igamma] = mcg->getParents()[0];
@@ -346,9 +420,29 @@ void Pi0Tree::processEvent( LCEvent * evt ) {
     }
     // check if really from same mother
     if (mcgps[0] && mcgps[1] && mcgps[0] == mcgps[1]) {
-      istrue = 1;
-      pdg = mcgps[0]->getPDG();
-      streamlog_out(MESSAGE) << "(fully correct) PDG of both photons parent is = " << pdg << std::endl ;
+      double rVertexSquared = 0.0;
+      for(int i=0; i<=2; i++){
+          rVertexSquared += pow(mcgps[0]->getVertex()[i],2);
+      }
+      if(rVertexSquared < 10000.0)istrue = 1;
+      if(istrue){
+         pdg = mcgps[0]->getPDG();
+         streamlog_out(MESSAGE) << "(fully correct) PDG of both photons parent is = " << pdg << " Etrue = " << mcgps[0]->getEnergy() 
+                                << " VTX squared = " << rVertexSquared << std::endl ;
+         ESum_Reco_Correct += ggp->getEnergy();
+         ESum_Reco_MC_Correct += mcgps[0]->getEnergy();
+         if(pdg == 111)nCorrectPi0++;
+         if(pdg == 221)nCorrectEta++;
+         if(pdg == 331)nCorrectEtaPrime++;
+      }
+      else{
+         streamlog_out(MESSAGE) << "(Non-prompt associated) PDG of both photons parent is = " << pdg << " Etrue = " << mcgps[0]->getEnergy() 
+                                << " VTX squared = " << rVertexSquared << std::endl ;         
+      }
+    }
+    else{
+      ESum_Reco_Wrong += ggp->getEnergy();
+//      ESum_Reco_MC_Wrong += something    (need to find the true energies of the photons that have been wrongly paired up ...)
     }
     
     nTruePhotons.push_back(ntruephoton);
@@ -362,7 +456,29 @@ void Pi0Tree::processEvent( LCEvent * evt ) {
         
   }  // loop over GammaGammaParticles
   
-  
+  streamlog_out(DEBUG) << " nRecoGammaGammaParticles Found = " << nRecoPi0 << 
+                       " ( " << nRecoPi0-nRecoEta-nRecoEtaPrime << " " << nRecoEta << " " << nRecoEtaPrime << " ) " << 
+                       " ESum Reco = " << ESum_Reco << std::endl;
+  streamlog_out(DEBUG) << " SUMMARY = " << nMCPi0 << " ESum MCP = " << ESum_MCP << " " << nRecoPi0 
+                       << " ESum Reco = " << ESum_Reco << "  Esum_Reco_Correct = " << ESum_Reco_Correct 
+                       << " ESum Reco Wrong = " << ESum_Reco_Wrong 
+                       << " ESum_Reco_MC_Correct " << ESum_Reco_MC_Correct
+                       << " ESum_Reco_Meas " << ESum_Reco_Meas << 
+                       " ESum_Reco_MC_All " << ESum_Reco_MC_All << std::endl;
+
+  streamlog_out(DEBUG) << " SUMMARY2 = " << std::setw(2) << nMCPi0 << " " << std::setw(10) << ESum_MCP << " " 
+                                         << std::setw(2) << nMCPi0-nMCEta-nMCEtaPrime << " " 
+                                         << std::setw(2) << nMCEta << " " << std::setw(2) << nMCEtaPrime << " "
+                                         << std::setw(2) << nRecoPi0 << " " << std::setw(10) << ESum_Reco << " "
+                                         << std::setw(2) << nRecoPi0-nRecoEta-nRecoEtaPrime << " " 
+                                         << std::setw(2) << nRecoEta << " " << std::setw(2) << nRecoEtaPrime << " "
+                                         << std::setw(2) << nCorrectPi0 << " " 
+                                         << std::setw(2) << nCorrectEta << " " << std::setw(2) << nCorrectEtaPrime << " " 
+                                         << std::setw(10) << ESum_Reco_Correct << " " << std::setw(10) << ESum_Reco_Wrong << " " 
+                                         << std::setw(10) << ESum_Reco_MC_Correct << " "
+                                         << std::setw(10) << ESum_Reco_Meas << " " 
+                                         << std::setw(10) << ESum_Reco_MC_All << std::endl;
+
   pi0Tree->Fill(); 
   nEvt++;
   

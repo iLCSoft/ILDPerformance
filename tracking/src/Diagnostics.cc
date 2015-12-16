@@ -551,7 +551,7 @@ void Diagnostics::processEvent( LCEvent * evt ) {
       
       int foundFlag = 0 ;
       
-      for (int jj=0;jj<trkvec.size();jj++){
+      for (unsigned int jj=0;jj<trkvec.size();jj++){
 
 	int IPFlag = 0 ; 
       
@@ -647,7 +647,7 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	  double rec_z0_err = ((Track*)trkvec[jj])->getCovMatrix()[9] ;
 	  double rec_omega = ((Track*)trkvec[jj])->getOmega();
 	  double rec_omega_error = ((Track*)trkvec[jj])->getCovMatrix()[5];
-	  double rec_phi = ((Track*)trkvec[jj])->getPhi();
+	  // double rec_phi = ((Track*)trkvec[jj])->getPhi();
 	  double rec_phi_error = ((Track*)trkvec[jj])->getCovMatrix()[2];
 	  double rec_tanlambda = ((Track*)trkvec[jj])->getTanLambda() ;
 	  double rec_tanlambda_err = ((Track*)trkvec[jj])->getCovMatrix()[14] ;

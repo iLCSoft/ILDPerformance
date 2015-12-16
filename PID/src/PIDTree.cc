@@ -190,7 +190,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
       int imaxtrckweight = -1;
       int imaxcaloweight = -1;
       int imaxweight = -1;
-      for (int irel = 0; irel < recovec.size(); irel++) {
+      for (unsigned int irel = 0; irel < recovec.size(); irel++) {
         streamlog_out(DEBUG) << " irel " << irel << ", recoweight = " << int(recoweightvec.at(irel)) 
                              << ", recoweight%10000 = " << int(recoweightvec.at(irel))%10000 
                              << ", recoweight/10000 = " << int(recoweightvec.at(irel))/10000 << std::endl;  
@@ -235,7 +235,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
         const EVENT::TrackVec& trackvec = rcp->getTracks();
         streamlog_out(DEBUG) << " trackvec has length = " << trackvec.size() << std::endl ;
         double dedx = 0;
-        for (int itrack = 0; itrack < trackvec.size(); itrack++) {
+        for (unsigned int itrack = 0; itrack < trackvec.size(); itrack++) {
           dedx += trackvec.at(itrack)->getdEdx();
           if (itrack == 1) streamlog_out(WARNING) << " found reco particle with ntrack = " << trackvec.size() << " tracks - summing up dEdx " << std::endl ;
         }
