@@ -1,0 +1,22 @@
+####################################################
+# Calculation of energy resolution
+#
+# Authors: Lan Tran, Yorgos Voutsinas
+#
+#####################################################
+
+
+In order to calculate the energy resolution (RMS90), one has to source the script
+runEnergyRes.sh
+
+What that script does is:
+
+1) runs the PFOAnalysis processor of PandoraAnalysis, which produces a plot with the sum of the energy of all PFOs of the event
+
+2) runs a macro tht reads the above mentioned histogram and calculates the RMS90 and its uncertainty
+
+The calculated value are printed at the screen (the user can access the histogram also from the produced ROOT file)
+
+The user needs to provide a reconstructed lcio file (up to MarlinPandora)
+The name of the file should be given to the variable INFILE, in the runEnergyRes.sh script.
+Via the script one may also change the gear file (in case a different detector design is under study)

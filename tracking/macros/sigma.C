@@ -44,7 +44,7 @@ void sigma(){
       TH1F* hd0 = (TH1F*) d1->Get("d0pull");	
       TH1F* hz0 = (TH1F*) d1->Get("z0pull");	
 
-      if (hOmega->GetEntries()>0){
+      if (hOmega->GetEntries()>50){
 
 	hOmega->Fit("gaus");
 	TF1 *fit1 = (TF1*)hOmega->GetFunction("gaus");
