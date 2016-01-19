@@ -190,17 +190,20 @@ void PIDTree::processEvent( LCEvent * evt ) {
       int imaxtrckweight = -1;
       int imaxcaloweight = -1;
       int imaxweight = -1;
+      double trckweight, caloweight;
       for (unsigned int irel = 0; irel < recovec.size(); irel++) {
+        trckweight = double((int(recoweightvec.at(irel))%10000)/1000.);
+        caloweight = double((int(recoweightvec.at(irel))/10000)/1000.);
         streamlog_out(DEBUG) << " irel " << irel << ", recoweight = " << int(recoweightvec.at(irel)) 
-                             << ", recoweight%10000 = " << int(recoweightvec.at(irel))%10000 
-                             << ", recoweight/10000 = " << int(recoweightvec.at(irel))/10000 << std::endl;  
-        if (recoweightvec.at(irel) > maxtrckweight) {
+                             << ", recoweight%10000 = " << trckweight
+                             << ", recoweight/10000 = " << caloweight << std::endl;  
+        if (trckweight > maxtrckweight) {
           imaxtrckweight = irel;
-          maxtrckweight = double((int(recoweightvec.at(irel))%10000)/1000.);
+          maxtrckweight = trckweight;
         }
-        if (recoweightvec.at(irel) > maxcaloweight) {
+        if (caloweight > maxcaloweight) {
           imaxcaloweight = irel;
-          maxcaloweight = double((int(recoweightvec.at(irel))/10000)/1000.);
+          maxcaloweight = caloweight;
         }
       }
       
