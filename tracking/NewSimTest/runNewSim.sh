@@ -21,8 +21,10 @@ ddsim --inputFiles=mcparticles_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio 
 
 # RECONSTRUCTION
 
+cp $ILCSOFT/ILDConfig/HEAD/StandardConfig/lcgeo_current/Pandora* .
+
 Marlin $ILCSOFT/ILDConfig/HEAD/StandardConfig/lcgeo_current/bbudsc_3evt_stdreco_dd4hep.xml \
-    --global.GearXMLFile=$ILCSOFT/ILDConfig/HEAD/StandardConfig/lcgeo_current/gear_ILD_o1_v05_dd4hep.xml \
+    --global.GearXMLFile=$ILCSOFT/ILDConfig/HEAD/StandardConfig/lcgeo_current/GearOutput.xml \
     --global.LCIOInputFiles=SIM_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio \
     --InitDD4hep.DD4hepXMLFile=$lcgeo_DIR/ILD/compact/ILD_o1_v05/ILD_o1_v05.xml \
     --MyLCIOOutputProcessor.LCIOOutputFile=RECO_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio \
@@ -51,7 +53,7 @@ INFILE=REFIT_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio
 
 Marlin Diagnostics.xml \
     --global.LCIOInputFiles=$INFILE \
-    --global.GearXMLFile=$ILCSOFT/ILDConfig/HEAD/StandardConfig/lcgeo_current/gear_ILD_o1_v05_dd4hep.xml \
+    --global.GearXMLFile=$ILCSOFT/ILDConfig/HEAD/StandardConfig/lcgeo_current/GearOutput.xml \
     --MyAIDAProcessor.FileName=analysis_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
     --global.MaxRecordNumber=1000 \
     --global.SkipNEvents=0 \
