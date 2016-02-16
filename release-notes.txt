@@ -9,8 +9,14 @@
 Release Notes:
 
  --------
-| v00-02 |   - Jenny added PID subdirectory 
+| v00-02 |  
  --------
+
+  - Jenny added PID subdirectory 
+  - additional directories:  JER, PID, pi0 
+
+   -> for details see Changelog.txt 
+
  
  --------
 | v00-01 |   - original version by Alonso & Yorgos...

@@ -1,0 +1,588 @@
+------------------------------------------------------------------------
+r5416 | gaede | 2016-02-16 15:04:44 +0100 (Tue, 16 Feb 2016) | 3 lines
+Changed paths:
+   M /ILDPerformance/trunk/CMakeLists.txt
+
+ - updated version  --------- v00-02 ----------
+
+
+------------------------------------------------------------------------
+r5353 | voutsina | 2016-01-21 18:35:47 +0100 (Thu, 21 Jan 2016) | 2 lines
+Changed paths:
+   A /ILDPerformance/trunk/FullAnalysis_DESY
+   A /ILDPerformance/trunk/FullAnalysis_DESY/README
+   A /ILDPerformance/trunk/FullAnalysis_DESY/RecoFiles
+   A /ILDPerformance/trunk/FullAnalysis_DESY/RootFiles
+   A /ILDPerformance/trunk/FullAnalysis_DESY/SIM_n_RECO
+   A /ILDPerformance/trunk/FullAnalysis_DESY/SIM_n_RECO/lctuple.xml
+   A /ILDPerformance/trunk/FullAnalysis_DESY/SIM_n_RECO/reco_ilc.sh
+   A /ILDPerformance/trunk/FullAnalysis_DESY/SIM_n_RECO/runSimReco.sh
+   A /ILDPerformance/trunk/FullAnalysis_DESY/SimFiles
+   M /ILDPerformance/trunk/tracking/NewSimTest/runNewSim.sh
+
+example of full analysis - HZ->mumuX - using the new simulation/reconstruction software added
+it uses the NAF facility to parallelise the simulation in order to save time
+------------------------------------------------------------------------
+r5346 | boehmej | 2016-01-19 11:53:37 +0100 (Tue, 19 Jan 2016) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/PID/src/PIDTree.cc
+
+fixed bug reported by Strahinja
+------------------------------------------------------------------------
+r5339 | voutsina | 2016-01-14 16:46:20 +0100 (Thu, 14 Jan 2016) | 1 line
+Changed paths:
+   D /ILDPerformance/trunk/tracking/NewSimTest/ddsim.py
+   D /ILDPerformance/trunk/tracking/NewSimTest/runNewSim.py
+
+removing some deprecated scripts
+------------------------------------------------------------------------
+r5338 | voutsina | 2016-01-14 16:44:50 +0100 (Thu, 14 Jan 2016) | 3 lines
+Changed paths:
+   M /ILDPerformance/trunk/tracking/NewSimTest/runNewSim.sh
+   D /ILDPerformance/trunk/tracking/NewSimTest/run_sitracking.xml
+   A /ILDPerformance/trunk/tracking/macros/mean.C
+
+updating diagnostics for new simulation 
+in order not to duplicate code, we call steering files from ILDConfig and here only edit the parameters
+so the new simulation diagnostics work only with HEAD ILCSoft installations
+------------------------------------------------------------------------
+r5310 | voutsina | 2015-12-22 15:27:20 +0100 (Tue, 22 Dec 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/CMakeLists.txt
+   D /ILDPerformance/trunk/JER/include
+   D /ILDPerformance/trunk/JER/scripts/EnergyResolution.xml
+   A /ILDPerformance/trunk/JER/scripts/Jer.C
+   A /ILDPerformance/trunk/JER/scripts/README
+   A /ILDPerformance/trunk/JER/scripts/pfoanalysis.xml
+   A /ILDPerformance/trunk/JER/scripts/runEnergyRes.sh
+   D /ILDPerformance/trunk/JER/src
+   M /ILDPerformance/trunk/tracking/macros/sigma.C
+
+macros - scripts for calculation of the RMS 90 of the energy resolution added
+------------------------------------------------------------------------
+r5294 | gwwilson@ku.edu | 2015-12-16 16:42:34 +0100 (Wed, 16 Dec 2015) | 2 lines
+Changed paths:
+   M /ILDPerformance/trunk/JER/src/EnergyResolution.cc
+   M /ILDPerformance/trunk/PID/src/PIDTree.cc
+   M /ILDPerformance/trunk/pi0/include/pi0Tree.h
+   M /ILDPerformance/trunk/pi0/src/pi0Tree.cc
+   M /ILDPerformance/trunk/tracking/src/Diagnostics.cc
+
+minor changes for debugging of pi0tree and fix couple of minor compiler warnings in tracking, JER, PID.
+
+------------------------------------------------------------------------
+r5277 | boehmej | 2015-12-11 09:40:07 +0100 (Fri, 11 Dec 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/PID/src/PIDTree.cc
+
+changed mcp->getParent(i) to mcp->getParents()[i] in PIDTree.cc
+------------------------------------------------------------------------
+r5276 | voutsina | 2015-12-10 20:03:01 +0100 (Thu, 10 Dec 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/tracking/macros/sigma.C
+
+protection against empty fits added
+------------------------------------------------------------------------
+r5275 | voutsina | 2015-12-10 19:14:57 +0100 (Thu, 10 Dec 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/tracking/NewSimTest/bbudsc_3evt_stdreco_dd4hep.xml
+   M /ILDPerformance/trunk/tracking/NewSimTest/runNewSim.sh
+   M /ILDPerformance/trunk/tracking/NewSimTest/run_refit_aidaTT.xml
+   M /ILDPerformance/trunk/tracking/macros/Plots.C
+
+Improvements & cosmetics to tracking performance scripts and macros
+------------------------------------------------------------------------
+r5274 | voutsina | 2015-12-10 18:48:39 +0100 (Thu, 10 Dec 2015) | 1 line
+Changed paths:
+   A /ILDPerformance/trunk/tracking/macros/sigma.C
+
+adding macro that plots the sigma of the track pulls as a function of P and polar angle
+------------------------------------------------------------------------
+r5272 | voutsina | 2015-12-04 17:18:39 +0100 (Fri, 04 Dec 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/tracking/scripts/runAll.sh
+
+restoring runAll script
+------------------------------------------------------------------------
+r5271 | voutsina | 2015-12-04 17:12:24 +0100 (Fri, 04 Dec 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/CMakeLists.txt
+   A /ILDPerformance/trunk/JER
+   A /ILDPerformance/trunk/JER/include
+   A /ILDPerformance/trunk/JER/include/EnergyResolution.h
+   A /ILDPerformance/trunk/JER/scripts
+   A /ILDPerformance/trunk/JER/scripts/EnergyResolution.xml
+   A /ILDPerformance/trunk/JER/scripts/GearOutput.xml
+   A /ILDPerformance/trunk/JER/src
+   A /ILDPerformance/trunk/JER/src/EnergyResolution.cc
+   M /ILDPerformance/trunk/tracking/scripts/Diagnostics.xml
+   M /ILDPerformance/trunk/tracking/scripts/runAll.sh
+
+adding energy resolution to ILDPerformance - not yet fully complete - only for testing for now
+------------------------------------------------------------------------
+r5264 | voutsina | 2015-11-30 00:56:33 +0100 (Mon, 30 Nov 2015) | 1 line
+Changed paths:
+   A /ILDPerformance/trunk/tracking/NewSimTest/ddsim.py
+
+adding ddsim.py - replacing runNewSim.py
+------------------------------------------------------------------------
+r5263 | voutsina | 2015-11-30 00:24:56 +0100 (Mon, 30 Nov 2015) | 3 lines
+Changed paths:
+   M /ILDPerformance/trunk/tracking/NewSimTest/Diagnostics.xml
+   A /ILDPerformance/trunk/tracking/NewSimTest/bbudsc_3evt_stdreco_dd4hep.xml
+   A /ILDPerformance/trunk/tracking/NewSimTest/gear_ILD_o1_v05_dd4hep.xml
+   M /ILDPerformance/trunk/tracking/NewSimTest/lcio_particle_gun.py
+   M /ILDPerformance/trunk/tracking/NewSimTest/runNewSim.sh
+   A /ILDPerformance/trunk/tracking/NewSimTest/run_refit_aidaTT.xml
+
+Updated generation - simulation - reconstruction chain for new DD4hep sim
+for time being by default refits the tracks with aidaTT 
+if the user wants to study a different track collection (i.e. KalTest fitted tracks ) they have to modify Diagnostics.xml accordingly
+------------------------------------------------------------------------
+r5262 | voutsina | 2015-11-27 15:34:27 +0100 (Fri, 27 Nov 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/tracking/macros/Pulls.C
+
+macro that creates booklet with the track parameter pulls for all the analysed files
+------------------------------------------------------------------------
+r5257 | gaede | 2015-11-25 16:35:40 +0100 (Wed, 25 Nov 2015) | 3 lines
+Changed paths:
+   M /ILDPerformance/trunk/tracking/scripts/runAll.sh
+
+ - made compatible with bash 
+
+
+------------------------------------------------------------------------
+r5254 | voutsina | 2015-11-24 15:55:24 +0100 (Tue, 24 Nov 2015) | 1 line
+Changed paths:
+   A /ILDPerformance/trunk/tracking/macros/ComparePulls.C
+
+change the UseParticleGun parameter of RecoMCTruthLinker in the Diagnostics steering file to true - adding macro to directly compare the pull histos of 2 files
+------------------------------------------------------------------------
+r5253 | voutsina | 2015-11-24 15:55:03 +0100 (Tue, 24 Nov 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/tracking/scripts/Diagnostics.xml
+
+change the UseParticleGun parameter of RecoMCTruthLinker in the Diagnostics steering file to true - adding macro to directly compare the pull histos of 2 files
+------------------------------------------------------------------------
+r5224 | boehmej | 2015-11-11 20:08:21 +0100 (Wed, 11 Nov 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/pi0/macros/plotEffi.C
+   M /ILDPerformance/trunk/pi0/src/pi0Tree.cc
+
+fixed true X->gammagamma selection in ILDPerformance/pi0
+------------------------------------------------------------------------
+r5223 | boehmej | 2015-11-11 18:46:12 +0100 (Wed, 11 Nov 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/pi0/include/pi0Tree.h
+   M /ILDPerformance/trunk/pi0/macros/plotERes.C
+   M /ILDPerformance/trunk/pi0/macros/plotEffi.C
+   M /ILDPerformance/trunk/pi0/scripts/pi0Tree.xml
+   M /ILDPerformance/trunk/pi0/src/pi0Tree.cc
+
+refined efficiency definition in ILDPerformance/pi0
+------------------------------------------------------------------------
+r5222 | boehmej | 2015-11-11 17:29:43 +0100 (Wed, 11 Nov 2015) | 1 line
+Changed paths:
+   A /ILDPerformance/trunk/pi0/Results
+   A /ILDPerformance/trunk/pi0/include
+   A /ILDPerformance/trunk/pi0/include/pi0Tree.h
+   A /ILDPerformance/trunk/pi0/macros
+   A /ILDPerformance/trunk/pi0/macros/plotERes.C
+   A /ILDPerformance/trunk/pi0/macros/plotEffi.C
+   A /ILDPerformance/trunk/pi0/macros/rootlogon.C
+   A /ILDPerformance/trunk/pi0/scripts
+   A /ILDPerformance/trunk/pi0/scripts/GearOutput.xml
+   A /ILDPerformance/trunk/pi0/scripts/e1e1h_gg_qqqq_250
+   A /ILDPerformance/trunk/pi0/scripts/e2e2h_gg_qqqq_250
+   A /ILDPerformance/trunk/pi0/scripts/pi0Tree.xml
+   A /ILDPerformance/trunk/pi0/src
+   A /ILDPerformance/trunk/pi0/src/pi0Tree.cc
+
+now the contents of ILDPerformance/pi0
+------------------------------------------------------------------------
+r5221 | boehmej | 2015-11-11 17:24:27 +0100 (Wed, 11 Nov 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/CMakeLists.txt
+   M /ILDPerformance/trunk/PID/macros/plotPIDs.C
+   M /ILDPerformance/trunk/PID/scripts/PIDTree.xml
+   A /ILDPerformance/trunk/pi0
+   A /ILDPerformance/trunk/pi0/README
+
+first commit of ILDPerformance/pi0
+------------------------------------------------------------------------
+r5215 | voutsina | 2015-11-05 18:25:50 +0100 (Thu, 05 Nov 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/tracking/src/Diagnostics.cc
+
+fixing an issue with phi
+------------------------------------------------------------------------
+r5213 | voutsina | 2015-11-03 13:40:13 +0100 (Tue, 03 Nov 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/tracking/include/Diagnostics.h
+   M /ILDPerformance/trunk/tracking/scripts/Diagnostics.xml
+   M /ILDPerformance/trunk/tracking/src/Diagnostics.cc
+
+Updating the steering with the latest RecoMCTruthLinker par., remove warnings and more small changes
+------------------------------------------------------------------------
+r5188 | boehmej | 2015-10-14 16:35:17 +0200 (Wed, 14 Oct 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/PID/README
+
+updated PID/README
+------------------------------------------------------------------------
+r5186 | boehmej | 2015-10-14 11:15:22 +0200 (Wed, 14 Oct 2015) | 1 line
+Changed paths:
+   D /ILDPerformance/trunk/PID/plots
+
+oops - removed accidentally committed plots again
+------------------------------------------------------------------------
+r5185 | boehmej | 2015-10-14 11:14:44 +0200 (Wed, 14 Oct 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/CMakeLists.txt
+   A /ILDPerformance/trunk/PID
+   A /ILDPerformance/trunk/PID/README
+   A /ILDPerformance/trunk/PID/Results
+   A /ILDPerformance/trunk/PID/include
+   A /ILDPerformance/trunk/PID/include/PIDTree.h
+   A /ILDPerformance/trunk/PID/macros
+   A /ILDPerformance/trunk/PID/macros/plotPIDs.C
+   A /ILDPerformance/trunk/PID/macros/rootlogon.C
+   A /ILDPerformance/trunk/PID/plots
+   A /ILDPerformance/trunk/PID/plots/MC_p_emuall.eps
+   A /ILDPerformance/trunk/PID/plots/MC_p_emuall.pdf
+   A /ILDPerformance/trunk/PID/plots/MC_pt_emuall.eps
+   A /ILDPerformance/trunk/PID/plots/MC_pt_emuall.pdf
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg11_cut1.eps
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg11_cut1.pdf
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg11_cut1.ps
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg11_cut2.eps
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg11_cut2.pdf
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg11_cut2.ps
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg13_cut1.eps
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg13_cut1.pdf
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg13_cut1.ps
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg13_cut2.eps
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg13_cut2.pdf
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg13_cut2.ps
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg211_cut1.eps
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg211_cut1.pdf
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg211_cut1.ps
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg211_cut2.eps
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg211_cut2.pdf
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg211_cut2.ps
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg2212_cut1.eps
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg2212_cut1.pdf
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg2212_cut1.ps
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg2212_cut2.eps
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg2212_cut2.pdf
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg2212_cut2.ps
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg321_cut1.eps
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg321_cut1.pdf
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg321_cut1.ps
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg321_cut2.eps
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg321_cut2.pdf
+   A /ILDPerformance/trunk/PID/plots/PDGs_pdg321_cut2.ps
+   A /ILDPerformance/trunk/PID/plots/dEdxeffi_recolevel3_ivar1_icut5.eps
+   A /ILDPerformance/trunk/PID/plots/dEdxeffi_recolevel3_ivar1_icut5.pdf
+   A /ILDPerformance/trunk/PID/plots/dEdxeffi_recolevel3_ivar1_icut5.ps
+   A /ILDPerformance/trunk/PID/plots/dEdxeffi_recolevel3_ivar5_icut2.eps
+   A /ILDPerformance/trunk/PID/plots/dEdxeffi_recolevel3_ivar5_icut2.pdf
+   A /ILDPerformance/trunk/PID/plots/dEdxeffi_recolevel3_ivar5_icut2.ps
+   A /ILDPerformance/trunk/PID/plots/dEdxeffi_recolevel3_ivar5_icut7.eps
+   A /ILDPerformance/trunk/PID/plots/dEdxeffi_recolevel3_ivar5_icut7.pdf
+   A /ILDPerformance/trunk/PID/plots/dEdxeffi_recolevel3_ivar5_icut7.ps
+   A /ILDPerformance/trunk/PID/plots/dEdxeffi_recolevel3_ivar5_icut8.eps
+   A /ILDPerformance/trunk/PID/plots/dEdxeffi_recolevel3_ivar5_icut8.pdf
+   A /ILDPerformance/trunk/PID/plots/dEdxeffi_recolevel3_ivar5_icut8.ps
+   A /ILDPerformance/trunk/PID/plots/dEdxeffi_recolevel6_ivar1_icut5.eps
+   A /ILDPerformance/trunk/PID/plots/dEdxeffi_recolevel6_ivar1_icut5.pdf
+   A /ILDPerformance/trunk/PID/plots/dEdxeffi_recolevel6_ivar1_icut5.ps
+   A /ILDPerformance/trunk/PID/plots/dEdxeffi_recolevel7_ivar1_icut1.eps
+   A /ILDPerformance/trunk/PID/plots/dEdxeffi_recolevel7_ivar1_icut1.pdf
+   A /ILDPerformance/trunk/PID/plots/dEdxeffi_recolevel7_ivar1_icut1.ps
+   A /ILDPerformance/trunk/PID/plots/dEdxeffi_recolevel7_ivar1_icut5.eps
+   A /ILDPerformance/trunk/PID/plots/dEdxeffi_recolevel7_ivar1_icut5.pdf
+   A /ILDPerformance/trunk/PID/plots/dEdxeffi_recolevel7_ivar1_icut5.ps
+   A /ILDPerformance/trunk/PID/plots/effi_allcharged_costheta.eps
+   A /ILDPerformance/trunk/PID/plots/effi_allneutral_costheta.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg0_recolevel1_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg11_recolevel1_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg11_recolevel2_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg11_recolevel3_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg11_recolevel4_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg11_recolevel5_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg11_recolevel6_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg13_recolevel1_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg13_recolevel2_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg13_recolevel3_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg13_recolevel3_ivar5.pdf
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg13_recolevel3_ivar5.ps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg13_recolevel4_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg13_recolevel5_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg13_recolevel6_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg1_recolevel1_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg211_recolevel1_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg211_recolevel2_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg211_recolevel3_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg211_recolevel3_ivar5.pdf
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg211_recolevel3_ivar5.ps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg211_recolevel4_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg211_recolevel5_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg211_recolevel6_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg2212_recolevel1_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg2212_recolevel3_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg2212_recolevel3_ivar5.pdf
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg2212_recolevel3_ivar5.ps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg2212_recolevel4_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg2212_recolevel5_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg321_recolevel1_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg321_recolevel2_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg321_recolevel3_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg321_recolevel3_ivar5.pdf
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg321_recolevel3_ivar5.ps
+   A /ILDPerformance/trunk/PID/plots/effi_ipdg321_recolevel5_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/treescan.txt
+   A /ILDPerformance/trunk/PID/plots/truth_ipdg0_ivar5.eps
+   A /ILDPerformance/trunk/PID/plots/truth_ipdg0_ivar5.pdf
+   A /ILDPerformance/trunk/PID/plots/truth_ipdg0_ivar5.ps
+   A /ILDPerformance/trunk/PID/scripts
+   A /ILDPerformance/trunk/PID/scripts/GearOutput.xml
+   A /ILDPerformance/trunk/PID/scripts/PIDTree.xml
+   A /ILDPerformance/trunk/PID/src
+   A /ILDPerformance/trunk/PID/src/PIDTree.cc
+   D /ILDPerformance/trunk/README
+   M /ILDPerformance/trunk/release-notes.txt
+   A /ILDPerformance/trunk/tracking/README (from /ILDPerformance/trunk/README:5167)
+
+added PID subdirectory
+------------------------------------------------------------------------
+r4979 | voutsina | 2015-07-03 18:45:52 +0200 (Fri, 03 Jul 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/tracking/include/Diagnostics.h
+   A /ILDPerformance/trunk/tracking/macros/eff_comp.C
+   M /ILDPerformance/trunk/tracking/src/Diagnostics.cc
+
+adding plot eff vs costheta & macro to compare efficiencies
+------------------------------------------------------------------------
+r4910 | voutsina | 2015-06-19 16:27:52 +0200 (Fri, 19 Jun 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/tracking/NewSimTest/lcio_particle_gun.py
+   M /ILDPerformance/trunk/tracking/NewSimTest/runNewSim.sh
+   M /ILDPerformance/trunk/tracking/NewSimTest/run_sitracking.xml
+
+making some updates/fixes to scripts running the new simulation/reconstruction
+------------------------------------------------------------------------
+r4879 | Rosa.Simoniello@cern.ch | 2015-06-17 10:34:39 +0200 (Wed, 17 Jun 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/tracking/include/Diagnostics.h
+   A /ILDPerformance/trunk/tracking/include/Skim.h
+   M /ILDPerformance/trunk/tracking/src/Diagnostics.cc
+   A /ILDPerformance/trunk/tracking/src/Skim.cc
+
+rescale phi angle in a fixed range, add processor to skim charged mc particple in some theta region
+------------------------------------------------------------------------
+r4858 | voutsina | 2015-06-10 18:05:57 +0200 (Wed, 10 Jun 2015) | 1 line
+Changed paths:
+   A /ILDPerformance/trunk/release-notes.txt
+
+release notes added
+------------------------------------------------------------------------
+r4847 | voutsina | 2015-06-09 16:32:51 +0200 (Tue, 09 Jun 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/tracking/scripts/Diagnostics.xml
+   M /ILDPerformance/trunk/tracking/scripts/GearOutput.xml
+   M /ILDPerformance/trunk/tracking/scripts/stdreco_tracking.xml
+
+minor bug fixes
+------------------------------------------------------------------------
+r4790 | voutsina | 2015-04-29 14:12:36 +0200 (Wed, 29 Apr 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/README
+   M /ILDPerformance/trunk/tracking/include/Diagnostics.h
+   M /ILDPerformance/trunk/tracking/scripts/Diagnostics.xml
+   M /ILDPerformance/trunk/tracking/src/Diagnostics.cc
+
+digging more info on bad tracks, updating README
+------------------------------------------------------------------------
+r4788 | voutsina | 2015-04-13 15:23:30 +0200 (Mon, 13 Apr 2015) | 4 lines
+Changed paths:
+   A /ILDPerformance/trunk/tracking/NewSimTest
+   A /ILDPerformance/trunk/tracking/NewSimTest/Diagnostics.xml
+   A /ILDPerformance/trunk/tracking/NewSimTest/README
+   A /ILDPerformance/trunk/tracking/NewSimTest/gear_SimpleILD_DD4hep.xml
+   A /ILDPerformance/trunk/tracking/NewSimTest/lcio_particle_gun.py
+   A /ILDPerformance/trunk/tracking/NewSimTest/runNewSim.py
+   A /ILDPerformance/trunk/tracking/NewSimTest/runNewSim.sh
+   A /ILDPerformance/trunk/tracking/NewSimTest/run_sitracking.xml
+
+scripts to run and test the new simulation 
+work on going
+uses HEAD versions of ILCSoft packages
+
+------------------------------------------------------------------------
+r4770 | voutsina | 2015-02-18 15:14:13 +0100 (Wed, 18 Feb 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/tracking/scripts/PatRec.sh
+
+correcting PatRec.sh script
+------------------------------------------------------------------------
+r4765 | voutsina | 2015-02-17 17:50:34 +0100 (Tue, 17 Feb 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/tracking/macros/D0Resolution.C
+   M /ILDPerformance/trunk/tracking/macros/PResolution.C
+   M /ILDPerformance/trunk/tracking/scripts/Diagnostics.xml
+   M /ILDPerformance/trunk/tracking/scripts/runAll.sh
+
+steering file parameters tuning - macros plot 20deg polar angle also
+------------------------------------------------------------------------
+r4764 | voutsina | 2015-02-17 16:17:17 +0100 (Tue, 17 Feb 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/tracking/macros/D0Resolution.C
+   M /ILDPerformance/trunk/tracking/macros/PResolution.C
+   M /ILDPerformance/trunk/tracking/scripts/Diagnostics.xml
+
+Some cosmetics to the macros
+------------------------------------------------------------------------
+r4758 | voutsina | 2015-02-05 15:15:39 +0100 (Thu, 05 Feb 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/README
+   M /ILDPerformance/trunk/tracking/include/Diagnostics.h
+   M /ILDPerformance/trunk/tracking/scripts/Diagnostics.xml
+   M /ILDPerformance/trunk/tracking/scripts/PatRec.sh
+   M /ILDPerformance/trunk/tracking/scripts/runAll.sh
+   M /ILDPerformance/trunk/tracking/src/Diagnostics.cc
+
+change from hard coded values to processor parameters the definition of efficiency and of the filters that define the examined MCParticle subsample
+------------------------------------------------------------------------
+r4754 | voutsina | 2015-02-03 18:49:34 +0100 (Tue, 03 Feb 2015) | 1 line
+Changed paths:
+   A /ILDPerformance/trunk/tracking/macros/PatRec.C
+
+adding macros
+------------------------------------------------------------------------
+r4753 | voutsina | 2015-02-03 18:00:38 +0100 (Tue, 03 Feb 2015) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/README
+   M /ILDPerformance/trunk/tracking/include/Diagnostics.h
+   A /ILDPerformance/trunk/tracking/macros/BadTracks.C
+   M /ILDPerformance/trunk/tracking/macros/D0Resolution.C
+   A /ILDPerformance/trunk/tracking/macros/Efficiency.C
+   M /ILDPerformance/trunk/tracking/macros/PResolution.C
+   A /ILDPerformance/trunk/tracking/macros/Plots.C
+   A /ILDPerformance/trunk/tracking/macros/Pulls.C
+   A /ILDPerformance/trunk/tracking/macros/Residuals.C
+   M /ILDPerformance/trunk/tracking/scripts/Diagnostics.xml
+   A /ILDPerformance/trunk/tracking/scripts/PatRec.sh
+   M /ILDPerformance/trunk/tracking/scripts/runAll.sh
+   M /ILDPerformance/trunk/tracking/scripts/runAnalysis.sh
+   M /ILDPerformance/trunk/tracking/src/Diagnostics.cc
+
+Readme updated, user friendliness improved, automatically initialising ROOT GUI after running the scripts, more macros added
+------------------------------------------------------------------------
+r4743 | voutsina | 2014-12-23 17:26:10 +0100 (Tue, 23 Dec 2014) | 1 line
+Changed paths:
+   A /ILDPerformance/trunk/tracking/macros/CompareResiduals.C
+   D /ILDPerformance/trunk/tracking/macros/PtResolutionOne.C
+   M /ILDPerformance/trunk/tracking/src/Diagnostics.cc
+
+Macro that compares the track parameters residuals of two track collections
+------------------------------------------------------------------------
+r4742 | voutsina | 2014-12-19 12:55:32 +0100 (Fri, 19 Dec 2014) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/tracking/include/Diagnostics.h
+   M /ILDPerformance/trunk/tracking/src/Diagnostics.cc
+
+adding canvas with residuals
+------------------------------------------------------------------------
+r4741 | gaede | 2014-12-19 10:25:07 +0100 (Fri, 19 Dec 2014) | 3 lines
+Changed paths:
+   M /ILDPerformance/trunk/tracking/src/Diagnostics.cc
+
+ - make sure ROOT has the dictionary for stdd::vector (needed e.g. on MacOS)
+
+
+------------------------------------------------------------------------
+r4736 | voutsina | 2014-12-09 13:56:02 +0100 (Tue, 09 Dec 2014) | 1 line
+Changed paths:
+   A /ILDPerformance/trunk/tracking/macros/D0Resolution.C
+   A /ILDPerformance/trunk/tracking/macros/PResolution.C
+
+macros for D0 - momentum resolution
+------------------------------------------------------------------------
+r4735 | voutsina | 2014-12-09 08:32:15 +0100 (Tue, 09 Dec 2014) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/tracking/macros/PtResolutionOne.C
+
+fixes at the Pt resolution macro
+------------------------------------------------------------------------
+r4734 | voutsina | 2014-12-08 18:45:46 +0100 (Mon, 08 Dec 2014) | 1 line
+Changed paths:
+   A /ILDPerformance/trunk/tracking/Results
+   A /ILDPerformance/trunk/tracking/Results/Analysis
+   A /ILDPerformance/trunk/tracking/Results/RecoFiles
+   A /ILDPerformance/trunk/tracking/Results/SimFiles
+   A /ILDPerformance/trunk/tracking/macros
+   A /ILDPerformance/trunk/tracking/macros/PtResolutionOne.C
+   M /ILDPerformance/trunk/tracking/scripts/runAll.sh
+   M /ILDPerformance/trunk/tracking/scripts/runAnalysis.sh
+   M /ILDPerformance/trunk/tracking/scripts/runMarlin.sh
+   M /ILDPerformance/trunk/tracking/scripts/runMokka.sh
+   M /ILDPerformance/trunk/tracking/scripts/stdreco_tracking.xml
+   M /ILDPerformance/trunk/tracking/src/Diagnostics.cc
+
+first testing macro to plot Pt resolution
+------------------------------------------------------------------------
+r4733 | voutsina | 2014-12-08 13:26:05 +0100 (Mon, 08 Dec 2014) | 1 line
+Changed paths:
+   A /ILDPerformance/trunk/tracking/scripts/Diagnostics.xml
+   A /ILDPerformance/trunk/tracking/scripts/GearOutput.xml
+   M /ILDPerformance/trunk/tracking/scripts/runAll.sh
+   A /ILDPerformance/trunk/tracking/scripts/stdreco_tracking.xml
+
+steering files for analysis
+------------------------------------------------------------------------
+r4728 | voutsina | 2014-12-08 07:52:08 +0100 (Mon, 08 Dec 2014) | 1 line
+Changed paths:
+   M /ILDPerformance/trunk/tracking/scripts/runAnalysis.sh
+
+correction in runAnalysis script
+------------------------------------------------------------------------
+r4727 | voutsina | 2014-12-08 07:38:25 +0100 (Mon, 08 Dec 2014) | 1 line
+Changed paths:
+   A /ILDPerformance/trunk/tracking/scripts
+   A /ILDPerformance/trunk/tracking/scripts/runAll.sh
+   A /ILDPerformance/trunk/tracking/scripts/runAnalysis.sh
+   A /ILDPerformance/trunk/tracking/scripts/runMarlin.sh
+   A /ILDPerformance/trunk/tracking/scripts/runMokka.sh
+
+Scripts to simulate, reconstruct and analyse single tracks of various momenta and polar angles added
+------------------------------------------------------------------------
+r4722 | voutsina | 2014-12-05 19:28:30 +0100 (Fri, 05 Dec 2014) | 1 line
+Changed paths:
+   A /ILDPerformance/trunk/CMakeLists.txt
+   A /ILDPerformance/trunk/tracking/include
+   A /ILDPerformance/trunk/tracking/include/Diagnostics.h
+   A /ILDPerformance/trunk/tracking/src
+   A /ILDPerformance/trunk/tracking/src/Diagnostics.cc
+
+first import of track diagnostics processor
+------------------------------------------------------------------------
+r4718 | gaede | 2014-12-05 11:56:08 +0100 (Fri, 05 Dec 2014) | 2 lines
+Changed paths:
+   A /ILDPerformance/trunk/tracking
+   A /ILDPerformance/trunk/tracking/resolution
+
+ - add empty directories
+
+------------------------------------------------------------------------
+r4717 | gaede | 2014-12-05 11:53:49 +0100 (Fri, 05 Dec 2014) | 2 lines
+Changed paths:
+   A /ILDPerformance/branches
+   A /ILDPerformance/tags
+   A /ILDPerformance/trunk
+   A /ILDPerformance/trunk/README
+
+ - created empty package structure
+
+------------------------------------------------------------------------
