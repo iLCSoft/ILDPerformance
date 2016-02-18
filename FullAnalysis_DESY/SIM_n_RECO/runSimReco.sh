@@ -36,26 +36,28 @@
 unset MARLIN_DLL
 . /afs/desy.de/project/ilcsoft/sw/x86_64_gcc44_sl6/HEAD-2016-01-18/init_ilcsoft.sh
 
+# set the ILDConfig version to be used
+ILDCONFIG=${ILCSOFT}/ILDConfig/HEAD
 
 #for i in {1..10}
 #do
 
 INFILE=/afs/desy.de/user/v/voutsina/public/w20618_01.stdhep
 COMPACTFILE=$lcgeo_DIR/ILD/compact/ILD_o1_v05/ILD_o1_v05.xml
-GEARFILE=$ILCSOFT/ILDConfig/HEAD/StandardConfig/lcgeo_current/GearOutput.xml
+GEARFILE=${ILDCONFIG}/StandardConfig/lcgeo_current/GearOutput.xml
 
 #==================================================
 #SIMULATION
 
-ddsim --inputFiles=$INFILE  --outputFile=$1.slcio --compactFile=$COMPACTFILE --steeringFile=$ILCSOFT/ILDConfig/HEAD/StandardConfig/lcgeo_current/bbudsc_3evt_ddsim.steer --numberOfEvents=$2  --skipNEvents=$3
+ddsim --inputFiles=$INFILE  --outputFile=$1.slcio --compactFile=$COMPACTFILE --steeringFile=${ILDCONFIG}/StandardConfig/lcgeo_current/ddsim_steer.py --numberOfEvents=$2  --skipNEvents=$3
 
 mv $1.slcio ../SimFiles
 #=================================================
 # RECONSTRUCTION
 
-cp $ILCSOFT/ILDConfig/HEAD/StandardConfig/lcgeo_current/Pandora* .
+cp ${ILDCONFIG}/StandardConfig/lcgeo_current/Pandora* .
 
-Marlin  $ILCSOFT/ILDConfig/HEAD/StandardConfig/lcgeo_current/bbudsc_3evt_stdreco_dd4hep.xml \
+Marlin  ${ILDCONFIG}/StandardConfig/lcgeo_current/bbudsc_3evt_stdreco_dd4hep.xml \
     --global.LCIOInputFiles=../SimFiles/$1.slcio \
     --global.GearXMLFile=$GEARFILE \
     --InitDD4hep.DD4hepXMLFile=$COMPACTFILE \
