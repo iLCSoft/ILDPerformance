@@ -22,7 +22,9 @@ ddsim --inputFiles=mcparticles_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio 
 
 # RECONSTRUCTION
 
-cp ${ILDCONFIG}/StandardConfig/lcgeo_current/Pandora* .
+cp ${ILDCONFIG}/StandardConfig/lcgeo_current/* .
+#fg: need to copy all config files here
+
 
 Marlin ${ILDCONFIG}/StandardConfig/lcgeo_current/bbudsc_3evt_stdreco_dd4hep.xml \
     --global.GearXMLFile=${ILDCONFIG}/StandardConfig/lcgeo_current/GearOutput.xml \
