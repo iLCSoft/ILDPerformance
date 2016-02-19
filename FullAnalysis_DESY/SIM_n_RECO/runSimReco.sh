@@ -55,7 +55,8 @@ mv $1.slcio ../SimFiles
 #=================================================
 # RECONSTRUCTION
 
-cp ${ILDCONFIG}/StandardConfig/lcgeo_current/Pandora* .
+cp ${ILDCONFIG}/StandardConfig/lcgeo_current/* .
+#fg: need to copy all config files here
 
 Marlin  ${ILDCONFIG}/StandardConfig/lcgeo_current/bbudsc_3evt_stdreco_dd4hep.xml \
     --global.LCIOInputFiles=../SimFiles/$1.slcio \
