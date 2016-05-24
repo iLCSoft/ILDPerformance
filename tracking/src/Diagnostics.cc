@@ -214,20 +214,17 @@ void Diagnostics::processEvent( LCEvent * evt ) {
     EvalTree->Branch("GhostsPt",&GhostsPt) ;
     EvalTree->Branch("SiTrksPt",&SiTrksPt) ;
     EvalTree->Branch("ghostTrkChi2OverNdof",&ghostTrkChi2OverNdof);
-    //EvalTree->Branch("SiTrkChi2OverNdof",&SiTrkChi2OverNdof);
-    //EvalTree->Branch("CluChi2OverNdof",&CluChi2OverNdof);
     EvalTree->Branch("foundTrkChi2OverNdof",&foundTrkChi2OverNdof);
     EvalTree->Branch("PtMCP",&PtMCP) ;
     EvalTree->Branch("InvWgt",&InvWgt) ;
     EvalTree->Branch("Wgt",&Wgt) ;
     EvalTree->Branch("TrackSiHits",&TrackSiHits) ;
-    //EvalTree->Branch("SiHitsSiTrk",&SiHitsSiTrk) ;
     EvalTree->Branch("VXDHits",&VXDHits) ;
     EvalTree->Branch("SITHits",&SITHits) ;
+    EvalTree->Branch("FTDHits",&FTDHits) ;
+    EvalTree->Branch("TPCHits",&TPCHits) ;
     EvalTree->Branch("ghost_hits",&ghost_hits) ;
     EvalTree->Branch("MarlinTracks",&MarlinTracks,"MarlinTracks/I") ;
-    //EvalTree->Branch("SeedTracks",&SeedTracks,"SeedTracks/I") ;
-    //EvalTree->Branch("SiliconTracks",&SiliconTracks,"SiliconTracks/I") ;
     EvalTree->Branch("trueD0",&trueD0) ;
     EvalTree->Branch("trueZ0",&trueZ0) ;
     EvalTree->Branch("recoD0",&recoD0) ;
@@ -244,17 +241,10 @@ void Diagnostics::processEvent( LCEvent * evt ) {
     EvalTree->Branch("recoTanLambda",&recoTanLambda) ;
     EvalTree->Branch("recoTanLambdaError",&recoTanLambdaError) ;
     EvalTree->Branch("ghostCosTheta",&ghostCosTheta) ;
-    //EvalTree->Branch("siTrksCosTheta",&siTrksCosTheta) ;
     EvalTree->Branch("MarlinTrkHits",&MarlinTrkHits) ;
     EvalTree->Branch("BadTrksD0",&BadTrksD0) ;
     EvalTree->Branch("BadTrksZ0",&BadTrksZ0) ;
-    /*
-    EvalTree->Branch("residualOmega",&residualOmega) ;
-    EvalTree->Branch("residualD0",&residualD0) ;
-    EvalTree->Branch("residualZ0",&residualZ0) ;
-    EvalTree->Branch("residualPhi",&residualPhi) ;
-    EvalTree->Branch("residualTanLambda",&residualTanLambda) ;
-    */
+
     OmegaPull = new TH1F("OmegaPull","Omega pull",100,-10,10);
     PhiPull = new TH1F("PhiPull","Phi pull",100,-10,10);
     TanLambdaPull = new TH1F("TanLambdaPull","TanLambda",100,-10,10);
@@ -267,7 +257,7 @@ void Diagnostics::processEvent( LCEvent * evt ) {
     d0Residual = new TH1F("d0Residual","d0 Residual",50,-0.1,0.1);
     z0Residual = new TH1F("z0Residual","z0 Residual",50,-0.1,0.1); 
 
-    //double bins[nBins+1] = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 0.8, 1.0, 2., 5.0 , 10. , 20. , 50. , 100. , 300. , 500. } ;
+
     double bins[nBins+1] = { 0.01, 0.1, 0.2, 0.3, 0.5 , 0.7 , 1.0 , 2., 5.0 , 10. , 20. , 50. , 100. , 300.  } ;
 
     hist_pt_t  = new TH1F( "hist_pt_t", "Pt distributions of true tracks", nBins , bins ) ;
@@ -293,7 +283,7 @@ void Diagnostics::processEvent( LCEvent * evt ) {
   recoD0Error.clear();    recoZ0Error.clear();  recoOmegaError.clear();   recoPhiError.clear();  recoTanLambdaError.clear();
   GhostsPt.clear();  
   foundTrkChi2OverNdof.clear();    ghostTrkChi2OverNdof.clear();  ghostCosTheta.clear();
-  MarlinTrkHits.clear();   VXDHits.clear();  SITHits.clear();
+  MarlinTrkHits.clear();   VXDHits.clear();  SITHits.clear();  FTDHits.clear();  TPCHits.clear();
   BadTrksZ0.clear();  BadTrksD0.clear(); ghost_hits.clear();
 
 
@@ -343,8 +333,10 @@ void Diagnostics::processEvent( LCEvent * evt ) {
       Track *MarlinRecoTrack = dynamic_cast<Track*>( MarlinTrks->getElementAt( ii ) ) ;
       MarlinTrkMap[MarlinRecoTrack] ++ ;
       MarlinTrkHits.push_back(MarlinRecoTrack->getTrackerHits().size());
-      //BadTrksD0.push_back(MarlinRecoTrack->getD0());
-      //BadTrksZ0.push_back(MarlinRecoTrack->getZ0());
+      FTDHits.push_back(MarlinRecoTrack->getSubdetectorHitNumbers()[4] );
+      VXDHits.push_back(MarlinRecoTrack->getSubdetectorHitNumbers()[0] );
+      TPCHits.push_back(MarlinRecoTrack->getSubdetectorHitNumbers()[6] );
+      SITHits.push_back(MarlinRecoTrack->getSubdetectorHitNumbers()[2] );
     }
   }
 
@@ -559,12 +551,10 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	
 	int SiHits = ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[0] + ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[2];  // *2 cause there are spacepoints
 
-	int SITHits = ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[2];
-
 	int TotalHits = ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[0] + ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[2] + ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[6] ;
 	int TotalHitsInFit = ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[1] + ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[3] + ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[7] ;
 
-	streamlog_out(DEBUG4) << " MCParticle " << mcpTracks[ii] << " index " << jj << " track " << trkvec[jj] << " purity " << testFromWgt[jj] << " Si hits " << SiHits << " SIT hits " << SITHits << " total hits " << TotalHits << " Total hits in fit " << TotalHitsInFit << std::endl ;
+	streamlog_out(DEBUG4) << " MCParticle " << mcpTracks[ii] << " index " << jj << " track " << trkvec[jj] << " purity " << testFromWgt[jj] << " Silicon hits " << SiHits << " total hits " << TotalHits << " Total hits in fit " << TotalHitsInFit << std::endl ;
 	streamlog_out(DEBUG4) << " Reco track " << ((Track*)trkvec[jj]) << "  Pt " << (fabs(1./(((Track*)trkvec[jj])->getOmega()))/1000.0) << " Inverse relative weight to MC particle "  << testWgt[jj] << " purity " << testFromWgt[jj] <<  " Silicon hits " << SiHits << std::endl ;
 	
 	InvWgt.push_back(testWgt[jj]);

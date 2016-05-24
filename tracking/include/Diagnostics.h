@@ -136,6 +136,8 @@ class Diagnostics : public Processor {
   vector<float> BadTrksZ0 ;
   vector<int> VXDHits ;
   vector<int> SITHits ;
+  vector<int> FTDHits ;
+  vector<int> TPCHits ;
   vector<int> ghost_hits;
   vector<float> foundTrkChi2OverNdof ;
   vector<float> ghostTrkChi2OverNdof ;
