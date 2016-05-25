@@ -14,14 +14,15 @@
 using namespace std;
 
 #define SIZE_M 8
-#define SIZE_PA 3
+#define SIZE_PA 4
 
 double sigma[SIZE_M][SIZE_PA], error_sigma[SIZE_M][SIZE_PA];
 
 int Mom[SIZE_M] = {1, 3, 5, 10, 15, 25, 50, 100};
 float Momentum[SIZE_M] = {1, 3, 5, 10, 15, 25, 50, 100};
 float zeros[SIZE_M];
-int PA[SIZE_PA] = {20, 40, 85};
+int PA[SIZE_PA] = {10, 20, 40, 85};
+
 float LimAxis;
 int color, marker;
 
@@ -67,13 +68,14 @@ void PResolution(){
 	    LimAxis = 1/(100*Mom[i]/1.0);
 	  }
 	}      
-        else{ //axis for polar angle 20
-	  if ( Mom[i] == 1 && PA[ii] == 20 ){
-	    LimAxis = 0.3;
-	  }
+        else if (PA[ii] == 20 ){ //axis for polar angle 20
+	  if ( Mom[i] == 1 ){ LimAxis = 0.3; }
 	  else{
 	    LimAxis = 0.01;
 	  }
+	}
+        else if (PA[ii] == 20 ){
+	  LimAxis = 0.04;
 	}
 
 	TH1F* h1 = new TH1F("h1","Momentum Resolution",100, (-1)*LimAxis, LimAxis); 
@@ -101,32 +103,36 @@ void PResolution(){
  float error20[SIZE_M];
  float r_error20[SIZE_M];
   for(int kk=0; kk < SIZE_M; kk++){
-    sigma20[kk] = sigma[kk][0];
-    error20[kk] = error_sigma[kk][0];
-    r_error20[kk] = 100*(error_sigma[kk][0]/sigma[kk][0]);
+    sigma20[kk] = sigma[kk][1];
+    error20[kk] = error_sigma[kk][1];
+    r_error20[kk] = 100*(error_sigma[kk][1]/sigma[kk][1]);
   }  
+
+  float sigma10[SIZE_M];
+  float error10[SIZE_M];
+  float r_error10[SIZE_M];
+  for(int kk=0; kk < SIZE_M; kk++){
+    sigma10[kk] = sigma[kk][0];
+    error10[kk] = error_sigma[kk][0];
+  }
   
   float sigma40[SIZE_M];
   float error40[SIZE_M];
   float r_error40[SIZE_M];
   for(int kk=0; kk < SIZE_M; kk++){
-    sigma40[kk] = sigma[kk][1];
-    error40[kk] = error_sigma[kk][1];
-    r_error40[kk] = 100*(error_sigma[kk][1]/sigma[kk][1]);
-
-    //std::cout << " polar angle = 40, momentum " << Momentum[kk] << " kk " << kk << " sigma40 " << sigma40[kk] << std::endl ;
-
+    sigma40[kk] = sigma[kk][2];
+    error40[kk] = error_sigma[kk][2];
+    r_error40[kk] = 100*(error_sigma[kk][2]/sigma[kk][2]);
   }
 
   float sigma85[SIZE_M];
   float error85[SIZE_M];
   float r_error85[SIZE_M];
   for(int kk=0; kk < SIZE_M; kk++){
-    sigma85[kk] = sigma[kk][2];
-    error85[kk] = error_sigma[kk][2];
-    r_error85[kk] = 100*(error_sigma[kk][2]/sigma[kk][2]);
-
-    //std::cout << " polar angle = 85, momentum " << Momentum[kk] << " kk " << kk << " sigma85 " << sigma85[kk] << std::endl ;
+    sigma85[kk] = sigma[kk][3];
+    error85[kk] = error_sigma[kk][3];
+    r_error85[kk] = 100*(error_sigma[kk][3]/sigma[kk][3]);
+    std::cout << " polar angle = 85, momentum " << Momentum[kk] << " kk " << kk << " sigma85 " << sigma85[kk] << std::endl ;
 
   }
 
@@ -160,6 +166,13 @@ void PResolution(){
   //Muon_plot40 -> SetMaximum( 2*pow(10, -1) );
   Muon_plot40 -> Draw("P");
 
+  TGraphErrors *Muon_plot10 = new TGraphErrors(SIZE_M, Momentum, sigma10,  zeros, error10);
+  Muon_plot10 -> SetTitle("Momentum Resolution");
+  Muon_plot10 -> SetMarkerColor(6);
+  Muon_plot10 -> SetMarkerStyle(20);
+  Muon_plot10 -> SetMarkerSize(1);
+  Muon_plot10 -> Draw("P");
+
   TGraphErrors *Muon_plot85 = new TGraphErrors(SIZE_M, Momentum, sigma85,  zeros, error85);
   Muon_plot85 -> SetTitle("Momentum Resolution");
   Muon_plot85 -> SetMarkerColor(1);
@@ -173,6 +186,7 @@ void PResolution(){
 
   TLegend *leg = new TLegend(0.6,0.7,0.75,0.95);
   //leg->SetHeader("Polar Angles"); //name of the legend
+  leg->AddEntry(Muon_plot10,"#theta = 10^{o}","p");
   leg->AddEntry(Muon_plot20,"#theta = 20^{o}","p");
   leg->AddEntry(Muon_plot40,"#theta = 40^{o}","p");
   leg->AddEntry(Muon_plot85,"#theta = 85^{o}","p");
