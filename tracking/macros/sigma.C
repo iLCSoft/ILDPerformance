@@ -53,23 +53,23 @@ void sigma(){
 	
 	hTanLambda->Fit("gaus");
 	TF1 *fit2 = (TF1*)hTanLambda->GetFunction("gaus");
-	sigmaTanLambda[i][ii] = fit1->GetParameter(2);
-	error_sigmaTanLambda[i][ii] =  fit1->GetParError(2);
+	sigmaTanLambda[i][ii] = fit2->GetParameter(2);
+	error_sigmaTanLambda[i][ii] =  fit2->GetParError(2);
       
 	hPhi->Fit("gaus");
 	TF1 *fit3 = (TF1*)hPhi->GetFunction("gaus");
-	sigmaPhi[i][ii] = fit1->GetParameter(2);
-	error_sigmaPhi[i][ii] =  fit1->GetParError(2);
+	sigmaPhi[i][ii] = fit3->GetParameter(2);
+	error_sigmaPhi[i][ii] =  fit3->GetParError(2);
 	
 	hd0->Fit("gaus");
 	TF1 *fit4 = (TF1*)hd0->GetFunction("gaus");
-	sigmad0[i][ii] = fit1->GetParameter(2);
-	error_sigmad0[i][ii] =  fit1->GetParError(2);
+	sigmad0[i][ii] = fit4->GetParameter(2);
+	error_sigmad0[i][ii] =  fit4->GetParError(2);
 	
 	hz0->Fit("gaus");
 	TF1 *fit5 = (TF1*)hz0->GetFunction("gaus");
-	sigmaz0[i][ii] = fit1->GetParameter(2);
-	error_sigmaz0[i][ii] =  fit1->GetParError(2);
+	sigmaz0[i][ii] = fit5->GetParameter(2);
+	error_sigmaz0[i][ii] =  fit5->GetParError(2);
 	
 
       }//loop for each .root files, here I have collected sigma and its error

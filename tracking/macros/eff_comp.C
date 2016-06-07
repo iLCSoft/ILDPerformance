@@ -1,4 +1,4 @@
-void efficiency(){
+void eff_comp(){
 
   gStyle->SetFillColor(0);
 

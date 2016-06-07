@@ -38,7 +38,7 @@ int PA[SIZE_PA] = {10};
 float LimAxis;
 int color, marker;
 
-void D0Resolution_new(){
+void D0Resolution(){
   for (int ll = 0; ll < SIZE_M; ll++){  
     zeros[ll] = 0;
   }
