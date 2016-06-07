@@ -1,27 +1,38 @@
 Directory to test the new simulation framework.
-Experimental, currently it requires HEAD versions of the ilcsoft packages.
 
-The script runNewSim.sh, generates, simulates, reconstructs and analyses 1000 single muon
-tracks, for various momenta and polar angles, using DD4hep.
-It simulates a simplified detector model, which consists of VXD and a pixel-like SIT.
+The script runNewSim.sh, generates, simulates, reconstructs and analyses 1000 single tracks (by default muons - the user may change that, see below for generation), for various momenta and polar angles, using DD4hep.
+
+Important: the user needs to source init_ilcsoft.sh and edit the variable ILDConfig
+to point to the path of the corresponding ILDConfig directory.
 
 generation: the python script lcio_particle_gun.py creates MCParticles. It takes as arguments
-the momentum, the polar angle and the name of the output lcio file which holds the MCParticles collection.
+1. momentum
+2. polar angle
+3. output file name
+4. particle pdg code
+5. particle's charge
 
-simulation: runNewSim.py
-It takes as arguments the compact xml file describing the detector geometry
-(default is the simple ILD model, the user can modify that)
-the name of the input MCParticles lcio file
-and the name of the output simulation lcio file.
+One might use particle gun instead. In that case, comment out the line that runs lcio_particle_gun.py and
+turn on the particle gun inside file ddsim_steer.py (see below)
 
-reconstruction: run_sitracking.xml
-as it is obvious by its name, this marlin steering file runs the digitisers on the simple ILD model, 
-and reconstructs silicon tracks.
-The gear file gear_SimpleILD_DD4hep.xml, which corresponds to the simple ILD geometry is provided.
-The user may replace it with another steering/gear files. 
+simulation: it runs ddsim, using by default assteering file ILDConfig/StandardConfig/lcgeo_current/ddsim_steer.py 
+A number of arguments can be used (have a look at ddsim_steer.py)
+by default we are using 
+1. input file name
+2. output file name
+3. compact file
+4. steering file
+5. number of events
 
-refitting with aidaTT: this part is currently commented it out, until aida tracking toolkit is
-completed, debugged and tested.
+
+
+reconstruction: we are using the standard reco file, at ILDCONFIG/StandardConfig/lcgeo_current/bbudsc_3evt_stdreco_dd4hep.xml
+
+
+refitting: runs the refit processor. The user can choose between aidaTT and DDKalTest tracking system, by editing
+the file run_refit_aidaTT.xml and modifying appropriately the processor parameter TrackSystemName
+
+ 
 
 analysis: runs the diagnostics processor on the reconstructed files. It produces a root file, which stores
 performance canvases (efficiency - pulls - residuals) and a TTree with track info.
