@@ -53,9 +53,9 @@
    <!--Name of the ReconstructedParticles input collection-->
    <parameter name="RecoParticleCollection" type="string" lcioInType="ReconstructedParticle"> PandoraPFOs </parameter>
    <!--Name of the Cluster collection -->
-   <parameter name="ClusterCollection" type="string" lcioInType="Cluster"> PandoraClusters </parameter>
+   <parameter name="ClusterCollection" type="string" lcioInType="Cluster"> PandoraClusters2 </parameter>
    <!--Name of the Tracks input collection-->
-   <parameter name="TrackCollection" type="string" lcioInType="Track">AidaTTTracks </parameter>
+   <parameter name="TrackCollection" type="string" lcioInType="Track">MarlinTrkTracks </parameter>
  
    <!-- Don't change any of these hit related collections if you're not very sure you know what you are doing.
        In any case, the ones listed here are the defaults, so they can be removed from
@@ -114,8 +114,8 @@
    <!-- links between tracks or clusters and mcparticles. The two sets differ
        in what the weight means. These four will only be output if the
        name is given here in the steering -->
-   <parameter name="MCTruthTrackLinkName" type="string" lcioOutType="LCRelation"> MCTruthAidaTTTracksLink </parameter>  
-   <parameter name="TrackMCTruthLinkName" type="string" lcioOutType="LCRelation"> AidaTTTracksMCTruthLink </parameter>
+   <parameter name="MCTruthTrackLinkName" type="string" lcioOutType="LCRelation"> MCTruthMarlinTrkTracksLink </parameter>  
+   <parameter name="TrackMCTruthLinkName" type="string" lcioOutType="LCRelation"> MarlinTrkTracksMCTruthLink </parameter>
    <parameter name="MCTruthClusterLinkName" type="string" lcioOutType="LCRelation"> MCTruthClusterLink </parameter>
    <parameter name="ClusterMCTruthLinkName" type="string" lcioOutType="LCRelation"> ClusterMCTruthLink </parameter>
 
@@ -140,11 +140,11 @@
 
  <processor name="MyDiagnostics" type="Diagnostics">
   <!--Name of the studied track collection-->
-  <parameter name="StudiedTracks" type="string" lcioInType="Track"> AidaTTTracks </parameter>
+  <parameter name="StudiedTracks" type="string" lcioInType="Track"> MarlinTrkTracks </parameter>
   <!--true - reco relation collection-->
-  <parameter name="MCTracksTruthLinkCollectionName" type="string" lcioInType="Track"> MCTruthAidaTTTracksLink </parameter>
+  <parameter name="MCTracksTruthLinkCollectionName" type="string" lcioInType="Track"> MCTruthMarlinTrkTracksLink </parameter>
   <!--reco - true relation collection-->
-  <parameter name="TracksMCTruthLinkCollectionName" type="string" lcioInType="Track"> AidaTTTracksMCTruthLink </parameter>
+  <parameter name="TracksMCTruthLinkCollectionName" type="string" lcioInType="Track"> MarlinTrkTracksMCTruthLink </parameter>
   <!--Name of the MCParticle input collection-->
   <parameter name="MCParticleCollection" type="string" lcioInType="MCParticle"> MCParticle </parameter>
   <!--Enables cuts to define the examined track sample-->
