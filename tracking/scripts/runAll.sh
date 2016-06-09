@@ -12,11 +12,11 @@ y_dir=('0.173' '0.342' '0.643' '0.996')
 z_dir=('0.985' '0.94'  '0.766' '0.087') 
 Mom=( '1' '3' '5' '10' '15' '25' '50' '100' )
 
-for i in {0..3}
+for i in {1..4}
 
 do
 
-for j in {0..7}
+for j in {1..8}
 
 do
 
@@ -74,7 +74,7 @@ cat >  muons << EOF
 /gun/momentum ${Mom[j]}
 /gun/particle mu-
 
-/run/beamOn 100
+/run/beamOn 500
 
 EOF
 #=================================================
