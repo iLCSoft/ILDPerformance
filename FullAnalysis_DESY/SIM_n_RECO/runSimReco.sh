@@ -32,17 +32,17 @@
 
 #=================================================
 
-#SET THE DESIRED ILCSOFT HEAD VERSION
+#SET THE DESIRED ILCSOFT RELEASE OR HEAD VERSION
 unset MARLIN_DLL
-. /afs/desy.de/project/ilcsoft/sw/x86_64_gcc44_sl6/HEAD-2016-01-18/init_ilcsoft.sh
+. /afs/desy.de/project/ilcsoft/sw/x86_64_gcc48_sl6/HEAD-2016-05-20/init_ilcsoft.sh
 
-# set the ILDConfig version to be used
+# set the ILDConfig version to be used. IMPORTANT: it should be consistent with the ilcsoft release
 ILDCONFIG=${ILCSOFT}/ILDConfig/HEAD
 
 #for i in {1..10}
 #do
 
-INFILE=/afs/desy.de/user/v/voutsina/public/w20618_01.stdhep
+INFILE=/nfs/dust/ilc/user/voutsina/GenFiles/E250-TDR_ws.Pe2e2h_mumu.Gwhizard-1_95.eL.pR.I108009.001.stdhep
 COMPACTFILE=$lcgeo_DIR/ILD/compact/ILD_o1_v05/ILD_o1_v05.xml
 GEARFILE=${ILDCONFIG}/StandardConfig/lcgeo_current/GearOutput.xml
 
@@ -56,6 +56,7 @@ mv $1.slcio ../SimFiles
 # RECONSTRUCTION
 
 cp ${ILDCONFIG}/StandardConfig/lcgeo_current/* .
+cp -rp ${ILDCONFIG}/StandardConfig/lcgeo_current/* .
 #fg: need to copy all config files here
 
 Marlin  ${ILDCONFIG}/StandardConfig/lcgeo_current/bbudsc_3evt_stdreco_dd4hep.xml \
