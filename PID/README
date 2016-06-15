@@ -19,7 +19,7 @@ $MARLIN/bin/Marlin PIDTree.xml
 
 cd ../macros
 root -l
-. x plotPIDs.C("../Results/analysis_output.root");
+.x plotPIDs.C("../Results/analysis_output.root");
 
 [plots PID efficiencies for the four algorthms,
 writes ../Results/PIDs_pdg[i]_cut[j].[eps,ps,pdf].

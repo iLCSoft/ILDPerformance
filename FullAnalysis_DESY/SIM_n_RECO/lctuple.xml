@@ -21,7 +21,7 @@
  </execute>
 
  <global>
-  <parameter name="LCIOInputFiles"> reco_DBD_0.slcio reco_DBD_1000.slcio reco_DBD_2000.slcio reco_DBD_3000.slcio reco_DBD_4000.slcio reco_DBD_5000.slcio reco_DBD_6000.slcio reco_DBD_7000.slcio reco_DBD_8000.slcio reco_DBD_9000.slcio </parameter>
+  <parameter name="LCIOInputFiles"> rv01-17-09_overlay.sv01-14-01-p00.mILD_o1_v05.E500-TDR_ws.I106519.Pe2e2h.eL.pR-00001-DST.slcio </parameter>
   <!-- limit the number of processed records (run+evt): -->  
   <parameter name="MaxRecordNumber" value="0" />  
   <parameter name="SkipNEvents" value="0"/>  

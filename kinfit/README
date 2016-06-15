@@ -1,0 +1,52 @@
+Standard test for WW -> 4 jets (udsc)
+=====================================
+
+- input:
+* DST / REC file with PFO collection
+  (Pandora or ???)
+
+- runs
+* jet finding (excl kt 4 jets + beam jets, cone R = 1.3)     
+* 5C kinematic fit (E, p, equal mass)
+
+- plots
+* jet mass
+* number of iterations
+* fit probability
+* fitted W mass
+
+Author: J.List
+=========================================
+
+Instructions
+==============
+
+0) initialize Marlin
+
+1) insert path to your input DST / REC file to test in
+   scripts/WW5CFit.xml
+    
+   [optionally: adjust output level, number of events, 
+                name of output root file etc] 
+                
+   if not ILD_o1_v05, copy your gear files and adjust in steering             
+
+2) run 
+   $MALIN/bin/Marlin scripts/WW5CFit.xml
+   
+   this writes root file 
+   rootfiles/WW5CFit_test.root
+    
+3) go to macros, start root and run
+
+   .x WW5CFit_compare.C
+
+   [if needed change input rootfile name here as well]
+   
+   This compares the above distributions from the test file with a 
+   reference file [provided in macros] and creates pdf and eps files ofthe canvas
+   
+   The reference histograms will be normalized to the same content as the test histogram!
+   
+   
+  
