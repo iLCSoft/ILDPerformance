@@ -2,10 +2,10 @@
 #include<sstream>
 
 
-void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root", 
-                      const char* testfilename = "../rootfiles/ZH5CFit_test.root", 
-                      const char* legtitle = "OPALFitter, ZH -> 4jets",
-                      const char* outfilename = "comparison_ZH5CFit") {
+void ZHWW5CFit_compare (const char* reffilename = "WW5CFit.root", 
+              const char* testfilename = "../rootfiles/ZH5CFit_test.root", 
+              const char* legtitle = "OPALFitter, WW/ZH -> 4jets",
+              const char* outfilename = "comparison_ZHWW5CFit") {
 
   gStyle->SetOptTitle(0);
   gStyle->SetTitleOffset(1.5,"y");
@@ -31,16 +31,16 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
   histnames[6][0] = "MyZH5CFit/hRecHMassNoFitBest";
   histnames[7][0] = "MyZH5CFit/hRecZMassNoFitBest";
   
-  histnames[0][1] = "MyZH5CFit/hJetMass";
+  histnames[0][1] = "MyWW5CFit/hJetMass";
   //histnames[0] = "MyZH5CFit/hFitError";
-  histnames[1][1] = "MyZH5CFit/hNItBest";
-  histnames[2][1] = "MyZH5CFit/hFitProb";
-  histnames[3][1] = "MyZH5CFit/hPhotonEnergy";
+  histnames[1][1] = "MyWW5CFit/hNItBest";
+  histnames[2][1] = "MyWW5CFit/hFitProb";
+  histnames[3][1] = "MyWW5CFit/hPhotonEnergy";
   
-  histnames[4][1] = "MyZH5CFit/hRecHMassBest";
-  histnames[5][1] = "MyZH5CFit/hRecHMassAll";
-  histnames[6][1] = "MyZH5CFit/hRecHMassNoFitBest";
-  histnames[7][1] = "MyZH5CFit/hRecZMassNoFitBest";
+  histnames[4][1] = "MyWW5CFit/hRecWMassBest";
+  histnames[5][1] = "MyWW5CFit/hRecWMassAll";
+  histnames[6][1] = "MyWW5CFit/hRecWMassNoFitBest";
+  histnames[7][1] = "MyWW5CFit/hRecWMassNoFitBest";
   
   bool logy[nhist] = {true, true, true, true, false, false, false, false};
   
@@ -52,10 +52,10 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
   axistitle[2] = "Fit probability";
   axistitle[3] = "Photon Energy / GeV";
   
-  axistitle[4] = "H mass / GeV  (best)";
-  axistitle[5] = "H mass / GeV  (all)";
-  axistitle[6] = "H mass / GeV  (best, no fit)";
-  axistitle[7] = "Z mass / GeV  (best, no fit)";
+  axistitle[4] = "W/H mass / GeV  (best)";
+  axistitle[5] = "W/H mass / GeV  (all)";
+  axistitle[6] = "W/H mass / GeV  (best, no fit)";
+  axistitle[7] = "W/Z mass / GeV  (best, no fit)";
   
   double leg_left[nhist]  = {0.4, 0.4, 0.4, 0.4, 0.7, 0.6, 0.7, 0.6};
   double leg_right[nhist] = {0.9, 0.9, 0.9, 0.9, 1.0, 0.9, 1.0, 0.9};
@@ -91,7 +91,6 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
         double max = h[ihist][0]->GetMaximum(); 
         if (h[ihist][1]->GetMaximum() > max) max = h[ihist][1]->GetMaximum();
         h[ihist][ifile]->SetMaximum(1.2*max); 
-        if (ihist == 2) h[ihist][ifile]->SetMinimum(10.); 
         if (ihist == 3) h[ihist][ifile]->SetMinimum(1.); 
         //h[ihist][ifile]->SetHistLineWidth(4);   
       }    
@@ -134,7 +133,7 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
   
   // --------------- save to pdf file ----------------------------------
 
-  std::string epsFile1( std::string( "../plots/" )  + std::string( outfilename ) + std::string( "_1" )  + std::string( ".eps" ) ) ;
+  std::string epsFile1( std::string( "../plots/" )  +  std::string( outfilename ) + std::string( "_1" )  + std::string( ".eps" ) ) ;
   std::string pdfFile1( std::string( "../plots/" )  +  std::string( outfilename ) + std::string( "_1" ) + std::string( ".pdf" ) ) ;
   //std::string cFile1  ( std::string( "../plots/" )  +  std::string( outfilename ) + std::string( "_1" ) + std::string( ".C" ) ) ;
   c1->Print( epsFile1.c_str() ) ;
