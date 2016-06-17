@@ -1,0 +1,130 @@
+<!-- Loading shared library : /data/boehmej/flc/MarlinWorkdir/mymarlin/lib/libmymarlin.so -->
+<!--##########################################
+    #                                        #
+    #     Example steering file for marlin   #
+    #                                        #
+    ##########################################-->
+  
+<!-- Add to ${PROJECT_NAME}_DEPENDS in CMakeLists.txt: MarlinReco CLHEP RAIDA -->
+
+<marlin>
+ <execute>
+  <processor name="MyAIDAProcessor"/>
+  <!--processor name="MySatoruJetFinderProcessor"/-->
+  <processor name="MyFastJetProcessor_exclkt"/>
+  <processor name="MyZH5CFit"/> 
+ </execute>
+
+ <global>
+  <!-- input file (needs to have Durham2Jets collection or you have to run the jet finder in addition!): -->  
+  <parameter name="LCIOInputFiles">
+  /nfs/dust/ilc/user/ebrahimi/ZqqHbbSample/LCIO/E500.Pqqh.DST_RV-v01-17-08_gcc44_withOverlay_ZqqHbbSelected.slcio
+ </parameter>
+  <!-- limit the number of processed records (run+evt): -->  
+  <parameter name="MaxRecordNumber" value="0" />  
+  <parameter name="SkipNEvents" value="0" />  
+  <parameter name="SupressCheck" value="false" />  
+  <parameter name="GearXMLFile">GearOutput_ILD_o1_v05.xml</parameter>  
+  <parameter name="Verbosity" options="VERBOSE,DEBUG,MESSAGE,WARNING,ERROR,SILENT">ERROR</parameter> 
+ </global>
+
+ <processor name="MyAIDAProcessor" type="AIDAProcessor">
+ <!--Processor that handles AIDA files. Creates on directory per processor.  Processors only need to create and fill the histograms, clouds and tuples. Needs to be the first ActiveProcessor-->
+  <!-- compression of output file?   0: false >0: true (default) -->
+  <parameter name="Compress" type="int"> 1 </parameter>
+  <!-- filename without extension-->
+  <parameter name="FileName" type="string"> ../rootfiles/ZH5CFit_OPALISR </parameter>
+  <!-- type of output file xml (default) or root ( only OpenScientist)-->
+  <parameter name="FileType" type="string"> root </parameter>
+</processor>
+
+ <processor name="MyFastJetProcessor_Durham4Jets" type="FastJetProcessor">
+ <!--Using the FastJet library to identify jets-->
+  <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+  <!--parameter name="Verbosity" type="string">DEBUG </parameter-->
+  <!--Selects the algorithm and its parameters. E.g. 'kt_algorithm 0.7' or 'ee_kt_algorithm'. For a full list of supported algorithms, see the logfile after execution.-->
+  <parameter name="algorithm" type="StringVec">ee_kt_algorithm  </parameter>
+  <!--One of 'Inclusive <minPt>', 'InclusiveIterativeNJets <nrJets> <minE>', 'ExclusiveNJets <nrJets>', 'ExclusiveYCut <yCut>'. Note: not all modes are available for all algorithms.-->
+  <parameter name="clusteringMode" type="StringVec">ExclusiveNJets 4 </parameter>
+  <!--The identified jets-->
+  <parameter name="jetOut" type="string" lcioOutType="ReconstructedParticle">Durham_4Jets </parameter>
+  <!--a list of all reconstructed particles we are searching for jets in.-->
+  <parameter name="recParticleIn" type="string" lcioInType="ReconstructedParticle">PandoraPFOs </parameter>
+  <!--The recombination scheme used when merging 2 particles. Usually there is no need to use anything else than 4-Vector addition: E_scheme-->
+  <parameter name="recombinationScheme" type="string">E_scheme </parameter>
+</processor>
+
+ <processor name="MyFastJetProcessor_exclkt" type="FastJetProcessor">
+ <!--Using the FastJet library to identify jets-->
+  <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+  <!--parameter name="Verbosity" type="string">DEBUG </parameter-->
+  <!--Selects the algorithm and its parameters. E.g. 'kt_algorithm 0.7' or 'ee_kt_algorithm'. For a full list of supported algorithms, see the logfile after execution.-->
+  <parameter name="algorithm" type="StringVec">kt_algorithm 1.3</parameter>
+  <!--One of 'Inclusive <minPt>', 'InclusiveIterativeNJets <nrJets> <minE>', 'ExclusiveNJets <nrJets>', 'ExclusiveYCut <yCut>'. Note: not all modes are available for all algorithms.-->
+  <parameter name="clusteringMode" type="StringVec">ExclusiveNJets 4 </parameter>
+  <!--The identified jets-->
+  <parameter name="jetOut" type="string" lcioOutType="ReconstructedParticle">Durham_4Jets </parameter>
+  <!--a list of all reconstructed particles we are searching for jets in.-->
+  <parameter name="recParticleIn" type="string" lcioInType="ReconstructedParticle">PandoraPFOs </parameter>
+  <!--The recombination scheme used when merging 2 particles. Usually there is no need to use anything else than 4-Vector addition: E_scheme-->
+  <parameter name="recombinationScheme" type="string">E_scheme </parameter>
+  <parameter name="findNrJets"> 4 </parameter>
+  <parameter name="findNrJetsCollectionPrefix"> Jets_ </parameter>
+</processor>
+
+ <processor name="MySatoruJetFinderProcessor" type="SatoruJetFinderProcessor">
+ <!--A multi algorithm jet finder-->
+  <!--Set debug level-->
+  <!--parameter name="Debug" type="int">0 </parameter-->
+  <!--Jet energycut for cone jet finding algorithm with variable number of jets-->
+  <!--parameter name="EpsCone" type="float">7 </parameter-->
+  <!--mode for manual alogorithm selection, see documentation for details-->
+  <!--parameter name="GlobalMode" type="string">0A </parameter-->
+  <!--Collection of reconstructed particles-->
+  <parameter name="InputCollection" type="string" lcioInType="ReconstructedParticle">PandoraPFOs</parameter>
+  <!--Merging mode, if mode is "manual"-->
+  <!--parameter name="MergingMode" type="int">0 </parameter-->
+  <!--Merging threshold, if mode is "manual"-->
+  <!--parameter name="MergingThreshold" type="float">0 </parameter-->
+  <!--Select predefined algorithms for jet finding(or "manual")-->
+  <parameter name="Mode" type="string">DurhamNJet </parameter>
+  <!--Force everything to N jets(if supported by current mode)-->
+  <parameter name="NJetRequested" type="int">4 </parameter>
+  <!--Name of collection with the found jets-->
+  <parameter name="OutputCollection" type="string" lcioOutType="ReconstructedParticle">Durham_4Jets</parameter>
+  <!--Primary jet finding mode, if mode is "manual"-->
+  <!--parameter name="PrimaryJetFindingMode" type="int">0 </parameter-->
+  <!--Half cone opening angle for cone jet finding algorithm with variable number of jet-->
+  <!--parameter name="RCone" type="float">0.7 </parameter-->
+  <!--Secong jet finding mode, if mode is "manual"-->
+  <!--parameter name="SecondJetFindingMode" type="int">0 </parameter-->
+  <!--Name of parameter added to event in case of successful jet finding-->
+  <!--parameter name="SuccessTag" type="string">JetsFound </parameter-->
+  <!--Threshold, if mode is "manual"-->
+  <!--parameter name="Threshold" type="float">0 </parameter-->
+  <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+  <!--parameter name="Verbosity" type="string">DEBUG </parameter-->
+  <!--YCut for jet finding algorithm(if supported by current mode)-->
+  <!--parameter name="YCut" type="float">0 </parameter-->
+</processor>
+
+ <processor name="MyZH5CFit" type="ZH5CFit">
+  <!--ZH5CFit does a 5C fit on 4 jet events (Px, Py, Pz, E, M12 = MZ (for all six permutations)) -->
+  <!--Name of the Jet collection-->
+  <parameter name="JetCollectionName" type="string" lcioInType="ReconstructedParticle">Durham_4Jets</parameter>
+  <!-- center-of-mass energy (default: 500.) -->
+  <parameter name="ECM" type="float"> 500. </parameter>
+  <!-- include ISR in fit hypothesis?    0: false >0: true (default) -->
+  <parameter name="FitISR" type="int"> 1 </parameter>
+  <!-- maximum energy (=|p_z|) for a single ISR photon  (default: 225. = WW at 500) -->
+  <parameter name="ISRPzMax" type="float"> 203. </parameter>
+  <!-- 0 = OPALFitter, 1 = NewFitter, 2 = NewtonFitter (default: 0) -->
+  <parameter name="fitter" type="int"> 0 </parameter>
+  <!-- set true if every event should be traced in DEBUG mode (default: false) -->
+  <parameter name="traceall" type="bool"> false </parameter>
+  <!-- number of individual event to be traced (default: -1) -->
+  <parameter name="ievttrace" type="int"> -1 </parameter>
+  <parameter name="Verbosity" options="VERBOSE,DEBUG,MESSAGE,WARNING,ERROR,SILENT">MESSAGE</parameter> 
+</processor>
+
+</marlin>

@@ -1,5 +1,5 @@
-Standard test for WW -> 4 jets (udsc)
-=====================================
+Standard test for WW -> 4 jets (udsc)  and ZH -> 4 jets
+========================================================
 
 - input:
 * DST / REC file with PFO collection
@@ -7,16 +7,18 @@ Standard test for WW -> 4 jets (udsc)
 
 - runs
 * jet finding (excl kt 4 jets + beam jets, cone R = 1.3)     
-* 5C kinematic fit (E, p, equal mass)
+* 5C kinematic fit (E, p, equal mass or E, p, M_Z)
 
 - plots
 * jet mass
 * number of iterations
 * fit probability
-* fitted W mass
+* fitted ISR photon energy
+* fitted W/H mass  (best / all permutations)
+* pre-fit W/H/Z mass for permutation which gives best fitprobability 
 
 Author: J.List
-=========================================
+=============================================================
 
 Instructions
 ==============
@@ -24,7 +26,7 @@ Instructions
 0) initialize Marlin
 
 1) insert path to your input DST / REC file to test in
-   scripts/WW5CFit.xml
+   scripts/WW5CFit.xml  or scripts/ZH5CFit.xml
     
    [optionally: adjust output level, number of events, 
                 name of output root file etc] 
@@ -33,18 +35,24 @@ Instructions
 
 2) run 
    $MALIN/bin/Marlin scripts/WW5CFit.xml
+    - or -
+   $MALIN/bin/Marlin scripts/ZH5CFit.xml
    
    this writes root file 
    rootfiles/WW5CFit_test.root
+    - or -
+   rootfiles/ZH5CFit_test.root
     
 3) go to macros, start root and run
 
    .x WW5CFit_compare.C
+    - or -
+   .x ZH5CFit_compare.C
 
    [if needed change input rootfile name here as well]
    
    This compares the above distributions from the test file with a 
-   reference file [provided in macros] and creates pdf and eps files ofthe canvas
+   reference file [provided in macros] and creates pdf and eps files of the canvas in directory plots  
    
    The reference histograms will be normalized to the same content as the test histogram!
    
