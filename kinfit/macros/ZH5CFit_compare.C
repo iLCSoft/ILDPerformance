@@ -3,9 +3,9 @@
 
 
 void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root", 
-                      const char* testfilename = "../rootfiles/ZH5CFit_OPALNoISR.root", 
-                      const char* legtitle = "OPALFitter, No ISR, ZH -> 4jets",
-                      const char* outfilename = "comparison_ZH5CFit_OPALNoISR") {
+                      const char* testfilename = "../rootfiles/ZH5CFit_test.root", 
+                      const char* legtitle = "OPALFitter, ZH -> 4jets",
+                      const char* outfilename = "comparison_ZH5CFit") {
 
   gStyle->SetOptTitle(0);
   gStyle->SetTitleOffset(1.5,"y");
@@ -42,7 +42,7 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
   histnames[6][1] = "MyZH5CFit/hRecHMassNoFitBest";
   histnames[7][1] = "MyZH5CFit/hRecZMassNoFitBest";
   
-  bool logy[nhist] = {true, true, true, true, false, false, false, false};
+  bool logy[nhist] = {true, true, true, true, true, true, true, true};
   
   TString axistitle[nhist];
 
@@ -57,7 +57,7 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
   axistitle[6] = "H mass / GeV  (best, no fit)";
   axistitle[7] = "Z mass / GeV  (best, no fit)";
   
-  double leg_left[nhist]  = {0.4, 0.4, 0.4, 0.4, 0.7, 0.6, 0.7, 0.6};
+  double leg_left[nhist]  = {0.4, 0.4, 0.4, 0.4, 0.7, 0.4, 0.7, 0.6};
   double leg_right[nhist] = {0.9, 0.9, 0.9, 0.9, 1.0, 0.9, 1.0, 0.9};
    
   TH1F *h[nhist][nfile];
@@ -91,7 +91,7 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
         double max = h[ihist][0]->GetMaximum(); 
         if (h[ihist][1]->GetMaximum() > max) max = h[ihist][1]->GetMaximum();
         h[ihist][ifile]->SetMaximum(1.2*max); 
-        if (ihist == 2) h[ihist][ifile]->SetMinimum(0.5); 
+        if (ihist == 2) h[ihist][ifile]->SetMinimum(10.); 
         if (ihist == 3) h[ihist][ifile]->SetMinimum(1.); 
         //h[ihist][ifile]->SetHistLineWidth(4);   
       }    
@@ -123,7 +123,8 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
   for (int ihist = 4; ihist < nhist; ++ihist) {
     c2->cd(ihist-3);
     if (logy[ihist]) gPad->SetLogy();
-    leg2[ihist] = new TLegend (leg_left[ihist], 0.7, leg_right[ihist], 0.9, legtitle);
+    if ( ihist == 5 ) leg2[ihist] = new TLegend (leg_left[ihist], 0.4, leg_right[ihist], 0.6, legtitle);
+    else leg2[ihist] = new TLegend (leg_left[ihist], 0.7, leg_right[ihist], 0.9, legtitle);
     h[ihist][1]->Draw("hist");
     leg2[ihist]->AddEntry(h[ihist][1],"Reference","L");
     h[ihist][0]->Draw("e0same");
