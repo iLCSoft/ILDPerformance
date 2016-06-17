@@ -136,11 +136,11 @@
   <!-- center-of-mass energy (default: 500.) -->
   <parameter name="ECM" type="float"> 500. </parameter>
   <!-- include ISR in fit hypothesis?    0: false >0: true (default) -->
-  <parameter name="FitISR" type="int"> 0 </parameter>
+  <parameter name="FitISR" type="int"> 1 </parameter>
   <!-- maximum energy (=|p_z|) for a single ISR photon  (default: 225.) -->
   <parameter name="ISRPzMax" type="float"> 225. </parameter>
   <!-- 0 = OPALFitter, 1 = NewFitter, 2 = NewtonFitter (default: 0) -->
-  <parameter name="fitter" type="int"> 1 </parameter>
+  <parameter name="fitter" type="int"> 0 </parameter>
   <!-- set true if every event should be traced in DEBUG mode (default: false) -->
   <parameter name="traceall" type="bool"> false </parameter>
   <!-- number of individual event to be traced (default: -1) -->

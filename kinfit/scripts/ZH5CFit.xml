@@ -21,7 +21,7 @@
   /nfs/dust/ilc/user/ebrahimi/ZqqHbbSample/LCIO/E500.Pqqh.DST_RV-v01-17-08_gcc44_withOverlay_ZqqHbbSelected.slcio
  </parameter>
   <!-- limit the number of processed records (run+evt): -->  
-  <parameter name="MaxRecordNumber" value="0" />  
+  <parameter name="MaxRecordNumber" value="10" />  
   <parameter name="SkipNEvents" value="0" />  
   <parameter name="SupressCheck" value="false" />  
   <parameter name="GearXMLFile">GearOutput_ILD_o1_v05.xml</parameter>  
@@ -33,7 +33,7 @@
   <!-- compression of output file?   0: false >0: true (default) -->
   <parameter name="Compress" type="int"> 1 </parameter>
   <!-- filename without extension-->
-  <parameter name="FileName" type="string"> ../rootfiles/ZH5CFit_OPALISR </parameter>
+  <parameter name="FileName" type="string"> ../rootfiles/ZH5CFit_test </parameter>
   <!-- type of output file xml (default) or root ( only OpenScientist)-->
   <parameter name="FileType" type="string"> root </parameter>
 </processor>
