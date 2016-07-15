@@ -92,6 +92,7 @@ class PIDTree : public Processor {
   int    nMCParticles;
   
   vector<double> trueP;
+  vector<double> trueMass;
   vector<double> truePt ;
   vector<double> trueTheta ;
   vector<double> truePhi ;

@@ -91,6 +91,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
     hermTree = new TTree("hermTree","hermTree");
     hermTree->Branch("nMCParticles",&nMCParticles,"nMCParticles/I") ;
     hermTree->Branch("trueP",&trueP) ;
+    hermTree->Branch("trueMass",&trueMass) ;
     hermTree->Branch("truePt",&truePt) ;
     hermTree->Branch("trueTheta",&trueTheta) ;
     hermTree->Branch("truePhi",&truePhi) ;
@@ -115,6 +116,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
   streamlog_out(DEBUG) << " clearing vectors " << std::endl;
   nMCParticles = 0;
   trueP.clear();  
+  trueMass.clear();  
   truePt.clear();  
   trueTheta.clear();  
   truePhi.clear();  
@@ -166,13 +168,14 @@ void PIDTree::processEvent( LCEvent * evt ) {
     
       streamlog_out(DEBUG) << " start push_back " << std::endl;  
       trueP.push_back(p.r());
+      trueMass.push_back( mcp->getMass() ) ;
       truePt.push_back(p.trans());
       trueTheta.push_back(p.theta());
       truePhi.push_back(p.phi());
       trueCharge.push_back(mcp->getCharge());
       truePDG.push_back(mcp->getPDG());
       streamlog_out(DEBUG) << " before getting parent " << std::endl;  
-      if (mcp->getParents()[0]) {
+      if ( mcp->getParents().size() > 0 ) {
         trueMother.push_back(mcp->getParents()[0]->getPDG());
       }  
       else {
