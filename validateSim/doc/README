@@ -1,0 +1,11 @@
+The idea is of this processor is to produce a basic set of
+plots to validate (or find problems) in a simulation model.
+
+Example distributions are of hit energies and time, position, and cell indices.
+
+The /test/ directory has a few scripts which can be used to produce a simple simulation file,
+and run the validation processor over it (sim_and_check.sh).
+
+Each hit collection is treated by one instance of the processor, and produced a root file for that collection.
+
+The plotallhits.C macro produces a .ps file with a selection of these plots.
