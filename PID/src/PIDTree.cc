@@ -4,6 +4,7 @@
 #include <UTIL/PIDHandler.h>
 #include "TROOT.h"
 
+#include <math.h>
 
 
 PIDTree aPIDTree ;
@@ -110,6 +111,11 @@ void PIDTree::processEvent( LCEvent * evt ) {
     hermTree->Branch("showerPDG",&showerPDG) ;
     hermTree->Branch("likeliPDG",&likeliPDG) ;
     hermTree->Branch("lowmomPDG",&lowmomPDG) ;
+    hermTree->Branch("LiPDG_el",&LiPDG_el) ;
+    hermTree->Branch("LiPDG_mu",&LiPDG_mu) ;
+    hermTree->Branch("LiPDG_pi",&LiPDG_pi) ;
+    hermTree->Branch("LiPDG_ka",&LiPDG_ka) ;
+    hermTree->Branch("LiPDG_pr",&LiPDG_pr) ;
 
   }
   
@@ -134,8 +140,12 @@ void PIDTree::processEvent( LCEvent * evt ) {
   dEdxPDG.clear();  
   showerPDG.clear();  
   likeliPDG.clear();  
-  lowmomPDG.clear();  
-
+  lowmomPDG.clear(); 
+  LiPDG_el.clear(); 
+  LiPDG_mu.clear(); 
+  LiPDG_pi.clear(); 
+  LiPDG_ka.clear(); 
+  LiPDG_pr.clear();  
 
   streamlog_out(DEBUG) << " iterator and navigator " << std::endl;
   LCIterator<MCParticle> mcpIt( evt, _mcParticleCollectionName ) ;
@@ -258,6 +268,74 @@ void PIDTree::processEvent( LCEvent * evt ) {
         likeliPDG.push_back(pidh->getParticleID(rcp, pidh->getAlgorithmID("LikelihoodPID")).getPDG());
         lowmomPDG.push_back(pidh->getParticleID(rcp, pidh->getAlgorithmID("LowMomMuID")).getPDG());
 
+
+// JL July 25, 2016 : ParticleIDVec does not seem to get filled !!!
+//       
+//         // getParticleIDs ("S" !) gives back a VECTOR of ParticleID objects for all hypotheses, ordered by value
+//         ParticleIDVec likeliPID = pidh->getParticleIDs(rcp, pidh->getAlgorithmID("LikelihoodPID"));
+//         
+//         int hypcounter[5] = {0,0,0,0,0};
+//         streamlog_out(MESSAGE) << " this ParticleIDVec has a size of = " << likeliPID.size() << endl;
+//         for (int ihyp = 0; ihyp < likeliPID.size(); ihyp++) {
+//           int pdg = abs(likeliPID[ihyp]->getPDG());
+//           switch (pdg) {
+//             case 11 :
+//               LiPDG_el.push_back(likeliPID[ihyp]->getLikelihood());
+//               hypcounter[0]++;
+//               break;
+//             case 13 :
+//               LiPDG_mu.push_back(likeliPID[ihyp]->getLikelihood());
+//               hypcounter[1]++;
+//               break;
+//             case 211 :
+//               LiPDG_pi.push_back(likeliPID[ihyp]->getLikelihood());
+//               hypcounter[2]++;
+//               break;
+//             case 321 :
+//               LiPDG_ka.push_back(likeliPID[ihyp]->getLikelihood());
+//               hypcounter[3]++;
+//               break;
+//             case 2212 :
+//               LiPDG_pr.push_back(likeliPID[ihyp]->getLikelihood());
+//               hypcounter[4]++;
+//               break;
+//             default :
+//               streamlog_out(WARNING) << " found unknown PID hypothesis with pdg = " << pdg << endl;
+//               break;
+//           }  
+//           if (ihyp == likeliPID.size() - 1) {
+//             for (int jhyp = 0; jhyp < 5; jhyp++) {
+//               if (hypcounter[jhyp] != 1) streamlog_out(ERROR) << " found wrong number of hypotheses: hypcounter [" << jhyp << "] = " << hypcounter[jhyp] << endl;
+//             }
+//           }
+//         }
+
+        
+        const ParticleID* likeliPID = &(pidh->getParticleID(rcp, pidh->getAlgorithmID("LikelihoodPID")));
+        if (likeliPID && likeliPID->getParameters().size() > 4 ) {
+          float likelihood[5] = {2.,2.,2.,2.,2};
+          for ( int ihyp = 0 ; ihyp < 5; ihyp++ ) {
+            likelihood[ihyp] = likeliPID->getParameters()[ihyp];
+            if ( std::isinf(likelihood[ihyp]) ) {
+              streamlog_out(MESSAGE) << " likelihood [" << ihyp << "] = " << likelihood[ihyp] << endl;
+              likelihood[ihyp] = 9.;
+            }  
+          }
+          LiPDG_el.push_back(likelihood[0]); streamlog_out(MESSAGE) << " electron hyp = " << likelihood[0] << endl;
+          LiPDG_mu.push_back(likelihood[1]); streamlog_out(MESSAGE) << " muon hyp = "     << likelihood[1] << endl;
+          LiPDG_pi.push_back(likelihood[2]); streamlog_out(MESSAGE) << " pion hyp = "     << likelihood[2] << endl;
+          LiPDG_ka.push_back(likelihood[3]); streamlog_out(MESSAGE) << " kaon hyp = "     << likelihood[3] << endl;
+          LiPDG_pr.push_back(likelihood[4]); streamlog_out(MESSAGE) << " proton hyp = "   << likelihood[4] << endl;
+        }
+        else {
+          streamlog_out(MESSAGE) << " likeliPID has = " << likeliPID->getParameters().size() << " parameters " << endl;
+          LiPDG_el.push_back(2.);
+          LiPDG_mu.push_back(2.);
+          LiPDG_pi.push_back(2.);
+          LiPDG_ka.push_back(2.);
+          LiPDG_pr.push_back(2.);
+        }
+
       } // if reco part
       // IMPROVE HERE: CHECK if track or cluster exists!
       else {
@@ -274,6 +352,12 @@ void PIDTree::processEvent( LCEvent * evt ) {
         showerPDG.push_back(0);
         likeliPDG.push_back(0);
         lowmomPDG.push_back(0);
+        LiPDG_el.push_back(2.);
+        LiPDG_mu.push_back(2.);
+        LiPDG_pi.push_back(2.);
+        LiPDG_ka.push_back(2.);
+        LiPDG_pr.push_back(2.);
+        
          
       }
   

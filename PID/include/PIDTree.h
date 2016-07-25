@@ -112,6 +112,13 @@ class PIDTree : public Processor {
   vector<int> showerPDG;
   vector<int> likeliPDG;
   vector<int> lowmomPDG;
+  
+  // individual likelihoods for each hypothesis
+  vector<float> LiPDG_el;
+  vector<float> LiPDG_mu;
+  vector<float> LiPDG_pi;
+  vector<float> LiPDG_ka;
+  vector<float> LiPDG_pr;
 
 } ;
 

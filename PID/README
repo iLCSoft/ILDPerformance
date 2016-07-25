@@ -15,11 +15,11 @@ needs:
 cd scripts
 $MARLIN/bin/Marlin PIDTree.xml
 
-[writes ../Results/analysis_output.root"]
+[writes ../Results/PID_output_n1n1hh.root"]
 
 cd ../macros
 root -l
-.x plotPIDs.C("../Results/analysis_output.root");
+.x plotPIDs.C("../Results/PID_output_n1n1hh.root");
 
 [plots PID efficiencies for the four algorthms,
 writes ../Results/PIDs_pdg[i]_cut[j].[eps,ps,pdf].
