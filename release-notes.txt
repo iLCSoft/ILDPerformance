@@ -8,6 +8,38 @@
 
 Release Notes:
 
+
+ --------
+| v01-00 |  
+ --------
+
+D. Jeans
+  - add simulation validation processor, examples and short documentation
+
+M. Petric
+   - Added GSL because required. It would however better to fix aidaTT to propagate GSL properly
+
+H.L. Tran
+   - Modify CMakeLists.txt file to include the validateSim folder.
+
+J. List
+   - added ZHWW5CFit
+   - added ZH example
+   - added first version of test on WW->4jets
+   - added likelihood values for all hypotheses as LiPDG_mu etc to PIDtree; == 9 means is -inf on DST =>check with Masakazu?; == 2 means no PID or no recoParticle existing for this MCP
+
+Y. Voutsinas
+   - add a diagnostics script that run a simple analysis hZ->mumuX for Mokka as well
+   - processor that calculates track - hit residuals based on aidaTT intersection calculation added
+   - updating tracking performance macros, track resolution performance plots
+
+F. Gaede
+   - made compatible with c++11
+   - removed -ansi -pedantic -Wno-long-long
+   -  added trueMass to PID TTree
+   - added macro plotdEdx
+   - bug fix for getParents.size()==0
+
  --------
 | v00-02 |  
  --------
