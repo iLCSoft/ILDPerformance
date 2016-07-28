@@ -228,7 +228,7 @@ void Residuals::processEvent( LCEvent * evt ) {
 	  double Y2 = testhit3->getPosition()[1] * dd4hep::mm;
 	  double Z2 = testhit3->getPosition()[2] * dd4hep::mm;
 
-	  float globpos2[3] = {X2, Y2, Z2};
+	  double globpos2[3] = {X2, Y2, Z2};
 	  aidaTT::Vector3D globalPos2(globpos2) ;
 	    
 	  //aidaTT::Vector2D* localPos2 = new Vector2D() ;
