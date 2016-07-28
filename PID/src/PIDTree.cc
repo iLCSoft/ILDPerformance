@@ -352,11 +352,11 @@ void PIDTree::processEvent( LCEvent * evt ) {
         showerPDG.push_back(0);
         likeliPDG.push_back(0);
         lowmomPDG.push_back(0);
-        LiPDG_el.push_back(2.);
-        LiPDG_mu.push_back(2.);
-        LiPDG_pi.push_back(2.);
-        LiPDG_ka.push_back(2.);
-        LiPDG_pr.push_back(2.);
+        LiPDG_el.push_back(5.);
+        LiPDG_mu.push_back(5.);
+        LiPDG_pi.push_back(5.);
+        LiPDG_ka.push_back(5.);
+        LiPDG_pr.push_back(5.);
         
          
       }
