@@ -73,7 +73,7 @@ void PIDTree::init() {
   streamlog_out(DEBUG) << "   init called  " 
 		       << std::endl ;
 
-  // usually a good idea to
+  // usually a good idea tomcp->getPDG()
   printParameters() ;
   nEvt = 0;
 
@@ -157,11 +157,13 @@ void PIDTree::processEvent( LCEvent * evt ) {
   // loop over MCParticles
   //----------------------------------------------------------------------------------------------------------------------------
   
+  int imcp = -1;
   while( MCParticle* mcp = mcpIt.next()  ) {
     
     if (!mcp) continue; 
     
-    streamlog_out(DEBUG) << " mcparticle id = " << mcp->getPDG() << ", genstat = " << mcp->getGeneratorStatus() << std::endl;  
+    imcp++;
+    streamlog_out(MESSAGE) << " mcparticle " << imcp << " has PDG = " << mcp->getPDG() << " and genstat = " << mcp->getGeneratorStatus() << std::endl;  
     
     bool keep = false;
     // keep stable generator particles 
@@ -194,7 +196,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
     
       streamlog_out(DEBUG) << " get reco particle " << std::endl;  
       const EVENT::LCObjectVec& recovec = mc2recoNav.getRelatedToObjects(mcp);
-      streamlog_out(DEBUG) << " recovec has length " << recovec.size() << std::endl;  
+      streamlog_out(MESSAGE) << " recovec has length " << recovec.size() << std::endl;  
       const EVENT::FloatVec& recoweightvec = mc2recoNav.getRelatedToWeights(mcp);
       streamlog_out(DEBUG) << " recoweightvec has length " << recoweightvec.size() << std::endl;  
       double maxtrckweight = 0;
@@ -220,8 +222,8 @@ void PIDTree::processEvent( LCEvent * evt ) {
         }
       }
       
-      streamlog_out(DEBUG) << " found reco particle for mcp at imaxtrackweight = " << imaxtrckweight << " with weight = " << maxtrckweight << std::endl ;
-      streamlog_out(DEBUG) << " found reco particle for mcp at imaxcaloweight = " << imaxcaloweight << " with weight = " << maxcaloweight << std::endl ;
+      streamlog_out(MESSAGE) << " found reco particle for mcp at imaxtrackweight = " << imaxtrckweight << " with weight = " << maxtrckweight << std::endl ;
+      streamlog_out(MESSAGE) << " found reco particle for mcp at imaxcaloweight = " << imaxcaloweight << " with weight = " << maxcaloweight << std::endl ;
        
       imaxweight = imaxcaloweight;
       maxweight = maxcaloweight;
@@ -249,14 +251,27 @@ void PIDTree::processEvent( LCEvent * evt ) {
     
       // IMPROVE HERE: use directly MCTruthTrackRelation and choose track with larger weight for dE/dx
         const EVENT::TrackVec& trackvec = rcp->getTracks();
-        streamlog_out(DEBUG) << " trackvec has length = " << trackvec.size() << std::endl ;
+        streamlog_out(MESSAGE) << " trackvec has length = " << trackvec.size() << std::endl ;
         double dedx = 0;
-        for (unsigned int itrack = 0; itrack < trackvec.size(); itrack++) {
-          dedx += trackvec.at(itrack)->getdEdx();
-          if (itrack == 1) streamlog_out(WARNING) << " found reco particle with ntrack = " << trackvec.size() << " tracks - summing up dEdx " << std::endl ;
+        if ( trackvec.size() == 1 ) {
+          dedx += trackvec.at(0)->getdEdx();
+          seenDEdx.push_back(dedx);
+        } 
+        else {
+          streamlog_out(MESSAGE) << " found reco particle with ntrack = " << trackvec.size() << " tracks for true PDG " << mcp->getPDG() << " - set dedx = 0 " << std::endl ;
+          seenDEdx.push_back(0);
+          if ( trackvec.size() > 1 ) {
+            for ( int itrack = 0; itrack < trackvec.size(); itrack++ ) {
+                streamlog_out(MESSAGE) << " ===> track " << itrack << " has innermost hit at " << trackvec.at(itrack)->getRadiusOfInnermostHit () << std::endl ;
+            }
+          }
+          if ( mcp->getParents().size() > 0 ) {
+            for ( int idaughter = 0; idaughter < mcp->getDaughters().size(); idaughter++ ) {
+                streamlog_out(MESSAGE) << " ===> mcp daughter " << idaughter << " has PDG " << mcp->getDaughters()[idaughter]->getPDG() << std::endl ;
+            }
+          }
         }
-        seenDEdx.push_back(dedx);
-        
+                   
         
       // Particle IDs
         LCCollection* rpcol = evt->getCollection( _pandoraPFOs ) ;
@@ -317,15 +332,15 @@ void PIDTree::processEvent( LCEvent * evt ) {
           for ( int ihyp = 0 ; ihyp < 5; ihyp++ ) {
             likelihood[ihyp] = likeliPID->getParameters()[ihyp];
             if ( std::isinf(likelihood[ihyp]) ) {
-              streamlog_out(MESSAGE) << " likelihood [" << ihyp << "] = " << likelihood[ihyp] << endl;
+              streamlog_out(DEBUG) << " likelihood [" << ihyp << "] = " << likelihood[ihyp] << endl;
               likelihood[ihyp] = 9.;
             }  
           }
-          LiPDG_el.push_back(likelihood[0]); streamlog_out(MESSAGE) << " electron hyp = " << likelihood[0] << endl;
-          LiPDG_mu.push_back(likelihood[1]); streamlog_out(MESSAGE) << " muon hyp = "     << likelihood[1] << endl;
-          LiPDG_pi.push_back(likelihood[2]); streamlog_out(MESSAGE) << " pion hyp = "     << likelihood[2] << endl;
-          LiPDG_ka.push_back(likelihood[3]); streamlog_out(MESSAGE) << " kaon hyp = "     << likelihood[3] << endl;
-          LiPDG_pr.push_back(likelihood[4]); streamlog_out(MESSAGE) << " proton hyp = "   << likelihood[4] << endl;
+          LiPDG_el.push_back(likelihood[0]); streamlog_out(DEBUG) << " electron hyp = " << likelihood[0] << endl;
+          LiPDG_mu.push_back(likelihood[1]); streamlog_out(DEBUG) << " muon hyp = "     << likelihood[1] << endl;
+          LiPDG_pi.push_back(likelihood[2]); streamlog_out(DEBUG) << " pion hyp = "     << likelihood[2] << endl;
+          LiPDG_ka.push_back(likelihood[3]); streamlog_out(DEBUG) << " kaon hyp = "     << likelihood[3] << endl;
+          LiPDG_pr.push_back(likelihood[4]); streamlog_out(DEBUG) << " proton hyp = "   << likelihood[4] << endl;
         }
         else {
           streamlog_out(MESSAGE) << " likeliPID has = " << likeliPID->getParameters().size() << " parameters " << endl;
@@ -339,7 +354,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
       } // if reco part
       // IMPROVE HERE: CHECK if track or cluster exists!
       else {
-        streamlog_out(WARNING) << "no ReconstructedParticle found for this mcp!" << std::endl ;
+        streamlog_out(WARNING) << "no ReconstructedParticle found for this mcp with PDG = " << mcp->getPDG() << " ! " << std::endl ;
         
         seenP.push_back(0);
         seenPt.push_back(0);
