@@ -73,6 +73,7 @@ class PIDTree : public Processor {
   /** Input collection name.
    */
   std::string _trueToReco ;
+  std::string _trueToTrack ;
   std::string _recoToTrue ;
   std::string _mcParticleCollectionName ;
   std::string _trackColName ;
@@ -100,7 +101,9 @@ class PIDTree : public Processor {
   vector<int>    truePDG;
   vector<int>    trueMother;
   
-  vector<double> isSeen;  // store max weight of relation here!
+  vector<double> isTrue;  // store max weight of reco -> truth
+  vector<double> isSeen;  // store max weight of truth -> reco
+  vector<double> isSeenDEdx ;  // store max weight of truth -> track
   vector<double> seenP;
   vector<double> seenPt ;
   vector<double> seenTheta ;
