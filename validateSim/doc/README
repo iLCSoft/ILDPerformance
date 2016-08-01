@@ -3,9 +3,18 @@ plots to validate (or find problems) in a simulation model.
 
 Example distributions are of hit energies and time, position, and cell indices.
 
-The /test/ directory has a few scripts which can be used to produce a simple simulation file,
-and run the validation processor over it (sim_and_check.sh).
+The /test/ directory has a few scripts which help produce a simple simulation file, produce validation plots from it.
 
-Each hit collection is treated by one instance of the processor, and produced a root file for that collection.
+A simple simulation sample suitable for validation can be made as follows:
+ddsim --steeringFile ./my_ddsim_steer.py --gun.isotrop True --gun.particle mu- --gun.energy 10*GeV --numberOfEvents 1000 --outputFile muons.slcio
 
-The plotallhits.C macro produces a .ps file with a selection of these plots.
+The autoValidate.sh script can be run on this sample.
+
+It runs two jobs, the first is a simple validationPreProcessor, which checks which simulated hit collections are in the events,
+and checks the ranges of various parameters (e.g. hit positions, energies, cell indices), and writes them to an ascii file.
+
+The second Marlin job (with the validateAutoProcessor) then reads this ascii file, uses the information within it
+to define suitable histograms, and then goes on to fill the histograms and put them into an output root file.
+
+The plotauto.C root macro prints the histograms into a .ps file in a logical and hopefully helpful way.
+
