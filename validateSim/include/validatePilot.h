@@ -5,6 +5,8 @@
 #include "UTIL/CellIDDecoder.h"
 #include "EVENT/SimCalorimeterHit.h"
 #include "EVENT/SimTrackerHit.h"
+#include "EVENT/CalorimeterHit.h"
+#include "EVENT/TrackerHit.h"
 #include "valStruct.h"
 #include "TFile.h"
 #include "TH1F.h"
@@ -43,14 +45,19 @@ class validatePilotProcessor : public Processor {
 
  protected:
 
+  int _simCols;
+  int _recCols;
+
   std::string _outfile;
 
   std::map < std::string , std::vector < std::pair < std::string, std::pair<int, int> > > > _indxCode;
 
   CellIDDecoder <SimCalorimeterHit> * _SimCalorimeterHitDecoder;
-  CellIDDecoder <SimTrackerHit> * _SimTrackerHitDecoder;
+  CellIDDecoder <SimTrackerHit> *     _SimTrackerHitDecoder;
+  CellIDDecoder <CalorimeterHit> *    _CalorimeterHitDecoder;
+  CellIDDecoder <TrackerHit> *        _TrackerHitDecoder;
 
-  std::map < std::string , validatePilotProcessor_maxMin > allranges;
+  std::map < std::string , validatePilotProcessor_maxMin > _allranges;
 
 
 };

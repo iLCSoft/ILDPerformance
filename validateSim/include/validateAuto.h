@@ -5,6 +5,8 @@
 #include "UTIL/CellIDDecoder.h"
 #include "EVENT/SimCalorimeterHit.h"
 #include "EVENT/SimTrackerHit.h"
+#include "EVENT/CalorimeterHit.h"
+#include "EVENT/TrackerHit.h"
 
 #include "TFile.h"
 #include "TH1F.h"
@@ -44,8 +46,6 @@ class validateAutoProcessor : public Processor {
 
   std::string _infile;
 
-
-  std::string _inColl;
   float _maxR;
   float _maxZ;
   float _minZ;
@@ -54,14 +54,12 @@ class validateAutoProcessor : public Processor {
 
   std::vector < std::string > cellindices;
 
-  //  std::map < std::string, std::pair<int, int> > _indxCode;
-
   CellIDDecoder <SimCalorimeterHit> * _SimCalorimeterHitDecoder;
   CellIDDecoder <SimTrackerHit>     * _SimTrackerHitDecoder;
+  CellIDDecoder <CalorimeterHit>    * _CalorimeterHitDecoder;
+  CellIDDecoder <TrackerHit>        * _TrackerHitDecoder;
 
-  void fillSpecificHistos() {}
-
-  std::map < std::string , validatePilotProcessor_maxMin > allranges;
+  std::map < std::string , validatePilotProcessor_maxMin > _allranges;
 
 
   TFile* _fout;
@@ -71,19 +69,16 @@ class validateAutoProcessor : public Processor {
   std::map < std::string, TH2F* > _h_overallposZR;
   std::map < std::string, TH2F* > _h_Log_overallposZR;
 
+  std::map < std::string, TH1F* > _h_HitEn;
+  std::map < std::string, TH1F* > _h_HitTime;
+  std::map < std::string, std::pair < TH2F* , TH2F* > > _h_posXY;
+  std::map < std::string, std::pair < TH2F* , TH2F* > > _h_posZR;
 
-  std::map < std::string, TH1F* > _hSim_HitEn;
-  std::map < std::string, TH1F* > _hSim_HitTime;
-  std::map < std::string, std::pair < TH2F* , TH2F* > > _hSim_posXY;
-  //  std::map < std::string, std::pair < TH2F* , TH2F* > > _hSim_posZX;
-  //  std::map < std::string, std::pair < TH2F* , TH2F* > > _hSim_posZY;
-  std::map < std::string, std::pair < TH2F* , TH2F* > > _hSim_posZR;
-
-  std::map < std::string, std::vector < std::pair < TH2F* , TH2F* > > > _hSim_index_posX;
-  std::map < std::string, std::vector < std::pair < TH2F* , TH2F* > > > _hSim_index_posY;
-  std::map < std::string, std::vector < std::pair < TH2F* , TH2F* > > > _hSim_index_posZ;
-  std::map < std::string, std::vector < std::pair < TH2F* , TH2F* > > > _hSim_index_posR;
-  std::map < std::string, std::vector < std::pair < TH2F* , TH2F* > > > _hSim_index_posPhi;
+  std::map < std::string, std::vector < std::pair < TH2F* , TH2F* > > > _h_index_posX;
+  std::map < std::string, std::vector < std::pair < TH2F* , TH2F* > > > _h_index_posY;
+  std::map < std::string, std::vector < std::pair < TH2F* , TH2F* > > > _h_index_posZ;
+  std::map < std::string, std::vector < std::pair < TH2F* , TH2F* > > > _h_index_posR;
+  std::map < std::string, std::vector < std::pair < TH2F* , TH2F* > > > _h_index_posPhi;
 
 
 };

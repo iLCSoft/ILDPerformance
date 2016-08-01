@@ -80,7 +80,8 @@ void plotauto(TString infilename) {
       else hh->Draw("same;box");
       icol++;
       if (icol==10) icol=1;
-      tl->AddEntry(hh, ((TObjString*) (hn.Tokenize("_") -> At(0)))->GetString()  , "l");
+      TString ss = hn.ReplaceAll( "_overallhitZR", "");
+      tl->AddEntry(hh, ss , "l");
     }
   }
 
@@ -125,8 +126,6 @@ void plotauto(TString infilename) {
       // is it an endcap collection?
       bool isEndcap = td->Get(dirname+"_hitXY_posZ");
 
-      cout << "Directory " << dirname << " isendcap: " << isEndcap << endl;
-
       // first overall geometry
       cc->Clear();
       cc->Divide(3,2);
@@ -167,9 +166,10 @@ void plotauto(TString infilename) {
 	  hh = (TH2F*) key2->ReadObj();
 	  TString hn = hh->GetName();
 	  if ( hn.Contains("Indx") ) {
-	    TString asas = ((TObjString*) (hn.Tokenize("_") -> At(1)))->GetString();
+	    TString ss = hn.ReplaceAll(dirname+"_", "");
+	    TString asas = ((TObjString*) (ss.Tokenize("_") -> At(0)))->GetString();
 	    if ( find( indices.begin(), indices.end(), asas )==indices.end() ) indices.push_back(asas);
-	    asas = ((TObjString*) (hn.Tokenize("_") -> At(2)))->GetString();
+	    asas = ((TObjString*) (ss.Tokenize("_") -> At(1)))->GetString();
 	    if ( find( variables.begin(), variables.end(), asas )==variables.end() ) variables.push_back(asas);
 	  }
 	}

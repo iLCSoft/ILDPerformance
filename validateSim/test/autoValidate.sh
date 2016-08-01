@@ -4,7 +4,8 @@ unset MARLIN_DLL
 source $initscript
 export MARLIN_DLL=../lib/libvalidateSim.so:${MARLIN_DLL}
 
-infile=mu-_10GeV_isotropic.slcio
+infile=/home/ilc/jeans/reco_v1-17-09/REC_noBg_mokka_ILDv05_dbd_si_uds200_00.stdhep_sub0.slcio
+# infile=mu-_10GeV_isotropic.slcio
 
 parfile=parameter_ranges.txt
 
@@ -18,14 +19,16 @@ cat > pilotjob.xml <<EOF
     <parameter name="LCIOInputFiles">
 $infile
     </parameter>
-    <parameter name="MaxRecordNumber" value="1000"/>
+    <parameter name="MaxRecordNumber" value="20"/>
     <parameter name="SkipNEvents" value="0"/>
     <parameter name="SupressCheck" value="false"/>
     <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT"> MESSAGE </parameter>
   </global>
 
   <processor name="myPilot" type="validationPreProcessor">
- <parameter name="outputParamFilename"> $parfile </parameter>
+    <parameter name="outputParamFilename"> $parfile </parameter>
+    <parameter name="simhitCollections"> 1 </parameter>
+    <parameter name="recohitCollections"> 0 </parameter>
   </processor>
 
 </marlin>
@@ -43,7 +46,7 @@ cat > autovalidate.xml <<EOF
     <parameter name="LCIOInputFiles">
 $infile
     </parameter>
-    <parameter name="MaxRecordNumber" value="1000"/>
+    <parameter name="MaxRecordNumber" value="20"/>
     <parameter name="SkipNEvents" value="0"/>
     <parameter name="SupressCheck" value="false"/>
     <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT"> MESSAGE </parameter>

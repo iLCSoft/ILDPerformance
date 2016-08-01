@@ -8,7 +8,6 @@
 #include "lcio.h"
 
 #include "EVENT/LCCollection.h"
-#include "EVENT/CalorimeterHit.h"
 
 #include "EVENT/LCParameters.h"
 
@@ -33,7 +32,6 @@ validateAutoProcessor::validateAutoProcessor() : Processor("validateAutoProcesso
                              "name of input parameter file",
                              _infile,
                              paramFileName);
-
 }
 
 
@@ -42,6 +40,8 @@ void validateAutoProcessor::init() {
 
   _SimCalorimeterHitDecoder=0;
   _SimTrackerHitDecoder=0;
+  _CalorimeterHitDecoder=0;
+  _TrackerHitDecoder=0;
 
   // read in the collections, indices, and ranges
   cout << _infile << endl;
@@ -63,47 +63,38 @@ void validateAutoProcessor::init() {
       std::string varname = tsvarname.Data();
       float minval = ( (TObjString*) tor->At(2) )->String().Atof();
       float maxval = ( (TObjString*) tor->At(3) )->String().Atof();
-      if ( allranges.find( colname ) == allranges.end() ) {
+      if ( _allranges.find( colname ) == _allranges.end() ) {
         validatePilotProcessor_maxMin ss;
-        allranges[colname] = ss;
+        _allranges[colname] = ss;
       }
       if ( isindex ) {
-        allranges[colname].indx_name.push_back(varname);
-        allranges[colname].indx_minmax.push_back( std::pair < int, int > ( int(minval), int(maxval) ) );
+        _allranges[colname].indx_name.push_back(varname);
+        _allranges[colname].indx_minmax.push_back( std::pair < int, int > ( int(minval), int(maxval) ) );
       } else if ( varname=="Energy" ) {
-        allranges[colname].eminmax =  std::pair < float, float > (minval, maxval);
+        _allranges[colname].eminmax =  std::pair < float, float > (minval, maxval);
       } else if ( varname=="Time" ) {
-        allranges[colname].tminmax =  std::pair < float, float > (minval, maxval);
+        _allranges[colname].tminmax =  std::pair < float, float > (minval, maxval);
       } else if ( varname=="X" ) {
-        allranges[colname].xminmax =  std::pair < float, float > (minval, maxval);
+        _allranges[colname].xminmax =  std::pair < float, float > (minval, maxval);
       } else if ( varname=="Y" ) {
-        allranges[colname].yminmax =  std::pair < float, float > (minval, maxval);
+        _allranges[colname].yminmax =  std::pair < float, float > (minval, maxval);
       } else if ( varname=="Z" ) {
-        allranges[colname].zminmax =  std::pair < float, float > (minval, maxval);
+        _allranges[colname].zminmax =  std::pair < float, float > (minval, maxval);
       } else if ( varname=="Absz" ) {
-        allranges[colname].abszminmax =  std::pair < float, float > (minval, maxval);
+        _allranges[colname].abszminmax =  std::pair < float, float > (minval, maxval);
       } else if ( varname=="R" ) {
-        allranges[colname].rminmax =  std::pair < float, float > (minval, maxval);
+        _allranges[colname].rminmax =  std::pair < float, float > (minval, maxval);
       } else {
         cout << "unknown variable? " << varname << endl;
         assert(0);
       }
-      //  std::map < std::string , validatePilotProcessor_maxMin > allranges;
+      //  std::map < std::string , validatePilotProcessor_maxMin > _allranges;
     }
     myfile.close();
   } else {
     cout << "Unable to open file " << _infile << endl;
     assert(0);
   }
-
-  // variables to plot indices against
-//  std::vector < std::string > index_variables;
-//  index_variables.push_back("X");
-//  index_variables.push_back("Y");
-//  index_variables.push_back("Z");
-//  index_variables.push_back("R");
-//  index_variables.push_back("Phi");
-
 
   // the output root file for histograms
   std::string outfilename = "autoValidate.root";
@@ -112,18 +103,11 @@ void validateAutoProcessor::init() {
   const int nbins1d=300;
   const int nbins2d=100;
 
-
   float zmaxall(0);
   float rmaxall(0);
 
-
-
-
-
-
-
   // make a directory for each collection
-  for ( std::map < std::string , validatePilotProcessor_maxMin >::iterator itt=allranges.begin(); itt!=allranges.end(); itt++) {
+  for ( std::map < std::string , validatePilotProcessor_maxMin >::iterator itt=_allranges.begin(); itt!=_allranges.end(); itt++) {
 
     zmaxall = std::max( rmaxall, itt->second.zminmax.second);
     rmaxall = std::max( rmaxall, itt->second.rminmax.second);
@@ -142,15 +126,16 @@ void validateAutoProcessor::init() {
     diff = hmax-hmin;
     hmin-=diff/20.;
     hmax+=diff/20.;
-    _hSim_HitEn[ itt->first ] = new TH1F(hname, hname,nbins1d,hmin,hmax);
+    _h_HitEn[ itt->first ] = new TH1F(hname, hname,nbins1d,hmin,hmax);
+    _h_HitEn[ itt->first ]->GetXaxis()->SetTitle("hit energy");
 
     hname = itt->first.c_str(); hname += "_hitTime";
     hmin = itt->second.tminmax.first;
     hmax = itt->second.tminmax.second;
     if ( hmax > 100 ) hmax = 100;
     diff = hmax-hmin;    hmin-=diff/20.;    hmax+=diff/20.;
-    _hSim_HitTime[ itt->first ] = new TH1F(hname, hname,nbins1d,hmin,hmax);
-
+    _h_HitTime[ itt->first ] = new TH1F(hname, hname,nbins1d,hmin,hmax);
+    _h_HitTime[ itt->first ]->GetXaxis()->SetTitle("hit time [ns]");
 
     bool isEndcap = itt->second.abszminmax.first > itt->second.zminmax.second/15.;
 
@@ -168,11 +153,15 @@ void validateAutoProcessor::init() {
     hmax2 = itt->second.yminmax.second;
     diff2 = hmax2-hmin2; hmin2-=diff2/20.;    hmax2+=diff2/20.;
     h1 = new TH2F(hname1, hname1,nbins2d,hmin,hmax, nbins2d, hmin2, hmax2);
+    h1->GetXaxis()->SetTitle("hit X [mm]");
+    h1->GetYaxis()->SetTitle("hit Y [mm]");
     if ( isEndcap ) {
       hname2 = hname + "_negZ";
       h2 = new TH2F(hname2, hname2,nbins2d,hmin,hmax, nbins2d, hmin2, hmax2);
+      h2->GetXaxis()->SetTitle("hit X [mm]");
+      h2->GetYaxis()->SetTitle("hit Y [mm]");
     }
-    _hSim_posXY[ itt->first ] = std::pair < TH2F* , TH2F* > (h1, h2);
+    _h_posXY[ itt->first ] = std::pair < TH2F* , TH2F* > (h1, h2);
 
     hname = itt->first.c_str(); hname += "_hitZR";
     hname1 = isEndcap ? hname + "_posZ" : hname;
@@ -185,24 +174,23 @@ void validateAutoProcessor::init() {
     hmax2 = itt->second.rminmax.second;
     diff2 = hmax2-hmin2; hmin2-=diff2/20.;    hmax2+=diff2/20.;
     h1 = new TH2F(hname1, hname1,nbins2d,hmin,hmax, nbins2d, hmin2, hmax2);
+    h1->GetXaxis()->SetTitle("hit Z [mm]");
+    h1->GetYaxis()->SetTitle("hit R [mm]");
     if ( isEndcap ) {
       hname2 = hname + "_negZ";
       h2 = new TH2F(hname2, hname2,nbins2d,-hmax,-hmin, nbins2d, hmin2, hmax2);
+      h2->GetXaxis()->SetTitle("hit Z [mm]");
+      h2->GetYaxis()->SetTitle("hit R [mm]");
     }
-    _hSim_posZR[ itt->first ] = std::pair < TH2F* , TH2F* > (h1, h2);
+    _h_posZR[ itt->first ] = std::pair < TH2F* , TH2F* > (h1, h2);
 
-
-//    std::vector < std::string > index_variables;
-//    index_variables.push_back("X");
-//    index_variables.push_back("Y");
-//    index_variables.push_back("Z");
-//    index_variables.push_back("R");
-//    index_variables.push_back("Phi");
 
     std::vector < std::pair < TH2F* , TH2F* > > aa;
     int nbins(1);
 
-    _hSim_index_posX[ itt->first ] = aa;
+    _h_index_posX[ itt->first ] = aa;
+    
+    // indices vs. Z
     for (size_t jj=0; jj<itt->second.indx_name.size(); jj++) {
       hname = itt->first.c_str(); hname += "_Indx"+itt->second.indx_name[jj]+"_X";
       hname1 = isEndcap ? hname + "_posZ" : hname;
@@ -213,14 +201,21 @@ void validateAutoProcessor::init() {
       
       hmin2 = itt->second.xminmax.first;
       hmax2 = itt->second.xminmax.second;
+      diff2 = hmax2-hmin2; hmin2-=diff2/20.;    hmax2+=diff2/20.;
+
       h1 = new TH2F(hname1, hname1,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
+      h1->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
+      h1->GetYaxis()->SetTitle("hit X [mm]");
       if ( isEndcap ) {
 	hname2 = hname + "_negZ";
 	h2 = new TH2F(hname2, hname2,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
+	h2->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
+	h2->GetYaxis()->SetTitle("hit X [mm]");
       }
-      _hSim_index_posX[ itt->first ].push_back( std::pair < TH2F* , TH2F* > (h1, h2) );
+      _h_index_posX[ itt->first ].push_back( std::pair < TH2F* , TH2F* > (h1, h2) );
     }
 
+    // vs. Y
     for (size_t jj=0; jj<itt->second.indx_name.size(); jj++) {
       hname = itt->first.c_str(); hname += "_Indx"+itt->second.indx_name[jj]+"_Y";
       hname1 = isEndcap ? hname + "_posZ" : hname;
@@ -230,14 +225,20 @@ void validateAutoProcessor::init() {
 
       hmin2 = itt->second.yminmax.first;
       hmax2 = itt->second.yminmax.second;
+      diff2 = hmax2-hmin2; hmin2-=diff2/20.;    hmax2+=diff2/20.;
       h1 = new TH2F(hname1, hname1,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
+      h1->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
+      h1->GetYaxis()->SetTitle("hit Y [mm]");
       if ( isEndcap ) {
 	hname2 = hname + "_negZ";
 	h2 = new TH2F(hname2, hname2,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
+	h2->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
+	h2->GetYaxis()->SetTitle("hit Y [mm]");
       }
-      _hSim_index_posY[ itt->first ].push_back( std::pair < TH2F* , TH2F* > (h1, h2) );
+      _h_index_posY[ itt->first ].push_back( std::pair < TH2F* , TH2F* > (h1, h2) );
     }
 
+    // vs. Z
     for (size_t jj=0; jj<itt->second.indx_name.size(); jj++) {
       hname = itt->first.c_str(); hname += "_Indx"+itt->second.indx_name[jj]+"_Z";
       hname1 = isEndcap ? hname + "_posZ" : hname;
@@ -251,14 +252,20 @@ void validateAutoProcessor::init() {
 	hmin2 = itt->second.zminmax.first;
 	hmax2 = itt->second.zminmax.second;
       }
+      diff2 = hmax2-hmin2; hmin2-=diff2/20.;    hmax2+=diff2/20.;
       h1 = new TH2F(hname1, hname1,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
+      h1->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
+      h1->GetYaxis()->SetTitle("hit Z [mm]");
       if ( isEndcap ) {
 	hname2 = hname + "_negZ";
 	h2 = new TH2F(hname2, hname2,nbins,hmin,hmax, nbins2d, -hmax2, -hmin2);
+	h2->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
+	h2->GetYaxis()->SetTitle("hit Z [mm]");
       }
-      _hSim_index_posZ[ itt->first ].push_back( std::pair < TH2F* , TH2F* > (h1, h2) );
+      _h_index_posZ[ itt->first ].push_back( std::pair < TH2F* , TH2F* > (h1, h2) );
     }
 
+    // vs. R
     for (size_t jj=0; jj<itt->second.indx_name.size(); jj++) {
       hname = itt->first.c_str(); hname += "_Indx"+itt->second.indx_name[jj]+"_R";
       hname1 = isEndcap ? hname + "_posZ" : hname;
@@ -267,79 +274,71 @@ void validateAutoProcessor::init() {
       nbins = hmax-hmin; if (nbins>nbins2d) nbins=nbins2d;
       hmin2 = itt->second.rminmax.first;
       hmax2 = itt->second.rminmax.second;
+      diff2 = hmax2-hmin2; hmin2-=diff2/20.;    hmax2+=diff2/20.;
       h1 = new TH2F(hname1, hname1,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
+      h1->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
+      h1->GetYaxis()->SetTitle("hit R [mm]");
       if ( isEndcap ) {
 	hname2 = hname + "_negZ";
 	h2 = new TH2F(hname2, hname2,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
+	h2->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
+	h2->GetYaxis()->SetTitle("hit R [mm]");
       }
-      _hSim_index_posR[ itt->first ].push_back( std::pair < TH2F* , TH2F* > (h1, h2) );
+      _h_index_posR[ itt->first ].push_back( std::pair < TH2F* , TH2F* > (h1, h2) );
     }
 
+    // vs Phi
     for (size_t jj=0; jj<itt->second.indx_name.size(); jj++) {
       hname = itt->first.c_str(); hname += "_Indx"+itt->second.indx_name[jj]+"_Phi";
       hname1 = isEndcap ? hname + "_posZ" : hname;
       hmin = itt->second.indx_minmax[jj].first-1;
       hmax = itt->second.indx_minmax[jj].second+2;
       nbins = hmax-hmin; if (nbins>nbins2d) nbins=nbins2d;
-      hmin2 = -1.1*acos(-1);
-      hmax2 = 1.1*acos(-1);
+      hmin2 = -acos(-1);
+      hmax2 =  acos(-1);
+      diff2 = hmax2-hmin2; hmin2-=diff2/20.;    hmax2+=diff2/20.;
       h1 = new TH2F(hname1, hname1,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
+      h1->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
+      h1->GetYaxis()->SetTitle("hit Phi [rad]");
       if ( isEndcap ) {
 	hname2 = hname + "_negZ";
 	h2 = new TH2F(hname2, hname2,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
+	h2->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
+	h2->GetYaxis()->SetTitle("hit Phi [rad]");
       }
-      _hSim_index_posPhi[ itt->first ].push_back( std::pair < TH2F* , TH2F* > (h1, h2) );
+      _h_index_posPhi[ itt->first ].push_back( std::pair < TH2F* , TH2F* > (h1, h2) );
     }
 
   }
 
 
 
-  // overall view
+  // overall geometry view
 
   _fout->mkdir( "ALLCollections" );
   _fout->cd( "ALLCollections" );
 
   TString hname1 = "ALLCollections_overallhitZR";
   _hAll_overallposZR = new TH2F(hname1, hname1,2*nbins2d,-zmaxall*1.1,zmaxall*1.1, 2*nbins2d, 0, rmaxall*1.1);
+  _hAll_overallposZR->GetXaxis()->SetTitle("Z [mm]");
+  _hAll_overallposZR->GetYaxis()->SetTitle("R [mm]");
   hname1 = "ALLCollections_Log_overallhitZR";
   _hAll_Log_overallposZR = new TH2F(hname1, hname1,2*nbins2d,-1,log10(zmaxall)*1.1, 2*nbins2d, 0.5, log10(rmaxall)*1.1);
+  _hAll_Log_overallposZR->GetXaxis()->SetTitle("log10(Z [mm])");
+  _hAll_Log_overallposZR->GetYaxis()->SetTitle("log10(R [mm])");
 
-  for ( std::map < std::string , validatePilotProcessor_maxMin >::iterator itt=allranges.begin(); itt!=allranges.end(); itt++) {
+  for ( std::map < std::string , validatePilotProcessor_maxMin >::iterator itt=_allranges.begin(); itt!=_allranges.end(); itt++) {
     hname1 = itt->first + "_overallhitZR";
     _h_overallposZR[itt->first] = new TH2F(hname1, hname1,2*nbins2d,-zmaxall*1.1,zmaxall*1.1, 2*nbins2d, 0, rmaxall*1.1);
+    _h_overallposZR[itt->first] ->GetXaxis()->SetTitle("Z [mm]");
+    _h_overallposZR[itt->first] ->GetYaxis()->SetTitle("R [mm]");
     hname1 = itt->first + "_Log_overallhitZR";
     _h_Log_overallposZR[itt->first] = new TH2F(hname1, hname1,2*nbins2d,-1,log10(zmaxall)*1.1, 2*nbins2d, 0.5, log10(rmaxall)*1.1);
+    _h_Log_overallposZR[itt->first]->GetXaxis()->SetTitle("log10(Z [mm])");
+    _h_Log_overallposZR[itt->first]->GetYaxis()->SetTitle("log10(R [mm])");
   }
 
 
-
-
-  //
-  //  _hSim_HitEn = new TH1F("Sim_HitEn", "Sim_HitEn", 1000,0,_maxE);
-  //
-  //  _hSim_HitTime = new TH1F("Sim_HitTime","Sim_HitTime",1000,-10,100);
-  //
-  //  int nbins=300;
-  //
-  //  for (int i=0; i<2; i++) {
-  //
-  //    TString endlab("");
-  //    float zmin(-_maxZ);
-  //    float zmax( _maxZ);
-  //    if (_isEndcap) {
-  //      if ( i==0 ) zmax=-_minZ;
-  //      else        zmin= _minZ;
-  //      endlab = "_end"; endlab+=i;
-  //    } else {
-  //      if (i==1) continue;
-  //    }
-  //
-  //    _hSim_posXY[i] = new TH2F("Sim_posXY"+endlab,"Sim_posXY"+endlab, nbins, -_maxR, _maxR, nbins, -_maxR, _maxR);
-  //    _hSim_posXZ[i] = new TH2F("Sim_posXZ"+endlab,"Sim_posXZ"+endlab, nbins, zmin, zmax, nbins, -_maxR, _maxR);
-  //    _hSim_posYZ[i] = new TH2F("Sim_posYZ"+endlab,"Sim_posYZ"+endlab, nbins, zmin, zmax, nbins, -_maxR, _maxR);
-  //    _hSim_posRZ[i] = new TH2F("Sim_posRZ"+endlab,"Sim_posRZ"+endlab, nbins, zmin, zmax, nbins, 0, _maxR);
-  //  }
 
   return;
 }
@@ -351,22 +350,17 @@ void validateAutoProcessor::processRunHeader( LCRunHeader* run) {
 void validateAutoProcessor::processEvent( LCEvent * evt ) {
 
 
-  for ( std::map < std::string , validatePilotProcessor_maxMin >::iterator itt=allranges.begin(); itt!=allranges.end(); itt++) {
-
+  for ( std::map < std::string , validatePilotProcessor_maxMin >::iterator itt=_allranges.begin(); itt!=_allranges.end(); itt++) {
     std::string colname = itt->first;
-
     try {
       LCCollection* simhitcol = evt->getCollection( colname );
-
-      //std::vector < std::string > cellindices;
       cellindices.clear();
-      for (size_t jj=0; jj<allranges[colname].indx_name.size(); jj++) {
-	cellindices.push_back( allranges[colname].indx_name[jj] );
+      for (size_t jj=0; jj<_allranges[colname].indx_name.size(); jj++) {
+	cellindices.push_back( _allranges[colname].indx_name[jj] );
       }
 
-
+      // work out what type of object is in this collection
       int objtype(0);
-
       if ( simhitcol->getTypeName () == LCIO::SIMCALORIMETERHIT ) {
         if ( _SimCalorimeterHitDecoder ) delete _SimCalorimeterHitDecoder;
         _SimCalorimeterHitDecoder = new CellIDDecoder<SimCalorimeterHit> (simhitcol);
@@ -375,12 +369,21 @@ void validateAutoProcessor::processEvent( LCEvent * evt ) {
         if ( _SimTrackerHitDecoder ) delete _SimTrackerHitDecoder;
         _SimTrackerHitDecoder = new CellIDDecoder<SimTrackerHit> (simhitcol);
         objtype=2;
+      } else if ( simhitcol->getTypeName () == LCIO::CALORIMETERHIT ) {
+        if ( _CalorimeterHitDecoder ) delete _CalorimeterHitDecoder;
+        _CalorimeterHitDecoder = new CellIDDecoder<CalorimeterHit> (simhitcol);
+        objtype=3;
+      } else if ( simhitcol->getTypeName () == LCIO::TRACKERHIT ) {
+        if ( _TrackerHitDecoder ) delete _TrackerHitDecoder;
+        _TrackerHitDecoder = new CellIDDecoder<TrackerHit> (simhitcol);
+        objtype=4;
       } else {
         cout << "unknown hit type! " << simhitcol->getTypeName () << endl;
+	// shouldn't get here
         assert(0);
       }
 
-
+      // loop over the elements of the collection
       for (int j=0; j<simhitcol->getNumberOfElements(); j++) {
 
         float energy(-99);
@@ -390,45 +393,60 @@ void validateAutoProcessor::processEvent( LCEvent * evt ) {
 
         SimCalorimeterHit* simcalhit;
         SimTrackerHit* simtrkhit;
+        CalorimeterHit* calhit;
+        TrackerHit* trkhit;
 
+	// get basic quantities, according to object type
         switch ( objtype ) {
 
         case 1: // SimCalorimeterHit
-
           simcalhit = dynamic_cast<SimCalorimeterHit*> (simhitcol->getElementAt(j));
           energy=simcalhit->getEnergy();
-
           for (int i=0; i<3; i++)
             pos[i] = simcalhit->getPosition()[i];
-
           for (int i=0; i<simcalhit->getNMCContributions (); i++)
             times.push_back( simcalhit->getTimeCont (i) );
-
-
 	  for ( size_t kk=0; kk<cellindices.size(); kk++) {
             int ii = (*_SimCalorimeterHitDecoder)( simcalhit ) [ cellindices[kk] ];
             indices.push_back( ii );
 	  }
-
           break;
 
         case 2: // SimTrackerHit
-
           simtrkhit = dynamic_cast<SimTrackerHit*> (simhitcol->getElementAt(j));
           energy=simtrkhit->getEDep();
-
           for (int i=0; i<3; i++)
             pos[i] = simtrkhit->getPosition()[i];
-
           times.push_back( simtrkhit->getTime() );
-
 	  for ( size_t kk=0; kk<cellindices.size(); kk++) {
             int ii = (*_SimTrackerHitDecoder)( simtrkhit ) [ cellindices[kk] ];
             indices.push_back( ii );
 	  }
-
           break;
 
+        case 3: // CalorimeterHit
+          calhit = dynamic_cast<CalorimeterHit*> (simhitcol->getElementAt(j));
+          energy=calhit->getEnergy();
+          for (int i=0; i<3; i++)
+            pos[i] = calhit->getPosition()[i];
+	  times.push_back( calhit->getTime() );
+	  for ( size_t kk=0; kk<cellindices.size(); kk++) {
+            int ii = (*_CalorimeterHitDecoder)( calhit ) [ cellindices[kk] ];
+            indices.push_back( ii );
+	  }
+          break;
+
+        case 4: // TrackerHit
+          trkhit = dynamic_cast<TrackerHit*> (simhitcol->getElementAt(j));
+          energy=trkhit->getEDep();
+          for (int i=0; i<3; i++)
+            pos[i] = trkhit->getPosition()[i];
+          times.push_back( trkhit->getTime() );
+	  for ( size_t kk=0; kk<cellindices.size(); kk++) {
+            int ii = (*_TrackerHitDecoder)( trkhit ) [ cellindices[kk] ];
+            indices.push_back( ii );
+	  }
+          break;
 
         default:
           cout << "unknown type! " << objtype << endl;
@@ -438,31 +456,31 @@ void validateAutoProcessor::processEvent( LCEvent * evt ) {
         }
 
         // fill histograms
-        _hSim_HitEn[colname]->Fill(energy);
+        _h_HitEn[colname]->Fill(energy);
 
 	for (size_t i=0; i<times.size(); i++)
-	  _hSim_HitTime[colname]->Fill( times[i] );
+	  _h_HitTime[colname]->Fill( times[i] );
 
-	bool isBarrel = _hSim_posXY[ colname ].second==0;
+	bool isBarrel = _h_posXY[ colname ].second==0;
 
 	if ( isBarrel ) {
-	  _hSim_posXY[ colname ].first->Fill(pos[0], pos[1] );
+	  _h_posXY[ colname ].first->Fill(pos[0], pos[1] );
 	} else {
 	  if ( pos[2]>0 ) {
-	    _hSim_posXY[ colname ].first->Fill(pos[0], pos[1] );
+	    _h_posXY[ colname ].first->Fill(pos[0], pos[1] );
 	  } else {	    
-	    _hSim_posXY[ colname ].second->Fill(pos[0], pos[1] );
+	    _h_posXY[ colname ].second->Fill(pos[0], pos[1] );
 	  }
 	}
 
 	float r = sqrt( pow(pos[0],2)+pow(pos[1],2) );
 	if ( isBarrel ) {
-	  _hSim_posZR[ colname ].first->Fill(pos[2], r );
+	  _h_posZR[ colname ].first->Fill(pos[2], r );
 	} else {
 	  if ( pos[2]>0 ) {
-	    _hSim_posZR[ colname ].first->Fill(pos[2], r );
+	    _h_posZR[ colname ].first->Fill(pos[2], r );
 	  } else {	    
-	    _hSim_posZR[ colname ].second->Fill(pos[2], r );
+	    _h_posZR[ colname ].second->Fill(pos[2], r );
 	  }
 	}
 
@@ -481,24 +499,24 @@ void validateAutoProcessor::processEvent( LCEvent * evt ) {
 	for ( size_t kk=0; kk<cellindices.size(); kk++) {
 
 	  if ( isBarrel ) {
-	    _hSim_index_posX[colname][kk].first->Fill( indices[kk], pos[0] );
-	    _hSim_index_posY[colname][kk].first->Fill( indices[kk], pos[1] );
-	    _hSim_index_posZ[colname][kk].first->Fill( indices[kk], pos[2] );
-	    _hSim_index_posR[colname][kk].first->Fill( indices[kk], rad );
-	    _hSim_index_posPhi[colname][kk].first->Fill( indices[kk], phi );
+	    _h_index_posX[colname][kk].first->Fill( indices[kk], pos[0] );
+	    _h_index_posY[colname][kk].first->Fill( indices[kk], pos[1] );
+	    _h_index_posZ[colname][kk].first->Fill( indices[kk], pos[2] );
+	    _h_index_posR[colname][kk].first->Fill( indices[kk], rad );
+	    _h_index_posPhi[colname][kk].first->Fill( indices[kk], phi );
 	  } else {
 	    if ( pos[2] > 0 ) {
-	      _hSim_index_posX[colname][kk].first ->Fill( indices[kk], pos[0] );
-	      _hSim_index_posY[colname][kk].first->Fill( indices[kk], pos[1] );
-	      _hSim_index_posZ[colname][kk].first->Fill( indices[kk], pos[2] );
-	      _hSim_index_posR[colname][kk].first ->Fill( indices[kk], rad );
-	      _hSim_index_posPhi[colname][kk].first->Fill( indices[kk], phi );
+	      _h_index_posX[colname][kk].first ->Fill( indices[kk], pos[0] );
+	      _h_index_posY[colname][kk].first->Fill( indices[kk], pos[1] );
+	      _h_index_posZ[colname][kk].first->Fill( indices[kk], pos[2] );
+	      _h_index_posR[colname][kk].first ->Fill( indices[kk], rad );
+	      _h_index_posPhi[colname][kk].first->Fill( indices[kk], phi );
 	    } else {
-	      _hSim_index_posX[colname][kk].second->Fill( indices[kk], pos[0] );
-	      _hSim_index_posY[colname][kk].second->Fill( indices[kk], pos[1] );
-	      _hSim_index_posZ[colname][kk].second->Fill( indices[kk], pos[2] );
-	      _hSim_index_posR[colname][kk].second->Fill( indices[kk], rad );
-	      _hSim_index_posPhi[colname][kk].second->Fill( indices[kk], phi );
+	      _h_index_posX[colname][kk].second->Fill( indices[kk], pos[0] );
+	      _h_index_posY[colname][kk].second->Fill( indices[kk], pos[1] );
+	      _h_index_posZ[colname][kk].second->Fill( indices[kk], pos[2] );
+	      _h_index_posR[colname][kk].second->Fill( indices[kk], rad );
+	      _h_index_posPhi[colname][kk].second->Fill( indices[kk], phi );
 	    }
 	  }
 

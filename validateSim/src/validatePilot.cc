@@ -33,12 +33,22 @@ validatePilotProcessor::validatePilotProcessor() : Processor("validationPreProce
                              _outfile,
                              paramFileName);
 
+  registerProcessorParameter("simhitCollections",
+			     "look at simhit collections?",
+			     _simCols, int(1) );
+
+  registerProcessorParameter("recohitCollections",
+			     "look at reco hit collections?",
+			     _recCols, int(1) );
+
 }
 
 
 void validatePilotProcessor::init() {
   cout << "hello from validatePilotProcessor::init" << endl;
 
+  _indxCode.clear();
+  _allranges.clear();
 
   return;
 }
@@ -57,6 +67,35 @@ void validatePilotProcessor::processEvent( LCEvent * evt ) {
 
     LCCollection* col = evt->getCollection(colname);
     const std::string coltype = col->getTypeName();
+
+    int objtype(0);
+    if ( coltype == LCIO::SIMCALORIMETERHIT ) {
+      if ( _simCols==0 ) continue;
+      if ( _SimCalorimeterHitDecoder ) delete _SimCalorimeterHitDecoder;
+      _SimCalorimeterHitDecoder = new CellIDDecoder<SimCalorimeterHit> (col);
+      objtype=1;
+    } else if ( coltype == LCIO::SIMTRACKERHIT ) {
+      if ( _simCols==0 ) continue;
+      if ( _SimTrackerHitDecoder ) delete _SimTrackerHitDecoder;
+      _SimTrackerHitDecoder = new CellIDDecoder<SimTrackerHit> (col);
+      objtype=2;
+    } else if ( coltype == LCIO::CALORIMETERHIT ) {
+      if ( _recCols==0 ) continue;
+      if ( _CalorimeterHitDecoder ) delete _CalorimeterHitDecoder;
+      _CalorimeterHitDecoder = new CellIDDecoder<CalorimeterHit> (col);
+      objtype=3;
+    } else if ( coltype == LCIO::TRACKERHIT ) {
+      if ( _recCols==0 ) continue;
+      if ( _TrackerHitDecoder ) delete _TrackerHitDecoder;
+      _TrackerHitDecoder = new CellIDDecoder<TrackerHit> (col);
+      objtype=4;
+    } else {
+      //        cout << "unknown hit type! " << coltype << endl;
+      continue;
+    }
+
+
+    cout << colname << endl;
 
     std::vector < std::pair < std::string, std::pair<int, int> > > thiscode;
     if ( _indxCode.find( colname ) != _indxCode.end() ) {
@@ -94,22 +133,7 @@ void validatePilotProcessor::processEvent( LCEvent * evt ) {
       }
     }
 
-
     if ( col->getNumberOfElements()>0 && _indxCode.find( colname ) != _indxCode.end() )  { // this collection has cellID information attached
-
-      int objtype(0);
-      if ( col->getTypeName () == LCIO::SIMCALORIMETERHIT ) {
-        if ( _SimCalorimeterHitDecoder ) delete _SimCalorimeterHitDecoder;
-        _SimCalorimeterHitDecoder = new CellIDDecoder<SimCalorimeterHit> (col);
-        objtype=1;
-      } else if ( col->getTypeName () == LCIO::SIMTRACKERHIT ) {
-        if ( _SimTrackerHitDecoder ) delete _SimTrackerHitDecoder;
-        _SimTrackerHitDecoder = new CellIDDecoder<SimTrackerHit> (col);
-        objtype=2;
-      } else {
-        cout << "unknown hit type! " << col->getTypeName () << endl;
-        return;
-      }
 
       float energy(-99);
       float pos[3]={0,0,0};
@@ -118,6 +142,8 @@ void validatePilotProcessor::processEvent( LCEvent * evt ) {
 
       SimCalorimeterHit* simcalhit=0;
       SimTrackerHit* simtrkhit=0;
+      CalorimeterHit* calhit=0;
+      TrackerHit* trkhit=0;
 
       for (int j=0; j<col->getNumberOfElements(); j++) {
 
@@ -153,11 +179,36 @@ void validatePilotProcessor::processEvent( LCEvent * evt ) {
             indices.push_back( index );
           }
           break;
+        case 3: // calorimeterhit
+          calhit = dynamic_cast<CalorimeterHit*> (col->getElementAt(j));
+          energy=calhit->getEnergy();
+          for (int i=0; i<3; i++)
+            pos[i] = calhit->getPosition()[i];
+
+	  times.push_back( calhit->getTime() );
+
+          for (size_t ii=0; ii<thiscode.size(); ii++) {
+            int index = (*_CalorimeterHitDecoder)( calhit ) [ thiscode[ii].first ];
+            indices.push_back( index );
+          }
+          break;
+        case 4: // trackerhit
+          trkhit = dynamic_cast<TrackerHit*> (col->getElementAt(j));
+          energy=trkhit->getEDep();
+          for (int i=0; i<3; i++)
+            pos[i] = trkhit->getPosition()[i];
+          times.push_back( trkhit->getTime() );
+
+          for (size_t ii=0; ii<thiscode.size(); ii++) {
+            int index = (*_TrackerHitDecoder)( trkhit ) [ thiscode[ii].first ];
+            indices.push_back( index );
+          }
+          break;
         default:
           std::cout << "unknown obj type " << objtype << endl;
         }
 
-        if ( allranges.find( colname )==allranges.end() ) {
+        if ( _allranges.find( colname )==_allranges.end() ) {
           validatePilotProcessor_maxMin vmm;
           for (size_t j=0; j<indices.size(); j++) {
 	    vmm.indx_name.push_back( thiscode[j].first );
@@ -179,36 +230,36 @@ void validatePilotProcessor::processEvent( LCEvent * evt ) {
 	  vmm.rminmax = std::pair < float, float > (radius, radius);
 	  vmm.abszminmax = std::pair < float, float > (absz, absz);
 
-	  allranges[colname]=vmm;
+	  _allranges[colname]=vmm;
 
         } else {
           for (size_t j=0; j<indices.size(); j++) {
-            if ( indices[j] < allranges[colname].indx_minmax[j].first  ) allranges[colname].indx_minmax[j].first=indices[j];
-            if ( indices[j] > allranges[colname].indx_minmax[j].second ) allranges[colname].indx_minmax[j].second=indices[j];
+            if ( indices[j] < _allranges[colname].indx_minmax[j].first  ) _allranges[colname].indx_minmax[j].first=indices[j];
+            if ( indices[j] > _allranges[colname].indx_minmax[j].second ) _allranges[colname].indx_minmax[j].second=indices[j];
           }
-          if ( energy < allranges[colname].eminmax.first  ) allranges[colname].eminmax.first=energy;
-          if ( energy > allranges[colname].eminmax.second ) allranges[colname].eminmax.second=energy;
+          if ( energy < _allranges[colname].eminmax.first  ) _allranges[colname].eminmax.first=energy;
+          if ( energy > _allranges[colname].eminmax.second ) _allranges[colname].eminmax.second=energy;
           for (size_t j=0; j<times.size(); j++) {
-            if ( times[j] < allranges[colname].tminmax.first  ) allranges[colname].tminmax.first=times[j];
-            if ( times[j] > allranges[colname].tminmax.second ) allranges[colname].tminmax.second=times[j];
+            if ( times[j] < _allranges[colname].tminmax.first  ) _allranges[colname].tminmax.first=times[j];
+            if ( times[j] > _allranges[colname].tminmax.second ) _allranges[colname].tminmax.second=times[j];
           }
-          if ( pos[0] < allranges[colname].xminmax.first  ) allranges[colname].xminmax.first=pos[0];
-          if ( pos[0] > allranges[colname].xminmax.second ) allranges[colname].xminmax.second=pos[0];
+          if ( pos[0] < _allranges[colname].xminmax.first  ) _allranges[colname].xminmax.first=pos[0];
+          if ( pos[0] > _allranges[colname].xminmax.second ) _allranges[colname].xminmax.second=pos[0];
 
-          if ( pos[1] < allranges[colname].yminmax.first  ) allranges[colname].yminmax.first=pos[1];
-          if ( pos[1] > allranges[colname].yminmax.second ) allranges[colname].yminmax.second=pos[1];
+          if ( pos[1] < _allranges[colname].yminmax.first  ) _allranges[colname].yminmax.first=pos[1];
+          if ( pos[1] > _allranges[colname].yminmax.second ) _allranges[colname].yminmax.second=pos[1];
 
-          if ( pos[2] < allranges[colname].zminmax.first  ) allranges[colname].zminmax.first=pos[2];
-          if ( pos[2] > allranges[colname].zminmax.second ) allranges[colname].zminmax.second=pos[2];
+          if ( pos[2] < _allranges[colname].zminmax.first  ) _allranges[colname].zminmax.first=pos[2];
+          if ( pos[2] > _allranges[colname].zminmax.second ) _allranges[colname].zminmax.second=pos[2];
 
 	  float radius = sqrt(pos[0]*pos[0] + pos[1]*pos[1]);
           float absz = fabs(pos[2]);
 
-	  if ( radius < allranges[colname].rminmax.first  ) allranges[colname].rminmax.first=radius;
-	  if ( radius > allranges[colname].rminmax.second ) allranges[colname].rminmax.second=radius;
+	  if ( radius < _allranges[colname].rminmax.first  ) _allranges[colname].rminmax.first=radius;
+	  if ( radius > _allranges[colname].rminmax.second ) _allranges[colname].rminmax.second=radius;
 
-	  if ( absz < allranges[colname].abszminmax.first  ) allranges[colname].abszminmax.first=absz;
-	  if ( absz > allranges[colname].abszminmax.second ) allranges[colname].abszminmax.second=absz;
+	  if ( absz < _allranges[colname].abszminmax.first  ) _allranges[colname].abszminmax.first=absz;
+	  if ( absz > _allranges[colname].abszminmax.second ) _allranges[colname].abszminmax.second=absz;
 
         }
 
@@ -242,10 +293,9 @@ void validatePilotProcessor::end(){
   ofstream myfile (_outfile.c_str());
   if (myfile.is_open()) {
 
-    for ( std::map < std::string , validatePilotProcessor_maxMin >::iterator itt = allranges.begin(); itt!=allranges.end(); itt++) {
+    for ( std::map < std::string , validatePilotProcessor_maxMin >::iterator itt = _allranges.begin(); itt!=_allranges.end(); itt++) {
 
       validatePilotProcessor_maxMin vmm = itt->second;
-
 
       for (size_t i=0; i<vmm.indx_minmax.size(); i++) {
 	label = itt->first + " Index_" + vmm.indx_name[i];  myfile << label << " " << vmm.indx_minmax[i].first << " " << vmm.indx_minmax[i].second << endl;
