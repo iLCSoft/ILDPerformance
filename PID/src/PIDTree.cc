@@ -114,17 +114,28 @@ void PIDTree::processEvent( LCEvent * evt ) {
     hermTree->Branch("seenTheta",&seenTheta) ;
     hermTree->Branch("seenPhi",&seenPhi) ;
     hermTree->Branch("seenDEdx",&seenDEdx) ;
+    hermTree->Branch("seenDEdxErr",&seenDEdxErr) ;
     hermTree->Branch("seenCharge",&seenCharge) ;
     hermTree->Branch("basicPDG", &basicPDG) ;
     hermTree->Branch("dEdxPDG",  &dEdxPDG) ;
     hermTree->Branch("showerPDG",&showerPDG) ;
     hermTree->Branch("likeliPDG",&likeliPDG) ;
     hermTree->Branch("lowmomPDG",&lowmomPDG) ;
+    hermTree->Branch("dedxdist_el",&dedxdist_el) ;
+    hermTree->Branch("dedxdist_mu",&dedxdist_mu) ;
+    hermTree->Branch("dedxdist_pi",&dedxdist_pi) ;
+    hermTree->Branch("dedxdist_ka",&dedxdist_ka) ;
+    hermTree->Branch("dedxdist_pr",&dedxdist_pr) ;
     hermTree->Branch("LiPDG_el",&LiPDG_el) ;
     hermTree->Branch("LiPDG_mu",&LiPDG_mu) ;
     hermTree->Branch("LiPDG_pi",&LiPDG_pi) ;
     hermTree->Branch("LiPDG_ka",&LiPDG_ka) ;
     hermTree->Branch("LiPDG_pr",&LiPDG_pr) ;
+    hermTree->Branch("dedxPDG_el",&dedxPDG_el) ;
+    hermTree->Branch("dedxPDG_mu",&dedxPDG_mu) ;
+    hermTree->Branch("dedxPDG_pi",&dedxPDG_pi) ;
+    hermTree->Branch("dedxPDG_ka",&dedxPDG_ka) ;
+    hermTree->Branch("dedxPDG_pr",&dedxPDG_pr) ;
 
   }
   
@@ -146,6 +157,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
   seenTheta.clear();  
   seenPhi.clear();  
   seenDEdx.clear();  
+  seenDEdxErr.clear();  
   seenCharge.clear();  
   basicPDG.clear();  
   dEdxPDG.clear();  
@@ -157,6 +169,16 @@ void PIDTree::processEvent( LCEvent * evt ) {
   LiPDG_pi.clear(); 
   LiPDG_ka.clear(); 
   LiPDG_pr.clear();  
+  dedxdist_el.clear(); 
+  dedxdist_mu.clear(); 
+  dedxdist_pi.clear(); 
+  dedxdist_ka.clear(); 
+  dedxdist_pr.clear();  
+  dedxPDG_el.clear(); 
+  dedxPDG_mu.clear(); 
+  dedxPDG_pi.clear(); 
+  dedxPDG_ka.clear(); 
+  dedxPDG_pr.clear();  
 
   streamlog_out(DEBUG) << " iterator and navigator " << std::endl;
   LCIterator<MCParticle> mcpIt( evt, _mcParticleCollectionName ) ;
@@ -219,11 +241,8 @@ void PIDTree::processEvent( LCEvent * evt ) {
       streamlog_out(DEBUG) << " recoweightvec has length " << recoweightvec.size() << std::endl;  
       double maxtrckweight = 0;
       double maxcaloweight = 0;
-      double maxweight = 0;
-      double maxbackweight = 0;
       int imaxtrckweight = -1;
       int imaxcaloweight = -1;
-      int imaxweight = -1;
       double trckweight, caloweight;
       for (unsigned int irel = 0; irel < recovec.size(); irel++) {
         trckweight = double((int(recoweightvec.at(irel))%10000)/1000.);
@@ -293,6 +312,10 @@ void PIDTree::processEvent( LCEvent * evt ) {
       
       // give precedence to track link if both directions larger than 
       double weightcut = 0.5;
+      double maxweight = 0;
+      double maxbackweight = 0;
+      int imaxweight = -1;
+      
       if ( maxtrckweight > weightcut && mcptrckweight > weightcut ) {
         imaxweight = imaxtrckweight;
         maxweight = maxtrckweight;
@@ -314,7 +337,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
       isTrue.push_back(maxbackweight);
       isSeen.push_back(maxweight);
       
-      if (imaxweight >= 0) {
+      if (maxweight > 0 && imaxweight > -1 && imaxweight < recovec.size()) {
     
         ReconstructedParticle* rcp =  (ReconstructedParticle*) recovec.at(imaxweight); 
         gear::Vector3D rp( rcp->getMomentum()[0], rcp->getMomentum()[1], rcp->getMomentum()[2] );
@@ -329,12 +352,14 @@ void PIDTree::processEvent( LCEvent * evt ) {
         streamlog_out(MESSAGE) << " trackvec has length = " << trackvec.size() << " for true PDG " << mcp->getPDG() << std::endl ;
         const EVENT::FloatVec& trackweightvec = mc2trackNav.getRelatedToWeights(mcp);
         double dedx = 0.;
+        double dedxerr = 0.;
         double weightdedx = 0.;
         for ( int itrack = 0; itrack < trackvec.size(); itrack++ ) {
           Track *track = (Track *) trackvec.at(itrack);
           if ( fabs (trackweightvec.at(itrack) - maxtrckweight) < 0.001  ) { 
             streamlog_out(MESSAGE) << " found track with weight " << trackweightvec.at(itrack) << ", filling dE/dx !" << std::endl; 
             dedx = track->getdEdx();
+            dedxerr = track->getdEdxError();
             weightdedx = maxtrckweight;
           } 
           else {
@@ -350,7 +375,8 @@ void PIDTree::processEvent( LCEvent * evt ) {
           }
         }
         seenDEdx.push_back(dedx);
-        isSeen.push_back(weightdedx);
+        seenDEdxErr.push_back(dedxerr);
+        isSeenDEdx.push_back(weightdedx);
                
         
       // Particle IDs
@@ -407,29 +433,67 @@ void PIDTree::processEvent( LCEvent * evt ) {
 
         
         const ParticleID* likeliPID = &(pidh->getParticleID(rcp, pidh->getAlgorithmID("LikelihoodPID")));
+        float likelihood[5] = {999.,999.,999.,999.,999};
         if (likeliPID && likeliPID->getParameters().size() > 4 ) {
-          float likelihood[5] = {2.,2.,2.,2.,2};
           for ( int ihyp = 0 ; ihyp < 5; ihyp++ ) {
             likelihood[ihyp] = likeliPID->getParameters()[ihyp];
             if ( std::isinf(likelihood[ihyp]) ) {
-              streamlog_out(DEBUG) << " likelihood [" << ihyp << "] = " << likelihood[ihyp] << endl;
-              likelihood[ihyp] = 9.;
+              streamlog_out(MESSAGE) << " likelihood [" << ihyp << "] = " << likelihood[ihyp] << endl;
+              likelihood[ihyp] = 888.;
             }  
           }
-          LiPDG_el.push_back(likelihood[0]); streamlog_out(DEBUG) << " electron hyp = " << likelihood[0] << endl;
-          LiPDG_mu.push_back(likelihood[1]); streamlog_out(DEBUG) << " muon hyp = "     << likelihood[1] << endl;
-          LiPDG_pi.push_back(likelihood[2]); streamlog_out(DEBUG) << " pion hyp = "     << likelihood[2] << endl;
-          LiPDG_ka.push_back(likelihood[3]); streamlog_out(DEBUG) << " kaon hyp = "     << likelihood[3] << endl;
-          LiPDG_pr.push_back(likelihood[4]); streamlog_out(DEBUG) << " proton hyp = "   << likelihood[4] << endl;
+          streamlog_out(DEBUG) << " electron hyp = " << likelihood[0] << endl;
+          streamlog_out(DEBUG) << " muon hyp = "     << likelihood[1] << endl;
+          streamlog_out(DEBUG) << " pion hyp = "     << likelihood[2] << endl;
+          streamlog_out(DEBUG) << " kaon hyp = "     << likelihood[3] << endl;
+          streamlog_out(DEBUG) << " proton hyp = "   << likelihood[4] << endl;
         }
         else {
           streamlog_out(MESSAGE) << " likeliPID has = " << likeliPID->getParameters().size() << " parameters " << endl;
-          LiPDG_el.push_back(2.);
-          LiPDG_mu.push_back(2.);
-          LiPDG_pi.push_back(2.);
-          LiPDG_ka.push_back(2.);
-          LiPDG_pr.push_back(2.);
         }
+        LiPDG_el.push_back(likelihood[0]); 
+        LiPDG_mu.push_back(likelihood[1]); 
+        LiPDG_pi.push_back(likelihood[2]); 
+        LiPDG_ka.push_back(likelihood[3]); 
+        LiPDG_pr.push_back(likelihood[4]); 
+        
+        const ParticleID* dedxPID = &(pidh->getParticleID(rcp, pidh->getAlgorithmID("dEdxPID")));
+        float dedxlikeli[5] = {999.,999.,999.,999.,999.};
+        float distance[5] = {999.,999.,999.,999.,999.};
+        if (dedxPID && dedxPID->getParameters().size() > 17 ) {
+          for ( int ihyp = 0 ; ihyp < 5; ihyp++ ) {
+            dedxlikeli[ihyp] = dedxPID->getParameters()[ihyp];
+            if ( std::isinf(likelihood[ihyp]) ) {
+              streamlog_out(MESSAGE) << " dedxlikeli [" << ihyp << "] = " << dedxlikeli[ihyp] << endl;
+              dedxlikeli[ihyp] = 888.;
+            }  
+            distance[ihyp] = dedxPID->getParameters()[13+ihyp];
+            if ( std::isinf(distance[ihyp]) ) {
+              distance[ihyp] = 888.;
+            }  
+            streamlog_out(MESSAGE) << pidh->getParameterNames(pidh->getAlgorithmID("dEdxPID"))[13+ihyp] << " = " << distance[ihyp] << endl;
+          }
+          streamlog_out(DEBUG) << " dEdx liklihood electron hyp = " << dedxlikeli[0] << endl;
+          streamlog_out(DEBUG) << " dEdx liklihood muon hyp = "     << dedxlikeli[1] << endl;
+          streamlog_out(DEBUG) << " dEdx liklihood pion hyp = "     << dedxlikeli[2] << endl;
+          streamlog_out(DEBUG) << " dEdx liklihood kaon hyp = "     << dedxlikeli[3] << endl;
+          streamlog_out(DEBUG) << " dEdx liklihood proton hyp = "   << dedxlikeli[4] << endl;
+        }
+        else {
+          streamlog_out(MESSAGE) << " dedxPID has = " << dedxPID->getParameters().size() << " parameters " << endl;
+        }
+        dedxdist_el.push_back(distance[0]); 
+        dedxdist_mu.push_back(distance[1]); 
+        dedxdist_pi.push_back(distance[2]); 
+        dedxdist_ka.push_back(distance[3]); 
+        dedxdist_pr.push_back(distance[4]); 
+        dedxPDG_el.push_back(dedxlikeli[0]); 
+        dedxPDG_mu.push_back(dedxlikeli[1]); 
+        dedxPDG_pi.push_back(dedxlikeli[2]); 
+        dedxPDG_ka.push_back(dedxlikeli[3]); 
+        dedxPDG_pr.push_back(dedxlikeli[4]); 
+        
+        
 
       } // if reco part
       // IMPROVE HERE: CHECK if track or cluster exists!
@@ -447,11 +511,21 @@ void PIDTree::processEvent( LCEvent * evt ) {
         showerPDG.push_back(0);
         likeliPDG.push_back(0);
         lowmomPDG.push_back(0);
-        LiPDG_el.push_back(5.);
-        LiPDG_mu.push_back(5.);
-        LiPDG_pi.push_back(5.);
-        LiPDG_ka.push_back(5.);
-        LiPDG_pr.push_back(5.);
+        LiPDG_el.push_back(777.);
+        LiPDG_mu.push_back(777.);
+        LiPDG_pi.push_back(777.);
+        LiPDG_ka.push_back(777.);
+        LiPDG_pr.push_back(777.);
+        dedxdist_el.push_back(777.); 
+        dedxdist_mu.push_back(777.); 
+        dedxdist_pi.push_back(777.); 
+        dedxdist_ka.push_back(777.); 
+        dedxdist_pr.push_back(777.); 
+        dedxPDG_el.push_back(777.); 
+        dedxPDG_mu.push_back(777.); 
+        dedxPDG_pi.push_back(777.); 
+        dedxPDG_ka.push_back(777.); 
+        dedxPDG_pr.push_back(777.); 
         
          
       }

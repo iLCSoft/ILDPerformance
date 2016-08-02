@@ -20,7 +20,7 @@
       /afs/desy.de/user/b/boehmej/afspool/boehmej/MarlinWorkdir7/ILDConfig/StandardConfig/current/rHEAD-2016-07-21_nooverlay.sv01-14-01-p00.mILD_o1_v05.E500-TDR_ws.I106519.Pn1n1hh.eL.pR-00001-DST.slcio 
       </parameter>
       <parameter name="GearXMLFile" value="GearOutput.xml"/>
-      <parameter name="MaxRecordNumber" value="0"/>
+      <parameter name="MaxRecordNumber" value="4"/>
       <parameter name="SkipNEvents" value="0"/>
       <parameter name="SupressCheck" value="false"/>
       <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT"> DEBUG </parameter>
@@ -48,7 +48,7 @@
   <!--Name of the MCParticle input collection-->
   <parameter name="MCParticleCollection" type="string" lcioInType="MCParticle"> MCParticlesSkimmed </parameter>
   <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
-  <parameter name="Verbosity" type="string"> WARNING </parameter>
+  <parameter name="Verbosity" type="string"> DEBUG </parameter>
 </processor>
 
   

@@ -109,6 +109,7 @@ class PIDTree : public Processor {
   vector<double> seenTheta ;
   vector<double> seenPhi ;
   vector<double> seenDEdx ;
+  vector<double> seenDEdxErr ;
   vector<double> seenCharge ;
   vector<int> basicPDG;
   vector<int> dEdxPDG;
@@ -116,12 +117,24 @@ class PIDTree : public Processor {
   vector<int> likeliPDG;
   vector<int> lowmomPDG;
   
+  // dEdz distance for each hypothesis
+  vector<float> dedxdist_el;
+  vector<float> dedxdist_mu;
+  vector<float> dedxdist_pi;
+  vector<float> dedxdist_ka;
+  vector<float> dedxdist_pr;
+
   // individual likelihoods for each hypothesis
   vector<float> LiPDG_el;
   vector<float> LiPDG_mu;
   vector<float> LiPDG_pi;
   vector<float> LiPDG_ka;
   vector<float> LiPDG_pr;
+  vector<float> dedxPDG_el;
+  vector<float> dedxPDG_mu;
+  vector<float> dedxPDG_pi;
+  vector<float> dedxPDG_ka;
+  vector<float> dedxPDG_pr;
 
 } ;
 
