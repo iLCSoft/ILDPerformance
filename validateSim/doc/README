@@ -11,13 +11,12 @@ ddsim --steeringFile ./my_ddsim_steer.py --gun.isotrop True --gun.particle mu- -
 The autoValidate.sh script can be run on this sample.
 
 It runs two jobs, the first is a simple validationPreProcessor, which checks which hit collections are in the events,
-and checks the ranges of various parameters (e.g. hit positions, energies, cell indices), and writes them to an ascii file.
-You can choose whether to run over collections of simulated or reconstructed hits, or both, 
-using the simhitCollections and recohitCollections processor parameters of the validationPreProcessor.
+and checks the ranges of various parameters (e.g. hit positions, energies, cell indices), and writes them to ascii files
+(one file per type of object).
 
-The second Marlin job (with the validateAutoProcessor) then reads this ascii file, uses the information within it
+The second Marlin job (with the validateAutoProcessor) then reads this ascii files, uses the information within it
 to define suitable histograms, and then goes on to fill the histograms and save them into an output root file.
 
-The plotauto.C root macro prints the histograms into a .ps file in a logical and hopefully helpful way.
+The plotauto.C macro prints the histograms from the root file into a .ps file in a logical and hopefully helpful way.
 
 

@@ -27,11 +27,20 @@ validateAutoProcessor::validateAutoProcessor() : Processor("validateAutoProcesso
   // modify processor description
   _description = "validateAutoProcessor makes histograms of basic simhit properties to quickly check simulation results" ;
 
-  std::string paramFileName("BLAH.txt");
-  registerProcessorParameter("inputParamFilename",
-                             "name of input parameter file",
-                             _infile,
-                             paramFileName);
+  //  std::string paramFileName("BLAH.txt");
+
+  StringVec infiles;
+  infiles.push_back("BLAH.txt");
+  registerProcessorParameter("inputParamFilenames",
+                             "names of input parameter files",
+                             _infiles,
+                             infiles);
+
+  registerProcessorParameter("outputFilename",
+                             "name of output file",
+                             _outfile,
+                             std::string( "validate.root") );
+
 }
 
 
@@ -44,67 +53,72 @@ void validateAutoProcessor::init() {
   _TrackerHitDecoder=0;
 
   // read in the collections, indices, and ranges
-  cout << _infile << endl;
-  std::string line;
-  ifstream myfile (_infile.c_str());
-  if (myfile.is_open()) {
-    while ( getline (myfile,line) ) {
-      TString ll(line);
-      TObjArray* tor = ll.Tokenize(" ");
-      assert( tor->GetEntries() == 4 );
-      std::string colname = ( (TObjString*) tor->At(0) )->String().Data();
-      bool isindex=false;
-      TString tsvarname = ( (TObjString*) tor->At(1) )->String();
-      if ( tsvarname.Contains("Index_") ) {
-        isindex=true;
-        TObjArray* tb = tsvarname.Tokenize("_");
-        tsvarname = ( (TObjString*) tb->At(1) )->String().Data();
+
+  for (size_t jj=0; jj<_infiles.size(); jj++) {
+    cout << _infiles[jj] << endl;
+    std::string line;
+    ifstream myfile (_infiles[jj].c_str());
+    if (myfile.is_open()) {
+      while ( getline (myfile,line) ) {
+        TString ll(line);
+        TObjArray* tor = ll.Tokenize(" ");
+        assert( tor->GetEntries() == 4 );
+        std::string colname = ( (TObjString*) tor->At(0) )->String().Data();
+        bool isindex=false;
+        TString tsvarname = ( (TObjString*) tor->At(1) )->String();
+        if ( tsvarname.Contains("Index_") ) {
+          isindex=true;
+          TObjArray* tb = tsvarname.Tokenize("_");
+          tsvarname = ( (TObjString*) tb->At(1) )->String().Data();
+        }
+        std::string varname = tsvarname.Data();
+        float minval = ( (TObjString*) tor->At(2) )->String().Atof();
+        float maxval = ( (TObjString*) tor->At(3) )->String().Atof();
+        if ( _allranges.find( colname ) == _allranges.end() ) {
+          validatePilotProcessor_maxMin ss;
+          _allranges[colname] = ss;
+        }
+        if ( isindex ) {
+          _allranges[colname].indx_name.push_back(varname);
+          _allranges[colname].indx_minmax.push_back( std::pair < int, int > ( int(minval), int(maxval) ) );
+        } else if ( varname=="Energy" ) {
+          _allranges[colname].eminmax =  std::pair < float, float > (minval, maxval);
+        } else if ( varname=="Time" ) {
+          _allranges[colname].tminmax =  std::pair < float, float > (minval, maxval);
+        } else if ( varname=="X" ) {
+          _allranges[colname].xminmax =  std::pair < float, float > (minval, maxval);
+        } else if ( varname=="Y" ) {
+          _allranges[colname].yminmax =  std::pair < float, float > (minval, maxval);
+        } else if ( varname=="Z" ) {
+          _allranges[colname].zminmax =  std::pair < float, float > (minval, maxval);
+        } else if ( varname=="Absz" ) {
+          _allranges[colname].abszminmax =  std::pair < float, float > (minval, maxval);
+        } else if ( varname=="R" ) {
+          _allranges[colname].rminmax =  std::pair < float, float > (minval, maxval);
+        } else {
+          cout << "unknown variable? " << varname << endl;
+          assert(0);
+        }
+        //  std::map < std::string , validatePilotProcessor_maxMin > _allranges;
       }
-      std::string varname = tsvarname.Data();
-      float minval = ( (TObjString*) tor->At(2) )->String().Atof();
-      float maxval = ( (TObjString*) tor->At(3) )->String().Atof();
-      if ( _allranges.find( colname ) == _allranges.end() ) {
-        validatePilotProcessor_maxMin ss;
-        _allranges[colname] = ss;
-      }
-      if ( isindex ) {
-        _allranges[colname].indx_name.push_back(varname);
-        _allranges[colname].indx_minmax.push_back( std::pair < int, int > ( int(minval), int(maxval) ) );
-      } else if ( varname=="Energy" ) {
-        _allranges[colname].eminmax =  std::pair < float, float > (minval, maxval);
-      } else if ( varname=="Time" ) {
-        _allranges[colname].tminmax =  std::pair < float, float > (minval, maxval);
-      } else if ( varname=="X" ) {
-        _allranges[colname].xminmax =  std::pair < float, float > (minval, maxval);
-      } else if ( varname=="Y" ) {
-        _allranges[colname].yminmax =  std::pair < float, float > (minval, maxval);
-      } else if ( varname=="Z" ) {
-        _allranges[colname].zminmax =  std::pair < float, float > (minval, maxval);
-      } else if ( varname=="Absz" ) {
-        _allranges[colname].abszminmax =  std::pair < float, float > (minval, maxval);
-      } else if ( varname=="R" ) {
-        _allranges[colname].rminmax =  std::pair < float, float > (minval, maxval);
-      } else {
-        cout << "unknown variable? " << varname << endl;
-        assert(0);
-      }
-      //  std::map < std::string , validatePilotProcessor_maxMin > _allranges;
+      myfile.close();
+    } else {
+      cout << "Unable to open file " << _infiles[jj] << endl;
+      assert(0);
     }
-    myfile.close();
-  } else {
-    cout << "Unable to open file " << _infile << endl;
-    assert(0);
   }
 
   // the output root file for histograms
-  std::string outfilename = "autoValidate.root";
-  _fout = new TFile(outfilename.c_str(),"recreate");
+  _fout = new TFile(_outfile.c_str(),"recreate");
 
   const int nbins1d=300;
   const int nbins2d=100;
 
   float zmaxall(0);
   float rmaxall(0);
+
+  float margin = 0.08;
+
 
   // make a directory for each collection
   for ( std::map < std::string , validatePilotProcessor_maxMin >::iterator itt=_allranges.begin(); itt!=_allranges.end(); itt++) {
@@ -124,8 +138,8 @@ void validateAutoProcessor::init() {
     hmin = itt->second.eminmax.first;
     hmax = itt->second.eminmax.second;
     diff = hmax-hmin;
-    hmin-=diff/20.;
-    hmax+=diff/20.;
+    hmin-=diff*margin;
+    hmax+=diff*margin;
     _h_HitEn[ itt->first ] = new TH1F(hname, hname,nbins1d,hmin,hmax);
     _h_HitEn[ itt->first ]->GetXaxis()->SetTitle("hit energy");
 
@@ -133,7 +147,7 @@ void validateAutoProcessor::init() {
     hmin = itt->second.tminmax.first;
     hmax = itt->second.tminmax.second;
     if ( hmax > 100 ) hmax = 100;
-    diff = hmax-hmin;    hmin-=diff/20.;    hmax+=diff/20.;
+    diff = hmax-hmin;    hmin-=diff*margin;    hmax+=diff*margin;
     _h_HitTime[ itt->first ] = new TH1F(hname, hname,nbins1d,hmin,hmax);
     _h_HitTime[ itt->first ]->GetXaxis()->SetTitle("hit time [ns]");
 
@@ -143,15 +157,15 @@ void validateAutoProcessor::init() {
 
     TH2F* h1 = 0;
     TH2F* h2 = 0;
-
+    
     hname = itt->first.c_str(); hname += "_hitXY";
     hname1 = isEndcap ? hname + "_posZ" : hname;
     hmin = itt->second.xminmax.first;
     hmax = itt->second.xminmax.second;
-    diff = hmax-hmin;    hmin-=diff/20.;    hmax+=diff/20.;
+    diff = hmax-hmin;    hmin-=diff*margin;    hmax+=diff*margin;
     hmin2 = itt->second.yminmax.first;
     hmax2 = itt->second.yminmax.second;
-    diff2 = hmax2-hmin2; hmin2-=diff2/20.;    hmax2+=diff2/20.;
+    diff2 = hmax2-hmin2; hmin2-=diff2*margin;    hmax2+=diff2*margin;
     h1 = new TH2F(hname1, hname1,nbins2d,hmin,hmax, nbins2d, hmin2, hmax2);
     h1->GetXaxis()->SetTitle("hit X [mm]");
     h1->GetYaxis()->SetTitle("hit Y [mm]");
@@ -168,11 +182,11 @@ void validateAutoProcessor::init() {
 
     hmin = isEndcap ? itt->second.abszminmax.first : itt->second.zminmax.first;
     hmax = itt->second.zminmax.second;
-    diff = hmax-hmin;    hmin-=diff/20.;    hmax+=diff/20.;
+    diff = hmax-hmin;    hmin-=diff*margin;    hmax+=diff*margin;
 
     hmin2 = itt->second.rminmax.first;
     hmax2 = itt->second.rminmax.second;
-    diff2 = hmax2-hmin2; hmin2-=diff2/20.;    hmax2+=diff2/20.;
+    diff2 = hmax2-hmin2; hmin2-=diff2*margin;    hmax2+=diff2*margin;
     h1 = new TH2F(hname1, hname1,nbins2d,hmin,hmax, nbins2d, hmin2, hmax2);
     h1->GetXaxis()->SetTitle("hit Z [mm]");
     h1->GetYaxis()->SetTitle("hit R [mm]");
@@ -189,7 +203,7 @@ void validateAutoProcessor::init() {
     int nbins(1);
 
     _h_index_posX[ itt->first ] = aa;
-    
+
     // indices vs. Z
     for (size_t jj=0; jj<itt->second.indx_name.size(); jj++) {
       hname = itt->first.c_str(); hname += "_Indx"+itt->second.indx_name[jj]+"_X";
@@ -198,19 +212,19 @@ void validateAutoProcessor::init() {
       hmin = itt->second.indx_minmax[jj].first-1;
       hmax = itt->second.indx_minmax[jj].second+2;
       nbins = hmax-hmin; if (nbins>nbins2d) nbins=nbins2d;
-      
+
       hmin2 = itt->second.xminmax.first;
       hmax2 = itt->second.xminmax.second;
-      diff2 = hmax2-hmin2; hmin2-=diff2/20.;    hmax2+=diff2/20.;
+      diff2 = hmax2-hmin2; hmin2-=diff2*margin;    hmax2+=diff2*margin;
 
       h1 = new TH2F(hname1, hname1,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
       h1->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
       h1->GetYaxis()->SetTitle("hit X [mm]");
       if ( isEndcap ) {
-	hname2 = hname + "_negZ";
-	h2 = new TH2F(hname2, hname2,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
-	h2->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
-	h2->GetYaxis()->SetTitle("hit X [mm]");
+        hname2 = hname + "_negZ";
+        h2 = new TH2F(hname2, hname2,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
+        h2->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
+        h2->GetYaxis()->SetTitle("hit X [mm]");
       }
       _h_index_posX[ itt->first ].push_back( std::pair < TH2F* , TH2F* > (h1, h2) );
     }
@@ -225,15 +239,15 @@ void validateAutoProcessor::init() {
 
       hmin2 = itt->second.yminmax.first;
       hmax2 = itt->second.yminmax.second;
-      diff2 = hmax2-hmin2; hmin2-=diff2/20.;    hmax2+=diff2/20.;
+      diff2 = hmax2-hmin2; hmin2-=diff2*margin;    hmax2+=diff2*margin;
       h1 = new TH2F(hname1, hname1,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
       h1->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
       h1->GetYaxis()->SetTitle("hit Y [mm]");
       if ( isEndcap ) {
-	hname2 = hname + "_negZ";
-	h2 = new TH2F(hname2, hname2,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
-	h2->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
-	h2->GetYaxis()->SetTitle("hit Y [mm]");
+        hname2 = hname + "_negZ";
+        h2 = new TH2F(hname2, hname2,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
+        h2->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
+        h2->GetYaxis()->SetTitle("hit Y [mm]");
       }
       _h_index_posY[ itt->first ].push_back( std::pair < TH2F* , TH2F* > (h1, h2) );
     }
@@ -246,21 +260,21 @@ void validateAutoProcessor::init() {
       hmax = itt->second.indx_minmax[jj].second+2;
       nbins = hmax-hmin; if (nbins>nbins2d) nbins=nbins2d;
       if ( isEndcap ) {
-	hmin2 = itt->second.abszminmax.first;
-	hmax2 = itt->second.abszminmax.second;
+        hmin2 = itt->second.abszminmax.first;
+        hmax2 = itt->second.abszminmax.second;
       } else {
-	hmin2 = itt->second.zminmax.first;
-	hmax2 = itt->second.zminmax.second;
+        hmin2 = itt->second.zminmax.first;
+        hmax2 = itt->second.zminmax.second;
       }
-      diff2 = hmax2-hmin2; hmin2-=diff2/20.;    hmax2+=diff2/20.;
+      diff2 = hmax2-hmin2; hmin2-=diff2*margin;    hmax2+=diff2*margin;
       h1 = new TH2F(hname1, hname1,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
       h1->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
       h1->GetYaxis()->SetTitle("hit Z [mm]");
       if ( isEndcap ) {
-	hname2 = hname + "_negZ";
-	h2 = new TH2F(hname2, hname2,nbins,hmin,hmax, nbins2d, -hmax2, -hmin2);
-	h2->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
-	h2->GetYaxis()->SetTitle("hit Z [mm]");
+        hname2 = hname + "_negZ";
+        h2 = new TH2F(hname2, hname2,nbins,hmin,hmax, nbins2d, -hmax2, -hmin2);
+        h2->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
+        h2->GetYaxis()->SetTitle("hit Z [mm]");
       }
       _h_index_posZ[ itt->first ].push_back( std::pair < TH2F* , TH2F* > (h1, h2) );
     }
@@ -274,15 +288,15 @@ void validateAutoProcessor::init() {
       nbins = hmax-hmin; if (nbins>nbins2d) nbins=nbins2d;
       hmin2 = itt->second.rminmax.first;
       hmax2 = itt->second.rminmax.second;
-      diff2 = hmax2-hmin2; hmin2-=diff2/20.;    hmax2+=diff2/20.;
+      diff2 = hmax2-hmin2; hmin2-=diff2*margin;    hmax2+=diff2*margin;
       h1 = new TH2F(hname1, hname1,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
       h1->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
       h1->GetYaxis()->SetTitle("hit R [mm]");
       if ( isEndcap ) {
-	hname2 = hname + "_negZ";
-	h2 = new TH2F(hname2, hname2,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
-	h2->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
-	h2->GetYaxis()->SetTitle("hit R [mm]");
+        hname2 = hname + "_negZ";
+        h2 = new TH2F(hname2, hname2,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
+        h2->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
+        h2->GetYaxis()->SetTitle("hit R [mm]");
       }
       _h_index_posR[ itt->first ].push_back( std::pair < TH2F* , TH2F* > (h1, h2) );
     }
@@ -296,15 +310,15 @@ void validateAutoProcessor::init() {
       nbins = hmax-hmin; if (nbins>nbins2d) nbins=nbins2d;
       hmin2 = -acos(-1);
       hmax2 =  acos(-1);
-      diff2 = hmax2-hmin2; hmin2-=diff2/20.;    hmax2+=diff2/20.;
+      diff2 = hmax2-hmin2; hmin2-=diff2*margin;    hmax2+=diff2*margin;
       h1 = new TH2F(hname1, hname1,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
       h1->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
       h1->GetYaxis()->SetTitle("hit Phi [rad]");
       if ( isEndcap ) {
-	hname2 = hname + "_negZ";
-	h2 = new TH2F(hname2, hname2,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
-	h2->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
-	h2->GetYaxis()->SetTitle("hit Phi [rad]");
+        hname2 = hname + "_negZ";
+        h2 = new TH2F(hname2, hname2,nbins,hmin,hmax, nbins2d, hmin2, hmax2);
+        h2->GetXaxis()->SetTitle(itt->second.indx_name[jj].c_str());
+        h2->GetYaxis()->SetTitle("hit Phi [rad]");
       }
       _h_index_posPhi[ itt->first ].push_back( std::pair < TH2F* , TH2F* > (h1, h2) );
     }
@@ -356,7 +370,7 @@ void validateAutoProcessor::processEvent( LCEvent * evt ) {
       LCCollection* simhitcol = evt->getCollection( colname );
       cellindices.clear();
       for (size_t jj=0; jj<_allranges[colname].indx_name.size(); jj++) {
-	cellindices.push_back( _allranges[colname].indx_name[jj] );
+        cellindices.push_back( _allranges[colname].indx_name[jj] );
       }
 
       // work out what type of object is in this collection
@@ -379,7 +393,7 @@ void validateAutoProcessor::processEvent( LCEvent * evt ) {
         objtype=4;
       } else {
         cout << "unknown hit type! " << simhitcol->getTypeName () << endl;
-	// shouldn't get here
+        // shouldn't get here
         assert(0);
       }
 
@@ -396,7 +410,7 @@ void validateAutoProcessor::processEvent( LCEvent * evt ) {
         CalorimeterHit* calhit;
         TrackerHit* trkhit;
 
-	// get basic quantities, according to object type
+        // get basic quantities, according to object type
         switch ( objtype ) {
 
         case 1: // SimCalorimeterHit
@@ -406,10 +420,10 @@ void validateAutoProcessor::processEvent( LCEvent * evt ) {
             pos[i] = simcalhit->getPosition()[i];
           for (int i=0; i<simcalhit->getNMCContributions (); i++)
             times.push_back( simcalhit->getTimeCont (i) );
-	  for ( size_t kk=0; kk<cellindices.size(); kk++) {
+          for ( size_t kk=0; kk<cellindices.size(); kk++) {
             int ii = (*_SimCalorimeterHitDecoder)( simcalhit ) [ cellindices[kk] ];
             indices.push_back( ii );
-	  }
+          }
           break;
 
         case 2: // SimTrackerHit
@@ -418,10 +432,10 @@ void validateAutoProcessor::processEvent( LCEvent * evt ) {
           for (int i=0; i<3; i++)
             pos[i] = simtrkhit->getPosition()[i];
           times.push_back( simtrkhit->getTime() );
-	  for ( size_t kk=0; kk<cellindices.size(); kk++) {
+          for ( size_t kk=0; kk<cellindices.size(); kk++) {
             int ii = (*_SimTrackerHitDecoder)( simtrkhit ) [ cellindices[kk] ];
             indices.push_back( ii );
-	  }
+          }
           break;
 
         case 3: // CalorimeterHit
@@ -429,11 +443,11 @@ void validateAutoProcessor::processEvent( LCEvent * evt ) {
           energy=calhit->getEnergy();
           for (int i=0; i<3; i++)
             pos[i] = calhit->getPosition()[i];
-	  times.push_back( calhit->getTime() );
-	  for ( size_t kk=0; kk<cellindices.size(); kk++) {
+          times.push_back( calhit->getTime() );
+          for ( size_t kk=0; kk<cellindices.size(); kk++) {
             int ii = (*_CalorimeterHitDecoder)( calhit ) [ cellindices[kk] ];
             indices.push_back( ii );
-	  }
+          }
           break;
 
         case 4: // TrackerHit
@@ -442,10 +456,10 @@ void validateAutoProcessor::processEvent( LCEvent * evt ) {
           for (int i=0; i<3; i++)
             pos[i] = trkhit->getPosition()[i];
           times.push_back( trkhit->getTime() );
-	  for ( size_t kk=0; kk<cellindices.size(); kk++) {
+          for ( size_t kk=0; kk<cellindices.size(); kk++) {
             int ii = (*_TrackerHitDecoder)( trkhit ) [ cellindices[kk] ];
             indices.push_back( ii );
-	  }
+          }
           break;
 
         default:
@@ -458,69 +472,69 @@ void validateAutoProcessor::processEvent( LCEvent * evt ) {
         // fill histograms
         _h_HitEn[colname]->Fill(energy);
 
-	for (size_t i=0; i<times.size(); i++)
-	  _h_HitTime[colname]->Fill( times[i] );
+        for (size_t i=0; i<times.size(); i++)
+          _h_HitTime[colname]->Fill( times[i] );
 
-	bool isBarrel = _h_posXY[ colname ].second==0;
+        bool isBarrel = _h_posXY[ colname ].second==0;
 
-	if ( isBarrel ) {
-	  _h_posXY[ colname ].first->Fill(pos[0], pos[1] );
-	} else {
-	  if ( pos[2]>0 ) {
-	    _h_posXY[ colname ].first->Fill(pos[0], pos[1] );
-	  } else {	    
-	    _h_posXY[ colname ].second->Fill(pos[0], pos[1] );
-	  }
-	}
+        if ( isBarrel ) {
+          _h_posXY[ colname ].first->Fill(pos[0], pos[1] );
+        } else {
+          if ( pos[2]>0 ) {
+            _h_posXY[ colname ].first->Fill(pos[0], pos[1] );
+          } else {
+            _h_posXY[ colname ].second->Fill(pos[0], pos[1] );
+          }
+        }
 
-	float r = sqrt( pow(pos[0],2)+pow(pos[1],2) );
-	if ( isBarrel ) {
-	  _h_posZR[ colname ].first->Fill(pos[2], r );
-	} else {
-	  if ( pos[2]>0 ) {
-	    _h_posZR[ colname ].first->Fill(pos[2], r );
-	  } else {	    
-	    _h_posZR[ colname ].second->Fill(pos[2], r );
-	  }
-	}
+        float r = sqrt( pow(pos[0],2)+pow(pos[1],2) );
+        if ( isBarrel ) {
+          _h_posZR[ colname ].first->Fill(pos[2], r );
+        } else {
+          if ( pos[2]>0 ) {
+            _h_posZR[ colname ].first->Fill(pos[2], r );
+          } else {
+            _h_posZR[ colname ].second->Fill(pos[2], r );
+          }
+        }
 
-	_hAll_overallposZR->Fill(pos[2], r );
+        _hAll_overallposZR->Fill(pos[2], r );
 
-	_h_overallposZR[itt->first]->Fill(pos[2], r );
-	
+        _h_overallposZR[itt->first]->Fill(pos[2], r );
 
-	_hAll_Log_overallposZR->Fill(log10(fabs(pos[2])), log10(fabs(r)) );
 
-	_h_Log_overallposZR[itt->first]->Fill(log10(fabs(pos[2])), log10(fabs(r)) );
+        _hAll_Log_overallposZR->Fill(log10(fabs(pos[2])), log10(fabs(r)) );
 
-	float rad = sqrt( pos[0]*pos[0] + pos[1]*pos[1] );
-	float phi = atan2( pos[1], pos[0] );
+        _h_Log_overallposZR[itt->first]->Fill(log10(fabs(pos[2])), log10(fabs(r)) );
 
-	for ( size_t kk=0; kk<cellindices.size(); kk++) {
+        float rad = sqrt( pos[0]*pos[0] + pos[1]*pos[1] );
+        float phi = atan2( pos[1], pos[0] );
 
-	  if ( isBarrel ) {
-	    _h_index_posX[colname][kk].first->Fill( indices[kk], pos[0] );
-	    _h_index_posY[colname][kk].first->Fill( indices[kk], pos[1] );
-	    _h_index_posZ[colname][kk].first->Fill( indices[kk], pos[2] );
-	    _h_index_posR[colname][kk].first->Fill( indices[kk], rad );
-	    _h_index_posPhi[colname][kk].first->Fill( indices[kk], phi );
-	  } else {
-	    if ( pos[2] > 0 ) {
-	      _h_index_posX[colname][kk].first ->Fill( indices[kk], pos[0] );
-	      _h_index_posY[colname][kk].first->Fill( indices[kk], pos[1] );
-	      _h_index_posZ[colname][kk].first->Fill( indices[kk], pos[2] );
-	      _h_index_posR[colname][kk].first ->Fill( indices[kk], rad );
-	      _h_index_posPhi[colname][kk].first->Fill( indices[kk], phi );
-	    } else {
-	      _h_index_posX[colname][kk].second->Fill( indices[kk], pos[0] );
-	      _h_index_posY[colname][kk].second->Fill( indices[kk], pos[1] );
-	      _h_index_posZ[colname][kk].second->Fill( indices[kk], pos[2] );
-	      _h_index_posR[colname][kk].second->Fill( indices[kk], rad );
-	      _h_index_posPhi[colname][kk].second->Fill( indices[kk], phi );
-	    }
-	  }
+        for ( size_t kk=0; kk<cellindices.size(); kk++) {
 
-	}
+          if ( isBarrel ) {
+            _h_index_posX[colname][kk].first->Fill( indices[kk], pos[0] );
+            _h_index_posY[colname][kk].first->Fill( indices[kk], pos[1] );
+            _h_index_posZ[colname][kk].first->Fill( indices[kk], pos[2] );
+            _h_index_posR[colname][kk].first->Fill( indices[kk], rad );
+            _h_index_posPhi[colname][kk].first->Fill( indices[kk], phi );
+          } else {
+            if ( pos[2] > 0 ) {
+              _h_index_posX[colname][kk].first ->Fill( indices[kk], pos[0] );
+              _h_index_posY[colname][kk].first->Fill( indices[kk], pos[1] );
+              _h_index_posZ[colname][kk].first->Fill( indices[kk], pos[2] );
+              _h_index_posR[colname][kk].first ->Fill( indices[kk], rad );
+              _h_index_posPhi[colname][kk].first->Fill( indices[kk], phi );
+            } else {
+              _h_index_posX[colname][kk].second->Fill( indices[kk], pos[0] );
+              _h_index_posY[colname][kk].second->Fill( indices[kk], pos[1] );
+              _h_index_posZ[colname][kk].second->Fill( indices[kk], pos[2] );
+              _h_index_posR[colname][kk].second->Fill( indices[kk], rad );
+              _h_index_posPhi[colname][kk].second->Fill( indices[kk], phi );
+            }
+          }
+
+        }
 
       }
 

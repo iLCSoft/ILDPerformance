@@ -33,6 +33,7 @@ void plotauto(TString infilename) {
 
   gStyle->SetMarkerSize(0.1);
   gStyle->SetTitleSize(0.15,"ff");
+  gStyle->SetTitleTextColor(4);
 
   std::vector < TString > vnames;
   vnames.push_back("Sim_HitEn");
@@ -175,6 +176,7 @@ void plotauto(TString infilename) {
 	}
       }
 
+      if ( indices.size()==0 || variables.size()==0 ) continue;
 
 
       for (int inp=0; inp<2; inp++) {
@@ -207,7 +209,7 @@ void plotauto(TString infilename) {
 	}
 
 	for ( size_t k=0; k<indices.size(); k++) {
-	  tt.DrawTextNDC( 0.05 + (1.0*k)/(indices.size()), 0.02, indices[k] );
+	  tt.DrawTextNDC( 0.05 + (1.0*k)/(indices.size()), 0.02, indices[k].ReplaceAll("Indx","Indx_") );
 	}
 
 	tt.DrawTextNDC( 0.1, 0.99, dirname);

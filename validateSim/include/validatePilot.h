@@ -45,9 +45,6 @@ class validatePilotProcessor : public Processor {
 
  protected:
 
-  int _simCols;
-  int _recCols;
-
   std::string _outfile;
 
   std::map < std::string , std::vector < std::pair < std::string, std::pair<int, int> > > > _indxCode;
@@ -59,6 +56,9 @@ class validatePilotProcessor : public Processor {
 
   std::map < std::string , validatePilotProcessor_maxMin > _allranges;
 
+  std::map < std::string , int > _colTypes;
+
+  enum {SIMCALO=0, SIMTRK, CALO, TRK};
 
 };
 

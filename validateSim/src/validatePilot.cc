@@ -27,19 +27,10 @@ validatePilotProcessor::validatePilotProcessor() : Processor("validationPreProce
   // modify processor description
   _description = "validatePilotProcessor gets names of simhit collections and ranges of parameters" ;
 
-  std::string paramFileName("BLAH.txt");
   registerProcessorParameter("outputParamFilename",
                              "name of output parameter file",
                              _outfile,
-                             paramFileName);
-
-  registerProcessorParameter("simhitCollections",
-			     "look at simhit collections?",
-			     _simCols, int(1) );
-
-  registerProcessorParameter("recohitCollections",
-			     "look at reco hit collections?",
-			     _recCols, int(1) );
+                             std::string("BLAH") );
 
 }
 
@@ -59,6 +50,7 @@ void validatePilotProcessor::processRunHeader( LCRunHeader* run) {
 
 void validatePilotProcessor::processEvent( LCEvent * evt ) {
 
+
   const std::vector < std::string >* colnames = evt->getCollectionNames();
 
   for ( size_t icol=0; icol<colnames->size(); icol++) {
@@ -68,34 +60,29 @@ void validatePilotProcessor::processEvent( LCEvent * evt ) {
     LCCollection* col = evt->getCollection(colname);
     const std::string coltype = col->getTypeName();
 
-    int objtype(0);
+    int objtype(-99);
     if ( coltype == LCIO::SIMCALORIMETERHIT ) {
-      if ( _simCols==0 ) continue;
       if ( _SimCalorimeterHitDecoder ) delete _SimCalorimeterHitDecoder;
       _SimCalorimeterHitDecoder = new CellIDDecoder<SimCalorimeterHit> (col);
-      objtype=1;
+      objtype=SIMCALO;
     } else if ( coltype == LCIO::SIMTRACKERHIT ) {
-      if ( _simCols==0 ) continue;
       if ( _SimTrackerHitDecoder ) delete _SimTrackerHitDecoder;
       _SimTrackerHitDecoder = new CellIDDecoder<SimTrackerHit> (col);
-      objtype=2;
+      objtype=SIMTRK;
     } else if ( coltype == LCIO::CALORIMETERHIT ) {
-      if ( _recCols==0 ) continue;
       if ( _CalorimeterHitDecoder ) delete _CalorimeterHitDecoder;
       _CalorimeterHitDecoder = new CellIDDecoder<CalorimeterHit> (col);
-      objtype=3;
+      objtype=CALO;
     } else if ( coltype == LCIO::TRACKERHIT ) {
-      if ( _recCols==0 ) continue;
       if ( _TrackerHitDecoder ) delete _TrackerHitDecoder;
       _TrackerHitDecoder = new CellIDDecoder<TrackerHit> (col);
-      objtype=4;
+      objtype=TRK;
     } else {
       //        cout << "unknown hit type! " << coltype << endl;
       continue;
     }
 
-
-    cout << colname << endl;
+    _colTypes[colname] = objtype;
 
     std::vector < std::pair < std::string, std::pair<int, int> > > thiscode;
     if ( _indxCode.find( colname ) != _indxCode.end() ) {
@@ -107,6 +94,7 @@ void validatePilotProcessor::processEvent( LCEvent * evt ) {
       if ( std::find( stringVec.begin(), stringVec.end(), LCIO::CellIDEncoding ) != stringVec.end() ) {
         stringVec.clear();
         col->getParameters().getStringVals( LCIO::CellIDEncoding , stringVec ) ;
+
         std::istringstream f(stringVec[0]);
         std::string s,ss;
         std::vector<std::string> strings;
@@ -133,7 +121,9 @@ void validatePilotProcessor::processEvent( LCEvent * evt ) {
       }
     }
 
-    if ( col->getNumberOfElements()>0 && _indxCode.find( colname ) != _indxCode.end() )  { // this collection has cellID information attached
+    if ( col->getNumberOfElements()>0 ) {
+
+      bool hasIndices = _indxCode.find( colname ) != _indxCode.end(); // cell index info available
 
       float energy(-99);
       float pos[3]={0,0,0};
@@ -153,8 +143,7 @@ void validatePilotProcessor::processEvent( LCEvent * evt ) {
         indices.clear();
 
         switch ( objtype ) {
-        case 1: // simcalohit
-
+        case SIMCALO: // simcalohit
           simcalhit = dynamic_cast<SimCalorimeterHit*> (col->getElementAt(j));
           energy=simcalhit->getEnergy();
           for (int i=0; i<3; i++)
@@ -162,24 +151,28 @@ void validatePilotProcessor::processEvent( LCEvent * evt ) {
           for (int i=0; i<simcalhit->getNMCContributions (); i++)
             times.push_back( simcalhit->getTimeCont (i) );
 
-          for (size_t ii=0; ii<thiscode.size(); ii++) {
-            int index = (*_SimCalorimeterHitDecoder)( simcalhit ) [ thiscode[ii].first ];
-            indices.push_back( index );
-          }
+	  if ( hasIndices ) {
+	    for (size_t ii=0; ii<thiscode.size(); ii++) {
+	      int index = (*_SimCalorimeterHitDecoder)( simcalhit ) [ thiscode[ii].first ];
+	      indices.push_back( index );
+	    }
+	  }
           break;
-        case 2: // simtrackerhit
+        case SIMTRK: // simtrackerhit
           simtrkhit = dynamic_cast<SimTrackerHit*> (col->getElementAt(j));
           energy=simtrkhit->getEDep();
           for (int i=0; i<3; i++)
             pos[i] = simtrkhit->getPosition()[i];
           times.push_back( simtrkhit->getTime() );
 
-          for (size_t ii=0; ii<thiscode.size(); ii++) {
-            int index = (*_SimTrackerHitDecoder)( simtrkhit ) [ thiscode[ii].first ];
-            indices.push_back( index );
-          }
+	  if ( hasIndices ) {
+	    for (size_t ii=0; ii<thiscode.size(); ii++) {
+	      int index = (*_SimTrackerHitDecoder)( simtrkhit ) [ thiscode[ii].first ];
+	      indices.push_back( index );
+	    }
+	  }
           break;
-        case 3: // calorimeterhit
+        case CALO: // calorimeterhit
           calhit = dynamic_cast<CalorimeterHit*> (col->getElementAt(j));
           energy=calhit->getEnergy();
           for (int i=0; i<3; i++)
@@ -187,22 +180,26 @@ void validatePilotProcessor::processEvent( LCEvent * evt ) {
 
 	  times.push_back( calhit->getTime() );
 
-          for (size_t ii=0; ii<thiscode.size(); ii++) {
-            int index = (*_CalorimeterHitDecoder)( calhit ) [ thiscode[ii].first ];
-            indices.push_back( index );
-          }
+	  if ( hasIndices ) {
+	    for (size_t ii=0; ii<thiscode.size(); ii++) {
+	      int index = (*_CalorimeterHitDecoder)( calhit ) [ thiscode[ii].first ];
+	      indices.push_back( index );
+	    }
+	  }
           break;
-        case 4: // trackerhit
+        case TRK: // trackerhit
           trkhit = dynamic_cast<TrackerHit*> (col->getElementAt(j));
           energy=trkhit->getEDep();
           for (int i=0; i<3; i++)
             pos[i] = trkhit->getPosition()[i];
           times.push_back( trkhit->getTime() );
 
-          for (size_t ii=0; ii<thiscode.size(); ii++) {
-            int index = (*_TrackerHitDecoder)( trkhit ) [ thiscode[ii].first ];
-            indices.push_back( index );
-          }
+	  if ( hasIndices ) {
+	    for (size_t ii=0; ii<thiscode.size(); ii++) {
+	      int index = (*_TrackerHitDecoder)( trkhit ) [ thiscode[ii].first ];
+	      indices.push_back( index );
+	    }
+	  }
           break;
         default:
           std::cout << "unknown obj type " << objtype << endl;
@@ -290,30 +287,42 @@ void validatePilotProcessor::end(){
 
   std::string label;
 
-  ofstream myfile (_outfile.c_str());
-  if (myfile.is_open()) {
+  const int nff = TRK-SIMCALO+1;
+  ofstream myfile[nff];
+  myfile[SIMCALO-SIMCALO].open((_outfile+"_SIMCALO.txt").c_str());
+  myfile[SIMTRK-SIMCALO].open((_outfile+"_SIMTRK.txt").c_str());
+  myfile[CALO-SIMCALO].open((_outfile+"_CALO.txt").c_str());
+  myfile[TRK-SIMCALO].open((_outfile+"_TRK.txt").c_str());
 
-    for ( std::map < std::string , validatePilotProcessor_maxMin >::iterator itt = _allranges.begin(); itt!=_allranges.end(); itt++) {
+  //  ofstream myfile (_outfile.c_str());
+  //  if (myfile.is_open()) {
 
-      validatePilotProcessor_maxMin vmm = itt->second;
+  for ( std::map < std::string , validatePilotProcessor_maxMin >::iterator itt = _allranges.begin(); itt!=_allranges.end(); itt++) {
 
-      for (size_t i=0; i<vmm.indx_minmax.size(); i++) {
-	label = itt->first + " Index_" + vmm.indx_name[i];  myfile << label << " " << vmm.indx_minmax[i].first << " " << vmm.indx_minmax[i].second << endl;
-      }
+    int ttt = _colTypes[itt->first] - SIMCALO;
 
-      label = itt->first + " Energy"; myfile << label << " " << vmm.eminmax.first << " " << vmm.eminmax.second << endl;
-      label = itt->first + " Time";   myfile << label << " " << vmm.tminmax.first << " " << vmm.tminmax.second << endl;
-      label = itt->first + " X";      myfile << label << " " << vmm.xminmax.first << " " << vmm.xminmax.second << endl;
-      label = itt->first + " Y";      myfile << label << " " << vmm.yminmax.first << " " << vmm.yminmax.second << endl;
-      label = itt->first + " Z";      myfile << label << " " << vmm.zminmax.first << " " << vmm.zminmax.second << endl;
-      label = itt->first + " Absz";   myfile << label << " " << vmm.abszminmax.first << " " << vmm.abszminmax.second << endl;
-      label = itt->first + " R";      myfile << label << " " << vmm.rminmax.first << " " << vmm.rminmax.second << endl;
+    cout << itt->first << " " << _colTypes[itt->first] << " " << ttt << endl;
 
+    validatePilotProcessor_maxMin vmm = itt->second;
+
+    for (size_t i=0; i<vmm.indx_minmax.size(); i++) {
+      label = itt->first + " Index_" + vmm.indx_name[i];  
+      myfile[ttt] << label << " " << vmm.indx_minmax[i].first << " " << vmm.indx_minmax[i].second << endl;
     }
 
-    myfile.close();
+    label = itt->first + " Energy"; myfile[ttt] << label << " " << vmm.eminmax.first << " " << vmm.eminmax.second << endl;
+    label = itt->first + " Time";   myfile[ttt] << label << " " << vmm.tminmax.first << " " << vmm.tminmax.second << endl;
+    label = itt->first + " X";      myfile[ttt] << label << " " << vmm.xminmax.first << " " << vmm.xminmax.second << endl;
+    label = itt->first + " Y";      myfile[ttt] << label << " " << vmm.yminmax.first << " " << vmm.yminmax.second << endl;
+    label = itt->first + " Z";      myfile[ttt] << label << " " << vmm.zminmax.first << " " << vmm.zminmax.second << endl;
+    label = itt->first + " Absz";   myfile[ttt] << label << " " << vmm.abszminmax.first << " " << vmm.abszminmax.second << endl;
+    label = itt->first + " R";      myfile[ttt] << label << " " << vmm.rminmax.first << " " << vmm.rminmax.second << endl;
 
-  } else cout << "Unable to open file" << endl;
+  }
+
+  for (int i=0; i<nff; i++) {
+    myfile[i].close();
+  }
 
 }
 

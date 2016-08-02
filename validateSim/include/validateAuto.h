@@ -44,7 +44,8 @@ class validateAutoProcessor : public Processor {
 
  protected:
 
-  std::string _infile;
+  StringVec _infiles;
+  std::string _outfile;
 
   float _maxR;
   float _maxZ;
