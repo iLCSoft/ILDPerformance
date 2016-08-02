@@ -35,7 +35,7 @@ unset MARLIN_DLL
 INFILE=/nfs/dust/ilc/user/voutsina/GenFiles/E250-TDR_ws.Pe2e2h_mumu.Gwhizard-1_95.eL.pR.I108009.001.stdhep
 
 # set the ILDConfig version to be used. IMPORTANT: it should be consistent with the ilcsoft release
-ILDCONFIG==${ILCSOFT}/ILDConfig/trunk/StandardConfig/current
+ILDCONFIG=${ILCSOFT}/ILDConfig/trunk/StandardConfig/current
 
 cp ${ILDCONFIG}/* .
 cp -rp ${ILDCONFIG}/* .

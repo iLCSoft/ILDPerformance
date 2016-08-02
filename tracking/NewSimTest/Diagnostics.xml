@@ -12,7 +12,7 @@
    
    <execute>
      <processor name="MyAIDAProcessor"/>
-     <processor name="MyRecoMCTruthLinker"/>
+     <!--processor name="MyRecoMCTruthLinker"/-->
      <processor name="MyDiagnostics"/>
    </execute>
 
