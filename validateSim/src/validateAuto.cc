@@ -57,7 +57,7 @@ void validateAutoProcessor::init() {
   for (size_t jj=0; jj<_infiles.size(); jj++) {
     cout << _infiles[jj] << endl;
     std::string line;
-    ifstream myfile (_infiles[jj].c_str());
+    std::ifstream myfile (_infiles[jj].c_str());
     if (myfile.is_open()) {
       while ( getline (myfile,line) ) {
         TString ll(line);
