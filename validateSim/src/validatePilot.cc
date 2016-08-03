@@ -288,7 +288,7 @@ void validatePilotProcessor::end(){
   std::string label;
 
   const int nff = TRK-SIMCALO+1;
-  ofstream myfile[nff];
+  std::ofstream myfile[nff];
   myfile[SIMCALO-SIMCALO].open((_outfile+"_SIMCALO.txt").c_str());
   myfile[SIMTRK-SIMCALO].open((_outfile+"_SIMTRK.txt").c_str());
   myfile[CALO-SIMCALO].open((_outfile+"_CALO.txt").c_str());
