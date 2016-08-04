@@ -34,7 +34,7 @@ void plotPIDs(const char* _filename) {
   TFile *treefile = new TFile(_filename);
   TTree *tree = (TTree*) treefile->Get("hermTree");
     
-  // cut:
+  // cut:PID_output_n1n1hh2.root
   // 1: p > 1 GeV
   // 8: 1 GeV < p < 10 GeV
   int icut = 9;

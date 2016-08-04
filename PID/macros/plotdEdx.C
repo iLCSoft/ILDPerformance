@@ -11,8 +11,8 @@ void plotdEdx(const char* _filename ) {
 
   TFile *treefile = new TFile(_filename);
 
-  const int nBins = 10000 ;
-  const double maxX  = 1e3 ;
+  const int nBins = 100000 ;
+  const double maxX  = 1e5 ;
   const double maxY  = 0.0000005 ;
 
   TH2F* h1 = new TH2F("h1","All Partilces",nBins, 0.3, maxX, 1000,0,maxY);
@@ -26,7 +26,7 @@ void plotdEdx(const char* _filename ) {
   h2->SetMarkerColor(kBlue);
   h3->SetMarkerColor(8);
   h4->SetMarkerColor(kRed);
-  h5->SetMarkerColor(5);
+  h5->SetMarkerColor(kOrange);
   h6->SetMarkerColor(1);
 
   //  hermTree->Draw("seenDEdx:trueP/trueMass>>h1","abs(trueCharge)>0.5&&trueMass>0.&&seenDEdx>0.&&seenDEdx<1.e-6") ;
@@ -68,7 +68,7 @@ void plotdEdx(const char* _filename ) {
   h2->GetXaxis()->SetTitleSize( 0.04 ) ;
   h2->GetXaxis()->SetTitleOffset( 1.5 );
 
-  h2->GetYaxis()->SetTitle( "seendEdx" );
+  h2->GetYaxis()->SetTitle( "seendEdx (MeV/g.cm^-2)" );
   h2->GetYaxis()->SetTitleSize( 0.06 ) ;
   h2->GetYaxis()->SetTitleOffset( 1 );
 
@@ -81,7 +81,7 @@ c2->cd(3) ;
   h3->GetXaxis()->SetTitleSize( 0.04 ) ;
   h3->GetXaxis()->SetTitleOffset( 1.5 );
 
-  h3->GetYaxis()->SetTitle( "seendEdx" );
+  h3->GetYaxis()->SetTitle( "seendEdx (MeV/g.cm^-2) " );
   h3->GetYaxis()->SetTitleSize( 0.06 ) ;
   h3->GetYaxis()->SetTitleOffset(1 );
 
@@ -94,7 +94,7 @@ gPad->SetLogx();
   h4->GetXaxis()->SetTitleSize( 0.04 ) ;
   h4->GetXaxis()->SetTitleOffset( 1.5 );
 
-  h4->GetYaxis()->SetTitle( "seendEdx" );
+  h4->GetYaxis()->SetTitle( "seendEdx  (MeV/g.cm^-2)" );
   h4->GetYaxis()->SetTitleSize( 0.06 ) ;
   h4->GetYaxis()->SetTitleOffset( 1 );
 
@@ -107,7 +107,7 @@ gPad->SetLogx() ;
  h5->GetXaxis()->SetTitleSize( 0.04 ) ;
  h5->GetXaxis()->SetTitleOffset( 1.5 );
  
- h5->GetYaxis()->SetTitle( "seendEdx" );
+ h5->GetYaxis()->SetTitle( "seendEdx  (MeV/g.cm^-2)" );
  h5->GetYaxis()->SetTitleSize( 0.06 ) ;
  h5->GetYaxis()->SetTitleOffset( 1 );
 
@@ -119,11 +119,13 @@ h5->Draw();
  h6->GetXaxis()->SetTitle("true P/true Mass" );
  h6->GetXaxis()->SetTitleSize( 0.04 ) ;
  h6->GetXaxis()->SetTitleOffset( 1.5 );
-
-  h6->GetYaxis()->SetTitle( "seendEdx" );
+  h6->GetYaxis()->SetTitle( "seendEdx  (MeV/g.cm^-2)" );
   h6->GetYaxis()->SetTitleSize( 0.06 ) ;
   h6->GetYaxis()->SetTitleOffset( 1 );
 
  h6->Draw();
   
+ TString outfile = "../Results/dEdx_plots_output";
+   c2->Print(TString(outfile+".pdf"));
+
 }
