@@ -83,8 +83,8 @@ void plotPIDs(const char* _filename) {
     outfile += "_cut";
     outfile += icut;
     //cout << outfile << endl;
-    cpdg[ipdg]->Print(TString(outfile+".eps"));
-    cpdg[ipdg]->Print(TString(outfile+".ps"));
+    // cpdg[ipdg]->Print(TString(outfile+".eps"));
+    // cpdg[ipdg]->Print(TString(outfile+".ps"));
     cpdg[ipdg]->Print(TString(outfile+".pdf"));
 
   }

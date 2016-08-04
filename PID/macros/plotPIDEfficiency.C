@@ -8,7 +8,14 @@
 using namespace std;
 
 
-void plotPIDEfficiency(const char* _filename) {
+void plotPIDEfficiency(const char* _filename, int pdgCode) {
+
+  // ----- define some variables defining what to plot -----
+  //int pdgCode = 13 ;  // muon
+  //int pdgCode = 211 ;  // pion
+  //int pdgCode = 11 ; //electron
+  //int pdgCode = 321 ; //kaon
+  //int pdgCode = 2212 ; //protons
 
   gROOT->SetStyle("ildStyle");
   ildStyle->SetOptTitle(1);
@@ -32,12 +39,6 @@ void plotPIDEfficiency(const char* _filename) {
   ildStyle->SetMarkerStyle(20);
   ildStyle->SetMarkerSize(0.625);
 
-  // ----- define some variables defining what to plot -----
-  // int pdgCode = 13 ;  // muon
-  //int pdgCode = 211 ;  // pion
-  //int pdgCode = 11 ; //electron
-  //int pdgCode = 321 ; //kaon
-  //int pdgCode = 2212 ; //protons
 
   // --- open the file -----
 
@@ -261,7 +262,7 @@ void plotPIDEfficiency(const char* _filename) {
    TString outfile = "../Results/PID_efficiencies";
    outfile += "_pdg";
    outfile +=  pdgCode ;
-   c->Print(TString(outfile+".pdf"));
+   //c->Print(TString(outfile+".pdf"));
    
  TCanvas* k  = new TCanvas( " PID Failed " , " PID Failed " ,750 ,750);
    k->Divide(2,3) ;
@@ -331,7 +332,7 @@ void plotPIDEfficiency(const char* _filename) {
    TString outfile = "../Results/PID_Failed";
    outfile += "_pdg";
    outfile +=  pdgCode ;
-   k->Print(TString(outfile+".pdf"));
+   //   k->Print(TString(outfile+".pdf"));
 
    // ------ draw them both in one plot --------------------
 

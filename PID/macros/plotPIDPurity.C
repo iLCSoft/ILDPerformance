@@ -44,12 +44,6 @@ void plotPIDPurity(const char* _filename) {
   ildStyle->SetMarkerSize(0.625);
 
   // ----- define some variables defining what to plot -----
-  // int pdgCode = 13 ;  // muon
-  //int pdgCode = 211 ;  // pion
-  //int pdgCode = 11 ; //electron
-  //int pdgCode = 321 ; //kaon
-  //int pdgCode = 2212 ; //protons
-
 
   int pdgCode[5] = {11, 13, 211, 321, 2212};
   TString particleName[5] = {"electrons", "muons", "pions", "kaons", "protons"};
@@ -64,22 +58,14 @@ void plotPIDPurity(const char* _filename) {
   TTree *tree = (TTree*) treefile->Get("hermTree");
 
 
-  //************** create some histograms **************
-  // const int nBins = 100;
-  // const int maxX = 1;
-  // const int maxY = 1;
-  // TH2F* h1 = new TH2F("h1", "Electron likelyhood", nBins, 0, maxX, 1000, 0, maxY);
-  // TH2F* h2 = new TH2F("h2", "Muon likelyhood", nBins, 0, maxX, 1000, 0, maxY);
-  // TH2F* h3 = new TH2F("h3", "Pion likelyhood", nBins, 0, maxX, 1000, 0, maxY);
-  // TH2F* h4 = new TH2F("h4", "Kaon likelyhood", nBins, 0, maxX, 1000, 0, maxY);
-  // TH2F* h5 = new TH2F("h5", "Proton likelyhood", nBins, 0, maxX, 1000, 0, maxY);
   
   
   const double maxX  = 0. ;
   const double minX  = -200;
   
-  for (int i = 0; i < 5; ++i) {
+  for (int i = 0; i < 5; ++i) { // loop over 5 PDG types
 
+  // -- create the histograms 
     TString hname = "ht_" + particleName[i] ;
     TString htitle = " Likely PDG true " +  particleName[i] ; 
     ht[i] = new TH1F( hname , htitle, nBins ,minX , maxX ) ;
@@ -128,15 +114,12 @@ void plotPIDPurity(const char* _filename) {
     
     tree->SetBranchAddress( likelihoodName[i] , &likelihood );
     
-    //cout << "after branch addressing "  << endl;
+
     
     // ************************* loop over events and particles in tree *****************************
     
     
     int nevts = tree->GetEntries();
-    
-    // double Efficiency[5] ;
-    // double Purity[5];
     
     for (int ievt = 0; ievt < nevts; ++ievt) {
       
@@ -169,68 +152,62 @@ void plotPIDPurity(const char* _filename) {
     for(int iBins=0; iBins<nBins; iBins++){
       
       BinCentre_ht[iBins]  = ht[i]->GetBinCenter (iBins)  ;
-      BinContent_ht[iBins] = ht[i]->GetBinContent(iBins) ;
+      BinContent_ht[iBins] = ht[i]->GetBinContent(iBins+1) ;
       BinCentre_hf[iBins]  = hf[i]->GetBinCenter (iBins)  ;
-      BinContent_hf[iBins] = hf[i]->GetBinContent(iBins) ;
+      BinContent_hf[iBins] = hf[i]->GetBinContent(iBins+1) ;
     }
     
     double eff[ nBins ] ;
     double pur[ nBins ] ;
     
     for(int iBins=0; iBins<nBins; iBins++){
-      double sum_t_le_c = 0 ;  // sum of entries in true histogram that are below cut
-      double sum_t_gt_c = 0 ;  // ...
-      double sum_f_le_c = 0 ;
-      double sum_f_gt_c = 0 ;
+      double sum_t_lt_c = 0 ;  // sum of entries in true histogram that are below cut
+      double sum_t_ge_c = 0 ;  // ...
+      double sum_f_lt_c = 0 ;
+      double sum_f_ge_c = 0 ;
       
       for(int jBins=0; jBins<nBins; jBins++){
 	if( jBins < iBins){
-	  sum_t_le_c += BinContent_ht[jBins];
-	  sum_f_le_c += BinContent_hf[jBins];
+	  sum_t_lt_c += BinContent_ht[jBins];
+	  sum_f_lt_c += BinContent_hf[jBins];
 	} else {
-	  sum_t_gt_c += BinContent_ht[jBins];
-	  sum_f_gt_c += BinContent_hf[jBins];
+	  sum_t_ge_c += BinContent_ht[jBins];
+	  sum_f_ge_c += BinContent_hf[jBins];
 	}
       }
       
-      eff[ iBins ] =  sum_t_gt_c / (sum_t_gt_c + sum_t_le_c )  ;
-      pur[ iBins ] =  sum_t_gt_c / (sum_t_gt_c + sum_f_gt_c )  ;
+      eff[ iBins ] =  sum_t_ge_c / (sum_t_ge_c + sum_t_lt_c )  ;
+      pur[ iBins ] =  sum_t_ge_c / (sum_t_ge_c + sum_f_ge_c )  ;
     }
       
       
-    h[i]  = new TGraph( nBins , eff , pur );
+    h[i]  = new TGraph( nBins , pur , eff );
       
-    
-  
-    // std::cout << "trueCounter[i]=" << trueCounter[i] << endl;
-    // std::cout << "recoCounter[i]=" << recoCounter[i] << endl;
-    // std::cout << "trueandrecoCounter[i]=" << trueandrecoCounter[i] << endl;
-    
-    // Efficiency[i] = recoCounter[i]/ trueCounter[i];
-    // Purity[i] =  trueandrecoCounter[i]/ recoCounter[i];
-    
-    // std::cout << "Efficiency[i]=" << Efficiency[i] << endl;
-    // std::cout << "Purity[i]=" << Purity[i] << endl;
-    
+
+
   } // ==============================  loop over PDG types
 
+  
+
+
+  // **********   now plot the histotgrams ********************************************
+
+  // first the actual likelihoods
+  TCanvas* c0  = new TCanvas( "xxx" , "xxx" ,750 ,750);
+  c0->Divide(2,3) ;
+  for(int i=0 ; i<5; ++i){
+    c0->cd(i+1) ;
+    hf[i]->Draw() ;
+    ht[i]->Draw("same") ;
+  }
+
+  // and now the eff vs. pur. 
   TGraph*  h1 = h[0] ;
   TGraph*  h2 = h[1] ;
   TGraph*  h3 = h[2] ;
   TGraph*  h4 = h[3] ;
   TGraph*  h5 = h[4] ;
-
-  // double Efficiency[5] = recoCounter/ trueCounter;
-  //double Purity[5] = trueandrecoCounter/ recoCounter;
-
-  // hermTree->Draw("Efficiency[1]: Purity[1]>>h1"," abs(truePDG) == 11 ") ;
-  // hermTree->Draw("Efficiency[2]: Purity[2]>>h2"," abs(truePDG) == 13 ") ;
-  // hermTree->Draw("Efficiency[3]: Purity[3]>>h3"," abs(truePDG) == 211 ") ;
-  // hermTree->Draw("Efficiency[4]: Purity[5]>>h4"," abs(truePDG) == 321 ") ;
-  // hermTree->Draw("Efficiency[6]: Purity[6]>>h5"," abs(truePDG) == 2212 ") ;
-  // **********   now plot the histotgrams ********************************************
-
-  //TCanvas* c  = new TCanvas( " PID eff." , " xxx "  ,750,750);
+  
   TCanvas* c  = new TCanvas( " PID efficiency vs purity" , "Efficiency purity" ,750 ,750);
   c->Divide(2,3) ;
   
