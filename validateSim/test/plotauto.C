@@ -60,7 +60,7 @@ void plotauto(TString infilename) {
   // overall geometry
   TDirectory* td = (TDirectory*) infile->Get("ALLCollections");
   cc->Clear();
-  cc->Divide(3,2);
+  cc->Divide(3,3);
   cc->cd(1);
   hh = (TH2F*) td->Get("ALLCollections_overallhitZR");
   hh->Draw("box");
@@ -74,8 +74,8 @@ void plotauto(TString infilename) {
     if (cll->InheritsFrom("TH2F")) {
       hh = (TH2F*)key->ReadObj();
       TString hn = hh->GetName();
-      if ( hn=="ALLCollections_overallhitZR" ) continue;
-      if ( hn.Contains("_Log_") ) continue;
+      if ( hn.Contains("ALL") ) continue;
+      if ( hn.Contains("_Log") ) continue;
       hh->SetLineColor(icol);
       if ( first ) {hh->Draw("box"); first=false;}
       else hh->Draw("same;box");
@@ -85,6 +85,9 @@ void plotauto(TString infilename) {
       tl->AddEntry(hh, ss , "l");
     }
   }
+  // the legend
+  cc->cd(3);
+  tl->Draw();
 
   cc->cd(4);
   hh = (TH2F*) td->Get("ALLCollections_Log_overallhitZR");
@@ -98,7 +101,7 @@ void plotauto(TString infilename) {
     if (cll->InheritsFrom("TH2F")) {
       hh = (TH2F*)key->ReadObj();
       TString hn = hh->GetName();
-      if ( hn=="ALLCollections_Log_overallhitZR" ) continue;
+      if ( hn.Contains("ALL" ) ) continue;
       if ( ! hn.Contains("_Log_") ) continue;
       hh->SetLineColor(icol);
       if ( first ) {hh->Draw("box"); first=false;}
@@ -108,9 +111,28 @@ void plotauto(TString infilename) {
     }
   }
 
-  // the legend
-  cc->cd(3);
-  tl->Draw();
+  cc->cd(7);
+  hh = (TH2F*) td->Get("ALLCollections_LogLog_overallhitZR");
+  hh->Draw("box");
+  cc->cd(8);
+  icol=1;
+  first=true;
+  next = td->GetListOfKeys();
+  while ((key = (TKey*)next())) {
+    TClass *cll = gROOT->GetClass(key->GetClassName());
+    if (cll->InheritsFrom("TH2F")) {
+      hh = (TH2F*)key->ReadObj();
+      TString hn = hh->GetName();
+      if ( hn.Contains("ALL" ) ) continue;
+      if ( ! hn.Contains("_LogLog_") ) continue;
+      hh->SetLineColor(icol);
+      if ( first ) {hh->Draw("box"); first=false;}
+      else hh->Draw("same;box");
+      icol++;
+      if (icol==10) icol=1;
+    }
+  }
+
 
   cc->Print(plname);
 
