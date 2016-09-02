@@ -33,7 +33,7 @@ void PResolution(){
   for(int ii = 0; ii < SIZE_PA; ii++){
     for (int i = 0; i < SIZE_M; i++){
       TFile *f = new TFile(Form("../Results/Analysis/analysis_MuonsAngle_%d_Mom_%d.root",PA[ii],Mom[i]), "read");
-	TTree *EvalTree = (TTree*)f->Get("MyRecoMCTruthLinker/EvalTree");
+	TTree *EvalTree = (TTree*)f->Get("EvalTree");
 
 	printf( " I am studying file analysis_MuonsAngle_%d_Mom_%d.root ",PA[ii],Mom[i]);
 

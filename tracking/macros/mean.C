@@ -36,13 +36,13 @@ void mean(){
   for(int ii = 0; ii < SIZE_PA; ii++){
     for (int i = 0; i < SIZE_M; i++){
       TFile *f1 = new TFile(Form("../Results/Analysis/analysis_MuonsAngle_%d_Mom_%d.root",PA[ii],Mom[i]), "read");
-      TDirectory *d1 = (TDirectory*) f1->Get("MyRecoMCTruthLinker");
+      //TDirectory *d1 = (TDirectory*) f1->Get("MyRecoMCTruthLinker");
       
-      TH1F* hOmega = (TH1F*) d1->Get("OmegaPull");
-      TH1F* hPhi = (TH1F*) d1->Get("PhiPull");
-      TH1F* hTanLambda = (TH1F*) d1->Get("TanLambdaPull");
-      TH1F* hd0 = (TH1F*) d1->Get("d0pull");	
-      TH1F* hz0 = (TH1F*) d1->Get("z0pull");	
+      TH1F* hOmega = (TH1F*) f1->Get("OmegaPull");
+      TH1F* hPhi = (TH1F*) f1->Get("PhiPull");
+      TH1F* hTanLambda = (TH1F*) f1->Get("TanLambdaPull");
+      TH1F* hd0 = (TH1F*) f1->Get("d0pull");	
+      TH1F* hz0 = (TH1F*) f1->Get("z0pull");	
 
       if (hOmega->GetEntries()>50){
 
