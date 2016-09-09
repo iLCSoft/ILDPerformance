@@ -28,9 +28,7 @@
 
 #SET THE DESIRED ILCSOFT RELEASE OR HEAD VERSION
 unset MARLIN_DLL
-. /afs/desy.de/project/ilcsoft/sw/x86_64_gcc44_sl6/v01-17-09/init_ilcsoft.sh
-#. /nfs/dust/ilc/user/voutsina/DBD/init_ilcsoft.sh
-#. /afs/desy.de/project/ilcsoft/sw/x86_64_gcc48_sl6/HEAD-2016-05-20/init_ilcsoft.sh
+. /afs/desy.de/project/ilcsoft/sw/x86_64_gcc48_sl6/v01-17-10/init_ilcsoft.sh
 
 INFILE=/nfs/dust/ilc/user/voutsina/GenFiles/E250-TDR_ws.Pe2e2h_mumu.Gwhizard-1_95.eL.pR.I108009.001.stdhep
 

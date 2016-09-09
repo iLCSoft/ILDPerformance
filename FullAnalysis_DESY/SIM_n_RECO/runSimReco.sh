@@ -34,7 +34,7 @@
 
 #SET THE DESIRED ILCSOFT RELEASE OR HEAD VERSION
 unset MARLIN_DLL
-. /afs/desy.de/project/ilcsoft/sw/x86_64_gcc48_sl6/HEAD-2016-05-20/init_ilcsoft.sh
+. /afs/desy.de/project/ilcsoft/sw/x86_64_gcc48_sl6/v01-17-10/init_ilcsoft.sh
 
 # set the ILDConfig version to be used. IMPORTANT: it should be consistent with the ilcsoft release
 ILDCONFIG=${ILCSOFT}/ILDConfig/HEAD

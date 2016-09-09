@@ -12,12 +12,12 @@
    
    <execute>
      <processor name="MyAIDAProcessor"/>
-     <processor name="MyRecoMCTruthLinker"/>
+     <!--processor name="MyRecoMCTruthLinker"/-->
      <processor name="MyDiagnostics"/>
    </execute>
 
    <global> 
-      <parameter name="LCIOInputFiles"> AntiMuonsAngle_40_Mom_5.slcio </parameter>
+      <parameter name="LCIOInputFiles"> /nfs/dust/ilc/user/voutsina/testarea/v011710/gcc44/mokka/ILDPerformance/trunk/tracking/Results/RecoFiles/Marlin_Reco_MuonsAngle_85_Mom_25.slcio </parameter>
       <parameter name="GearXMLFile" value="GearOutput.xml"/>
       <parameter name="MaxRecordNumber" value="0"/>
       <parameter name="SkipNEvents" value="0"/>

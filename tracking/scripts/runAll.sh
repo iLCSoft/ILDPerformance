@@ -12,6 +12,10 @@ y_dir=('0.173' '0.342' '0.643' '0.996')
 z_dir=('0.985' '0.94'  '0.766' '0.087') 
 Mom=( '1' '3' '5' '10' '15' '25' '50' '100' )
 
+# set the correct path to ILDConfig and copy the configuration files from there
+ILDCONFIG=/nfs/dust/ilc/user/voutsina/testarea/v011710/gcc44/DD4hep/ILDConfig/v01-17-10-p01
+#cp -rp ${ILDCONFIG}/StandardConfig/current/* .
+
 for i in {1..4}
 
 do
@@ -74,14 +78,14 @@ cat >  muons << EOF
 /gun/momentum ${Mom[j]}
 /gun/particle mu-
 
-/run/beamOn 500
+/run/beamOn 1000
 
 EOF
 #=================================================
 
-Mokka -U sim.steer
+#Mokka -U sim.steer
 
-mv MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio ../Results/SimFiles/
+#mv MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio ../Results/SimFiles/
 
 #======MARLIN=====#
 #======MARLIN=====#
@@ -92,7 +96,7 @@ echo $INFILE
 
 #=================================================
 
-Marlin stdreco_tracking.xml \
+Marlin bbudsc_3evt_stdreco.xml \
     --global.LCIOInputFiles=$INFILE \
     --global.GearXMLFile=GearOutput.xml \
     --MyLCIOOutputProcessor.LCIOOutputFile=Marlin_Reco_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio \

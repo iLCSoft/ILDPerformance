@@ -26,8 +26,8 @@ void Pulls(const char* ext = ".root")
   for (Int_t i = 0; i < n; i++){
     Printf("file -> %s", filename[i]);
     TFile *f1 = new TFile(filename[i], "read");
-    TDirectory *d1 = (TDirectory*) f1->Get("MyRecoMCTruthLinker");
-    Pulls = (TCanvas*)d1->Get("pulls");
+    //TDirectory *d1 = (TDirectory*) f1->Get("MyRecoMCTruthLinker");
+    Pulls = (TCanvas*)f1->Get("pulls");
     Pulls->SetTitle(filename[i]);
 
     // std::stringstream strs ;
