@@ -17,7 +17,7 @@ void ComparePulls()
   TH1F *TanLambda2 = (TH1F*)d2->Get("TanLambdaPull");
   TH1F *Phi2 = (TH1F*)d2->Get("PhiPull");
 
-  TCanvas *rescomp =  new TCanvas("rescomp","Track par. residuals",800,800);
+  TCanvas *rescomp =  new TCanvas("rescomp","Track par. pulls",800,800);
   TPad *pad1 = new TPad("pad1","",0,0,1,1);
   TPad *pad2 = new TPad("pad2","",0,0,1,1);
 

@@ -34,7 +34,7 @@ void D0Resolution_comp(){
   for(int ii = 0; ii < SIZE_PA; ii++){
     for (int i = 0; i < SIZE_M; i++){
 
-      TFile *f = new TFile(Form("/nfs/dust/ilc/user/voutsina/DBD/ILDPerformance/trunk/tracking/Results/Analysis/analysis_MuonsAngle_%d_Mom_%d.root",PA[ii],Mom[i]), "read");
+      TFile *f = new TFile(Form("/afs/desy.de/group/flc/pool/voutsina/SingleMuonTracks/DBD/Analysis/analysis_MuonsAngle_%d_Mom_%d.root",PA[ii],Mom[i]), "read");
       TTree *EvalTree = (TTree*)f->Get("MyRecoMCTruthLinker/EvalTree");
       
       printf( " I am studying file analysis_MuonsAngle_%d_Mom_%d.root ",PA[ii],Mom[i]);
@@ -239,7 +239,7 @@ void D0Resolution_comp(){
   Muon_plot20 -> SetMarkerStyle(23);
   Muon_plot20 -> SetMarkerSize(1);
   Muon_plot20 -> GetXaxis() -> SetTitle("P (GeV)");
-  Muon_plot20 -> GetYaxis() -> SetTitle("#sigma_{1/p_{T}}(GeV^{-1})");
+  Muon_plot20 -> GetYaxis() -> SetTitle("#sigma_{d0}(#mum)");
   Muon_plot20 -> SetMinimum( pow(10,-4) );
   //Muon_plot20 -> SetMaximum( 2*pow(10, -1) );
   Muon_plot20 -> SetMaximum(1. );

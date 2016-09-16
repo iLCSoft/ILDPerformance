@@ -33,7 +33,7 @@ void PResolution_comp(){
   }
   for(int ii = 0; ii < SIZE_PA; ii++){
     for (int i = 0; i < SIZE_M; i++){
-      TFile *f = new TFile(Form("/nfs/dust/ilc/user/voutsina/DBD/ILDPerformance/trunk/tracking/Results/Analysis/analysis_MuonsAngle_%d_Mom_%d.root",PA[ii],Mom[i]), "read");
+      TFile *f = new TFile(Form("/afs/desy.de/group/flc/pool/voutsina/SingleMuonTracks/DBD/analysis_MuonsAngle_%d_Mom_%d.root",PA[ii],Mom[i]), "read");
       TTree *EvalTree = (TTree*)f->Get("MyRecoMCTruthLinker/EvalTree");
 
       printf( " I am studying file analysis_MuonsAngle_%d_Mom_%d.root ",PA[ii],Mom[i]);

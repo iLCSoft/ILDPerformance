@@ -2,20 +2,20 @@ void CompareResiduals()
 {
 
   TFile *f1 = new TFile("first.root", "read");
-  TDirectory *d1 = (TDirectory*) f1->Get("MyRecoMCTruthLinker");
-  TH1F *D0 = (TH1F*)d1->Get("d0Residual");
-  TH1F *Z0 = (TH1F*)d1->Get("z0Residual");
-  TH1F *Omega = (TH1F*)d1->Get("OmegaResidual");
-  TH1F *TanLambda = (TH1F*)d1->Get("TanLambdaResidual");
-  TH1F *Phi = (TH1F*)d1->Get("PhiResidual");
+  //TDirectory *d1 = (TDirectory*) f1->Get("MyRecoMCTruthLinker");
+  TH1F *D0 = (TH1F*)f1->Get("d0Residual");
+  TH1F *Z0 = (TH1F*)f1->Get("z0Residual");
+  TH1F *Omega = (TH1F*)f1->Get("OmegaResidual");
+  TH1F *TanLambda = (TH1F*)f1->Get("TanLambdaResidual");
+  TH1F *Phi = (TH1F*)f1->Get("PhiResidual");
 
   TFile *f2 = new TFile("second.root", "read");
-  TDirectory *d2 = (TDirectory*) f2->Get("MyRecoMCTruthLinker");
-  TH1F *D02 = (TH1F*)d2->Get("d0Residual");
-  TH1F *Z02 = (TH1F*)d2->Get("z0Residual");
-  TH1F *Omega2 = (TH1F*)d2->Get("OmegaResidual");
-  TH1F *TanLambda2 = (TH1F*)d2->Get("TanLambdaResidual");
-  TH1F *Phi2 = (TH1F*)d2->Get("PhiResidual");
+  //TDirectory *d2 = (TDirectory*) f2->Get("MyRecoMCTruthLinker");
+  TH1F *D02 = (TH1F*)f2->Get("d0Residual");
+  TH1F *Z02 = (TH1F*)f2->Get("z0Residual");
+  TH1F *Omega2 = (TH1F*)f2->Get("OmegaResidual");
+  TH1F *TanLambda2 = (TH1F*)f2->Get("TanLambdaResidual");
+  TH1F *Phi2 = (TH1F*)f2->Get("PhiResidual");
 
   TCanvas *rescomp =  new TCanvas("rescomp","Track par. residuals",800,800);
 
