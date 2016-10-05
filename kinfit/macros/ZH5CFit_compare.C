@@ -8,6 +8,8 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
                       const char* outfilename = "comparison_ZH5CFit") {
 
   gStyle->SetOptTitle(0);
+//   gStyle->SetOptStat(0);
+  gStyle->SetOptFit(1);
   gStyle->SetTitleOffset(1.5,"y");
   gStyle->SetPadLeftMargin(0.2);
   
@@ -17,7 +19,7 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
   histfile[1] = new TFile(reffilename);
   
    
-  const int nhist = 8;
+  const int nhist = 14;
   TString histnames[nhist][nfile];
 
   histnames[0][0] = "MyZH5CFit/hJetMass";
@@ -31,6 +33,13 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
   histnames[6][0] = "MyZH5CFit/hRecHMassNoFitBest";
   histnames[7][0] = "MyZH5CFit/hRecZMassNoFitBest";
   
+  histnames[8][0] = "MyZH5CFit/hPullEJetOK";
+  histnames[9][0] = "MyZH5CFit/hPullEJetBest";
+  histnames[10][0] = "MyZH5CFit/hPullThJetOK";
+  histnames[11][0] = "MyZH5CFit/hPullThJetBest";
+  histnames[12][0] = "MyZH5CFit/hPullPhJetOK";
+  histnames[13][0] = "MyZH5CFit/hPullPhJetBest";
+  
   histnames[0][1] = "MyZH5CFit/hJetMass";
   //histnames[0] = "MyZH5CFit/hFitError";
   histnames[1][1] = "MyZH5CFit/hNItBest";
@@ -42,7 +51,14 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
   histnames[6][1] = "MyZH5CFit/hRecHMassNoFitBest";
   histnames[7][1] = "MyZH5CFit/hRecZMassNoFitBest";
   
-  bool logy[nhist] = {true, true, true, true, false, false, false, false};
+  histnames[8][1] = "MyZH5CFit/hPullEJetOK";
+  histnames[9][1] = "MyZH5CFit/hPullEJetBest";
+  histnames[10][1] = "MyZH5CFit/hPullThJetOK";
+  histnames[11][1] = "MyZH5CFit/hPullThJetBest";
+  histnames[12][1] = "MyZH5CFit/hPullPhJetOK";
+  histnames[13][1] = "MyZH5CFit/hPullPhJetBest";
+  
+  bool logy[nhist] = {true, true, true, true, false, false, false, false, false, false, false, false, false, false};
   
   TString axistitle[nhist];
 
@@ -56,9 +72,16 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
   axistitle[5] = "H mass / GeV  (all)";
   axistitle[6] = "H mass / GeV  (best, no fit)";
   axistitle[7] = "Z mass / GeV  (best, no fit)";
+
+  axistitle[8] = "pull E_jet";
+  axistitle[9] = "pull E_jet, best perm";
+  axistitle[10] = "pull #theta_jet";
+  axistitle[11] = "pull #theta_jet, best perm";
+  axistitle[12] = "pull #phi_jet";
+  axistitle[13] = "pull #phi_jet, best perm";
   
-  double leg_left[nhist]  = {0.4, 0.4, 0.4, 0.4, 0.7, 0.6, 0.7, 0.6};
-  double leg_right[nhist] = {0.9, 0.9, 0.9, 0.9, 1.0, 0.9, 1.0, 0.9};
+  double leg_left[nhist]  = {0.4, 0.4, 0.4, 0.4, 0.7, 0.6, 0.7, 0.6, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25};
+  double leg_right[nhist] = {0.9, 0.9, 0.9, 0.9, 1.0, 0.9, 1.0, 0.9, 0.5,  0.5,  0.5,  0.5,  0.5,  0.5};
    
   TH1F *h[nhist][nfile];
   
@@ -69,6 +92,7 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
       return; 
     }  
     for (int ihist = 0; ihist < nhist; ++ihist) {
+     if (ihist < 8 || ifile == 0 ) {
       cout << "reading histogram " << histnames[ihist][ifile] << " from ifile " << ifile << " with name " << histfile[ifile]->GetName() << endl;
       h[ihist][ifile] = (TH1F *) histfile[ifile]->Get(histnames[ihist][ifile])->Clone();
       if (!h[ihist][ifile]) {
@@ -94,7 +118,8 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
         if (ihist == 2) h[ihist][ifile]->SetMinimum(10.); 
         if (ihist == 3) h[ihist][ifile]->SetMinimum(1.); 
         //h[ihist][ifile]->SetHistLineWidth(4);   
-      }    
+      }
+     }   // skip ref histo for pulls for now!   
     }
   }
  
@@ -120,7 +145,7 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
   TCanvas *c2 = new TCanvas ("c2","masses",600,600);
   c2->Divide(2,2);
   TLegend *leg2[nhist];
-  for (int ihist = 4; ihist < nhist; ++ihist) {
+  for (int ihist = 4; ihist < 8; ++ihist) {
     c2->cd(ihist-3);
     if (logy[ihist]) gPad->SetLogy();
     leg2[ihist] = new TLegend (leg_left[ihist], 0.7, leg_right[ihist], 0.9, legtitle);
@@ -132,11 +157,29 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
     leg2[ihist]->Draw();   
   }
   
+  TCanvas *c3 = new TCanvas ("c3","pulls",600,600);
+  c3->Divide(2,3);
+  TLegend *leg3[nhist];
+  for (int ihist = 8; ihist < nhist; ++ihist) {
+    c3->cd(ihist-7);
+    if (logy[ihist]) gPad->SetLogy();
+    //gStyle->SetOptStat(1);
+    //gStyle->SetOptFit(1);
+    leg3[ihist] = new TLegend (leg_left[ihist], 0.7, leg_right[ihist], 0.9, legtitle);
+    //h[ihist][1]->Draw("hist");
+    //leg3[ihist]->AddEntry(h[ihist][1],"Reference","L");
+    h[ihist][0]->Draw("e0");
+    h[ihist][0]->Fit("gaus","R","",-1,1);
+    leg3[ihist]->AddEntry(h[ihist][0],"Test file","P");
+    
+    leg3[ihist]->Draw();   
+  }
+  
   // --------------- save to pdf file ----------------------------------
 
   std::string epsFile1( std::string( "../plots/" )  + std::string( outfilename ) + std::string( "_1" )  + std::string( ".eps" ) ) ;
   std::string pdfFile1( std::string( "../plots/" )  +  std::string( outfilename ) + std::string( "_1" ) + std::string( ".pdf" ) ) ;
-  //std::string cFile1  ( std::string( "../plots/" )  +  std::string( outfilename ) + std::string( "_1" ) + std::string( ".C" ) ) ;
+  //std::stTVirtualPad::SetOptFitring cFile1  ( std::string( "../plots/" )  +  std::string( outfilename ) + std::string( "_1" ) + std::string( ".C" ) ) ;
   c1->Print( epsFile1.c_str() ) ;
   c1->Print( pdfFile1.c_str() ) ;
   //c1->Print( cFile1.c_str() ) ;
@@ -147,6 +190,13 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
   c2->Print( epsFile2.c_str() ) ;
   c2->Print( pdfFile2.c_str() ) ;
   //c2->Print( cFile2.c_str() ) ;
+
+  std::string epsFile3( std::string( "../plots/" )  +  std::string( outfilename ) + std::string( "_3" )  + std::string( ".eps" ) ) ;
+  std::string pdfFile3( std::string( "../plots/" )  +  std::string( outfilename ) + std::string( "_3" ) + std::string( ".pdf" ) ) ;
+  //std::string cFile3  ( std::string( "../plots/" )  +  std::string( outfilename ) + std::string( "_3" ) + std::string( ".C" ) ) ;
+  c3->Print( epsFile3.c_str() ) ;
+  c3->Print( pdfFile3.c_str() ) ;
+  //c3->Print( cFile3.c_str() ) ;
 
 
 
