@@ -21,7 +21,7 @@
   /nfs/dust/ilc/user/ebrahimi/ZqqHbbSample/LCIO/E500.Pqqh.DST_RV-v01-17-08_gcc44_withOverlay_ZqqHbbSelected.slcio
  </parameter>
   <!-- limit the number of processed records (run+evt): -->  
-  <parameter name="MaxRecordNumber" value="10" />  
+  <parameter name="MaxRecordNumber" value="0" />  
   <parameter name="SkipNEvents" value="0" />  
   <parameter name="SupressCheck" value="false" />  
   <parameter name="GearXMLFile">GearOutput_ILD_o1_v05.xml</parameter>  
@@ -118,13 +118,19 @@
   <parameter name="FitISR" type="int"> 1 </parameter>
   <!-- maximum energy (=|p_z|) for a single ISR photon  (default: 225. = WW at 500) -->
   <parameter name="ISRPzMax" type="float"> 203. </parameter>
+  <!-- assumed energy resolution for jets as x/sqrt(E) - if 0, then parametrisation is used -->
+  <parameter name="errene" type="double"> 1.2 </parameter>
+  <!-- assumed theta resolution for jet axis -->
+  <parameter name="errtheta" type="double"> 0.1 </parameter>
+  <!-- assumed phi resolution for jet axis -->
+  <parameter name="errphi" type="double"> 0.1 </parameter>
   <!-- 0 = OPALFitter, 1 = NewFitter, 2 = NewtonFitter (default: 0) -->
   <parameter name="fitter" type="int"> 0 </parameter>
   <!-- set true if every event should be traced in DEBUG mode (default: false) -->
   <parameter name="traceall" type="bool"> false </parameter>
   <!-- number of individual event to be traced (default: -1) -->
   <parameter name="ievttrace" type="int"> -1 </parameter>
-  <parameter name="Verbosity" options="VERBOSE,DEBUG,MESSAGE,WARNING,ERROR,SILENT">MESSAGE</parameter> 
+  <parameter name="Verbosity" options="VERBOSE,DEBUG,MESSAGE,WARNING,ERROR,SILENT">ERROR</parameter> 
 </processor>
 
 </marlin>
