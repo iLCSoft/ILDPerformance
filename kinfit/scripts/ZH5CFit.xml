@@ -124,8 +124,8 @@
   <parameter name="errtheta" type="double"> 0.1 </parameter>
   <!-- assumed phi resolution for jet axis -->
   <parameter name="errphi" type="double"> 0.1 </parameter>
-  <!-- 0 = OPALFitter, 1 = NewFitter, 2 = NewtonFitter (default: 0) -->
-  <parameter name="fitter" type="int"> 0 </parameter>
+  <!-- 0 = OPALFitter, 1 = NewFitter (default: 0, deprecated: 2 = NewtonFitter ) -->
+  <parameter name="fitter" type="int"> 1 </parameter>
   <!-- set true if every event should be traced in DEBUG mode (default: false) -->
   <parameter name="traceall" type="bool"> false </parameter>
   <!-- number of individual event to be traced (default: -1) -->

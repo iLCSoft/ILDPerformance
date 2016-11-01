@@ -19,11 +19,10 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
   histfile[1] = new TFile(reffilename);
   
    
-  const int nhist = 14;
+  const int nhist = 12;
   TString histnames[nhist][nfile];
 
   histnames[0][0] = "MyZH5CFit/hJetMass";
-  //histnames[0] = "MyZH5CFit/hFitError";
   histnames[1][0] = "MyZH5CFit/hNItBest";
   histnames[2][0] = "MyZH5CFit/hFitProb";
   histnames[3][0] = "MyZH5CFit/hPhotonEnergy";
@@ -33,15 +32,12 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
   histnames[6][0] = "MyZH5CFit/hRecHMassNoFitBest";
   histnames[7][0] = "MyZH5CFit/hRecZMassNoFitBest";
   
-  histnames[8][0] = "MyZH5CFit/hPullEJetOK";
+  histnames[8][0] = "MyZH5CFit/hFitErrorBest";
   histnames[9][0] = "MyZH5CFit/hPullEJetBest";
-  histnames[10][0] = "MyZH5CFit/hPullThJetOK";
-  histnames[11][0] = "MyZH5CFit/hPullThJetBest";
-  histnames[12][0] = "MyZH5CFit/hPullPhJetOK";
-  histnames[13][0] = "MyZH5CFit/hPullPhJetBest";
+  histnames[10][0] = "MyZH5CFit/hPullThJetBest";
+  histnames[11][0] = "MyZH5CFit/hPullPhJetBest";
   
   histnames[0][1] = "MyZH5CFit/hJetMass";
-  //histnames[0] = "MyZH5CFit/hFitError";
   histnames[1][1] = "MyZH5CFit/hNItBest";
   histnames[2][1] = "MyZH5CFit/hFitProb";
   histnames[3][1] = "MyZH5CFit/hPhotonEnergy";
@@ -51,19 +47,16 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
   histnames[6][1] = "MyZH5CFit/hRecHMassNoFitBest";
   histnames[7][1] = "MyZH5CFit/hRecZMassNoFitBest";
   
-  histnames[8][1] = "MyZH5CFit/hPullEJetOK";
+  histnames[8][1] = "MyZH5CFit/hFitErrorBest";
   histnames[9][1] = "MyZH5CFit/hPullEJetBest";
-  histnames[10][1] = "MyZH5CFit/hPullThJetOK";
-  histnames[11][1] = "MyZH5CFit/hPullThJetBest";
-  histnames[12][1] = "MyZH5CFit/hPullPhJetOK";
-  histnames[13][1] = "MyZH5CFit/hPullPhJetBest";
+  histnames[10][1] = "MyZH5CFit/hPullThJetBest";
+  histnames[11][1] = "MyZH5CFit/hPullPhJetBest";
   
-  bool logy[nhist] = {true, true, true, true, false, false, false, false, false, false, false, false, false, false};
+  bool logy[nhist] = {true, true, true, true, false, false, false, false, true, false, false, false};
   
   TString axistitle[nhist];
 
   axistitle[0] = "Jet mass / GeV";
-//  axistitle[0] = "Error flag";
   axistitle[1] = "Number of iterations";
   axistitle[2] = "Fit probability";
   axistitle[3] = "Photon Energy / GeV";
@@ -73,15 +66,13 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
   axistitle[6] = "H mass / GeV  (best, no fit)";
   axistitle[7] = "Z mass / GeV  (best, no fit)";
 
-  axistitle[8] = "pull E_jet";
+  axistitle[8] = "Best error flag";
   axistitle[9] = "pull E_jet, best perm";
-  axistitle[10] = "pull #theta_jet";
-  axistitle[11] = "pull #theta_jet, best perm";
-  axistitle[12] = "pull #phi_jet";
-  axistitle[13] = "pull #phi_jet, best perm";
+  axistitle[10] = "pull #theta_jet, best perm";
+  axistitle[11] = "pull #phi_jet, best perm";
   
-  double leg_left[nhist]  = {0.4, 0.4, 0.4, 0.4, 0.7, 0.6, 0.7, 0.6, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25};
-  double leg_right[nhist] = {0.9, 0.9, 0.9, 0.9, 1.0, 0.9, 1.0, 0.9, 0.5,  0.5,  0.5,  0.5,  0.5,  0.5};
+  double leg_left[nhist]  = {0.4, 0.4, 0.4, 0.4, 0.7, 0.6, 0.7, 0.6, 0.6, 0.25, 0.25, 0.25};
+  double leg_right[nhist] = {0.9, 0.9, 0.9, 0.9, 1.0, 0.9, 1.0, 0.9, 0.9,  0.5,  0.5,  0.5};
    
   TH1F *h[nhist][nfile];
   
@@ -92,7 +83,6 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
       return; 
     }  
     for (int ihist = 0; ihist < nhist; ++ihist) {
-     if (ihist < 8 || ifile == 0 ) {
       cout << "reading histogram " << histnames[ihist][ifile] << " from ifile " << ifile << " with name " << histfile[ifile]->GetName() << endl;
       h[ihist][ifile] = (TH1F *) histfile[ifile]->Get(histnames[ihist][ifile])->Clone();
       if (!h[ihist][ifile]) {
@@ -102,6 +92,7 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
       h[ihist][ifile]->StatOverflows(true);
       h[ihist][ifile]->SetXTitle(axistitle[ihist]);
       h[ihist][ifile]->SetYTitle("Events");
+      if (h[ihist][ifile]->GetMinimum() > 1) h[ihist][ifile]->SetMinimum(1.); 
       if (ifile == 0){  // test histo
         h[ihist][ifile]->SetMarkerColor(1);    
         h[ihist][ifile]->SetMarkerStyle(20);    
@@ -115,11 +106,9 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
         double max = h[ihist][0]->GetMaximum(); 
         if (h[ihist][1]->GetMaximum() > max) max = h[ihist][1]->GetMaximum();
         h[ihist][ifile]->SetMaximum(1.2*max); 
-        if (ihist == 2) h[ihist][ifile]->SetMinimum(10.); 
-        if (ihist == 3) h[ihist][ifile]->SetMinimum(1.); 
+        //if (ihist == 2) h[ihist][ifile]->SetMinimum(10.); 
         //h[ihist][ifile]->SetHistLineWidth(4);   
       }
-     }   // skip ref histo for pulls for now!   
     }
   }
  
@@ -158,7 +147,7 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
   }
   
   TCanvas *c3 = new TCanvas ("c3","pulls",600,600);
-  c3->Divide(2,3);
+  c3->Divide(2,2);
   TLegend *leg3[nhist];
   for (int ihist = 8; ihist < nhist; ++ihist) {
     c3->cd(ihist-7);
@@ -166,10 +155,14 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
     //gStyle->SetOptStat(1);
     //gStyle->SetOptFit(1);
     leg3[ihist] = new TLegend (leg_left[ihist], 0.7, leg_right[ihist], 0.9, legtitle);
-    //h[ihist][1]->Draw("hist");
-    //leg3[ihist]->AddEntry(h[ihist][1],"Reference","L");
+    double max = h[ihist][0]->GetMaximum(); 
+    if (h[ihist][1]->GetMaximum() > max) max = h[ihist][1]->GetMaximum();
+    h[ihist][0]->SetMaximum (1.1*max); 
     h[ihist][0]->Draw("e0");
-    h[ihist][0]->Fit("gaus","R","",-1,1);
+    if (ihist > 8) h[ihist][0]->Fit("gaus","R","",-1,1);
+    h[ihist][1]->Draw("histsame");
+    h[ihist][0]->Draw("e0same");
+    leg3[ihist]->AddEntry(h[ihist][1],"Reference","L");
     leg3[ihist]->AddEntry(h[ihist][0],"Test file","P");
     
     leg3[ihist]->Draw();   

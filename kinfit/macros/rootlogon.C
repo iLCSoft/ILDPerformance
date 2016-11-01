@@ -24,7 +24,7 @@ ildStyle->SetPalette(1,0);
 ildStyle->SetHistLineColor(kBlack);
 
 //set the default line color for a fit function to be red
-ildStyle->SetFuncColor(kRed);
+ildStyle->SetFuncColor(kBlue);
 
 //make the axis labels black
 ildStyle->SetLabelColor(kBlack,"xyz");
