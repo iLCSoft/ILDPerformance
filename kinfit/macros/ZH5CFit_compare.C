@@ -2,9 +2,9 @@
 #include<sstream>
 
 
-void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root", 
-                      const char* testfilename = "../rootfiles/ZH5CFit_test.root", 
-                      const char* legtitle = "OPALFitter, ZH -> 4jets",
+void ZH5CFit_compare (const char* reffilename = "ZH5CFit_OPAL.root", 
+                      const char* testfilename = "../rootfiles/ZH5CFit_alldphi05.root", 
+                      const char* legtitle = "ZH -> 4jets",
                       const char* outfilename = "comparison_ZH5CFit") {
 
   gStyle->SetOptTitle(0);
@@ -71,7 +71,7 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
   axistitle[10] = "pull #theta_jet, best perm";
   axistitle[11] = "pull #phi_jet, best perm";
   
-  double leg_left[nhist]  = {0.4, 0.4, 0.4, 0.4, 0.7, 0.6, 0.7, 0.6, 0.6, 0.25, 0.25, 0.25};
+  double leg_left[nhist]  = {0.4, 0.4, 0.25, 0.25, 0.6, 0.6, 0.6, 0.5, 0.4, 0.25, 0.25, 0.25};
   double leg_right[nhist] = {0.9, 0.9, 0.9, 0.9, 1.0, 0.9, 1.0, 0.9, 0.9,  0.5,  0.5,  0.5};
    
   TH1F *h[nhist][nfile];
@@ -114,6 +114,9 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
  
      
   cout << "FINISHED READING HISTOGRAMS!" << endl;
+  
+  std::string legref = std::string("Reference: ") + std::string(reffilename);
+  std::string legtest = std::string("Test file");
 
   // draw
   TCanvas *c1 = new TCanvas ("c1","compare",600,600);
@@ -124,9 +127,9 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
     if (logy[ihist]) gPad->SetLogy();
     leg1[ihist] = new TLegend (leg_left[ihist], 0.7, leg_right[ihist], 0.9, legtitle);
     h[ihist][1]->Draw("hist");
-    leg1[ihist]->AddEntry(h[ihist][1],"Reference","L");
+    leg1[ihist]->AddEntry(h[ihist][1],legref.c_str(),"L");
     h[ihist][0]->Draw("e0same");
-    leg1[ihist]->AddEntry(h[ihist][0],"Test file","P");
+    leg1[ihist]->AddEntry(h[ihist][0],legtest.c_str(),"P");
     
     leg1[ihist]->Draw();   
   }
@@ -139,9 +142,9 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
     if (logy[ihist]) gPad->SetLogy();
     leg2[ihist] = new TLegend (leg_left[ihist], 0.7, leg_right[ihist], 0.9, legtitle);
     h[ihist][1]->Draw("hist");
-    leg2[ihist]->AddEntry(h[ihist][1],"Reference","L");
+    leg2[ihist]->AddEntry(h[ihist][1],legref.c_str(),"L");
     h[ihist][0]->Draw("e0same");
-    leg2[ihist]->AddEntry(h[ihist][0],"Test file","P");
+    leg2[ihist]->AddEntry(h[ihist][0],legtest.c_str(),"P");
     
     leg2[ihist]->Draw();   
   }
@@ -162,8 +165,8 @@ void ZH5CFit_compare (const char* reffilename = "ZH5CFit.root",
     if (ihist > 8) h[ihist][0]->Fit("gaus","R","",-1,1);
     h[ihist][1]->Draw("histsame");
     h[ihist][0]->Draw("e0same");
-    leg3[ihist]->AddEntry(h[ihist][1],"Reference","L");
-    leg3[ihist]->AddEntry(h[ihist][0],"Test file","P");
+    leg3[ihist]->AddEntry(h[ihist][1],legref.c_str(),"L");
+    leg3[ihist]->AddEntry(h[ihist][0],legtest.c_str(),"P");
     
     leg3[ihist]->Draw();   
   }
