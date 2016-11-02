@@ -10,9 +10,17 @@ Release Notes:
 
 
  --------
-| v01-00 |  
+| v01-01 ?|  
  --------
 
+kinfit (J.List):
+   - new reference histogram file for ZH5CFit 
+   - reference histograms for pull distributions
+   
+
+ --------
+| v01-00 |  
+ --------
 D. Jeans
   - add simulation validation processor, examples and short documentation
   - extend for CalorimeterHits and TrackerHits; a few other cleanups
@@ -23,7 +31,7 @@ H.L. Tran
    - Modify CMakeLists.txt file to include the validateSim folder.
 
 J. List
-   - added ZHWW5CFit
+   - added ZH5CFit
    - added ZH example
    - added first version of test on WW->4jets
    - added likelihood values for all hypotheses as LiPDG_mu etc to PIDtree; == 9 means is -inf on DST =>check with Masakazu?; == 2 means no PID or no recoParticle existing for this MCP
