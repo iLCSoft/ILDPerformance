@@ -3,7 +3,7 @@
 
 
 void ZH5CFit_compare (const char* reffilename = "ZH5CFit_OPAL.root", 
-                      const char* testfilename = "../rootfiles/ZH5CFit_alldphi05.root", 
+                      const char* testfilename = "../rootfiles/ZH5CFit_test.root", 
                       const char* legtitle = "ZH -> 4jets",
                       const char* outfilename = "comparison_ZH5CFit") {
 
