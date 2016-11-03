@@ -10,13 +10,17 @@ Release Notes:
 
 
  --------
-| v01-01 ?|  
+| v01-01 |  
  --------
 
 kinfit (J.List):
    - new reference histogram file for ZH5CFit 
    - reference histograms for pull distributions
    
+tracking Y.Voutsinas:
+   - adding macros that compare the resolutions with one from DBD plus a batch script to run 
+     the diagnostics to the example analysos reco files
+
 
  --------
 | v01-00 |  
