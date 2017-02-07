@@ -32,7 +32,7 @@
 #=================================================
 
 unset MARLIN_DLL
-. /afs/desy.de/project/ilcsoft/sw/x86_64_gcc44_sl6/v01-17-09/init_ilcsoft.sh
+. /cvmfs/ilc.desy.de/sw/x86_64_gcc49_sl6/v01-19-01/init_ilcsoft.sh
 
 
 INFILE=../RecoFiles/$1.slcio

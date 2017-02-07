@@ -26,7 +26,7 @@
 
 #=================================================
 #
-# # qsub ./runMarlinReco.sh mokka.slcio reco_dbd_trk_ 100
+# # qsub ./runMarlinReco.sh sim.slcio reco_dbd_trk_ 100
 #
 
 
@@ -34,7 +34,7 @@
 
 #SET THE DESIRED ILCSOFT RELEASE OR HEAD VERSION
 unset MARLIN_DLL
-. /afs/desy.de/project/ilcsoft/sw/x86_64_gcc48_sl6/v01-17-10/init_ilcsoft.sh
+. /cvmfs/ilc.desy.de/sw/x86_64_gcc49_sl6/v01-19-01/init_ilcsoft.sh
 
 # set the ILDConfig version to be used. IMPORTANT: it should be consistent with the ilcsoft release
 ILDCONFIG=${ILCSOFT}/ILDConfig/HEAD
@@ -42,9 +42,11 @@ ILDCONFIG=${ILCSOFT}/ILDConfig/HEAD
 #for i in {1..10}
 #do
 
-INFILE=/nfs/dust/ilc/user/voutsina/GenFiles/E250-TDR_ws.Pe2e2h_mumu.Gwhizard-1_95.eL.pR.I108009.001.stdhep
-COMPACTFILE=$lcgeo_DIR/ILD/compact/ILD_o1_v05/ILD_o1_v05.xml
-GEARFILE=${ILDCONFIG}/StandardConfig/lcgeo_current/GearOutput.xml
+#INFILE=/nfs/dust/ilc/user/voutsina/GenFiles/E250-TDR_ws.Pe2e2h_mumu.Gwhizard-1_95.eL.pR.I108009.001.stdhep
+#INFILE=/nfs/dust/ilc/group/ild/dbd-data/250/higgs/E250-TDR_ws.Pe2e2h_mumu.Gwhizard-1_95.eL.pR.I108009.001.stdhep
+INFILE=/nfs/dust/ilc/group/ild/dbd-data/500/6f/E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05.stdhep
+COMPACTFILE=$lcgeo_DIR/ILD/compact/ILD_l1_v01/ILD_l1_v01.xml
+GEARFILE=${ILDCONFIG}/StandardConfig/lcgeo_current/gear_ILD_l1_v01_dd4hep.xml
 
 #==================================================
 #SIMULATION
