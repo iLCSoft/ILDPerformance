@@ -8,6 +8,11 @@
 
 Release Notes:
 
+FullAnalysis_DESY (S.Lu)
+   - Updated the example script to use the cvmfs ilcsoft v01-19-01, added one example ttbar stdhep input file, for the monitor of the tracking efficiency.
+
+tracking (S.Lu)
+   - Updated README by adding instruction for option of DD4hep sim and reco.
 
  --------
 | v01-01 |  
