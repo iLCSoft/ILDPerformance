@@ -16,6 +16,14 @@ mkdir build; cd build
 cmake -C $ILCSOFT/ILCSoft.cmake .. ; make install
 
 
+0) For the DD4hep new framework sim and reco,
+Please go to folder "NewSimTest".
+
+cd NewSimTest
+and try "runNewSim.sh"
+
+
+
 1) Resolution plots
 
 Run the runAll.sh
