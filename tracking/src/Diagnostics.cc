@@ -599,7 +599,7 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	}
 	else {
 	  if ( testFromWgt[jj] > _minPurity ) { foundFlag = 1; }
-	  std::cout << " I use that cut " << std::endl;
+	  streamlog_out(DEBUG4) << " I use that cut " << std::endl;
 	}
 	
 	HelixClass helix ;
@@ -707,7 +707,7 @@ void Diagnostics::processEvent( LCEvent * evt ) {
     
     for( SiTrackMap::iterator ii=MarlinTrkMap.begin(); ii!=MarlinTrkMap.end(); ++ii)
       {
-	cout << " Found silicon tracks " << (*ii).first << ": " << (*ii).second << endl;
+	streamlog_out(DEBUG4) << " Found silicon tracks " << (*ii).first << ": " << (*ii).second << endl;
 	if ( (*ii).second == 1 ) {
 
 	  const EVENT::LCObjectVec& mcprelvec = nav.getRelatedFromObjects((*ii).first);
