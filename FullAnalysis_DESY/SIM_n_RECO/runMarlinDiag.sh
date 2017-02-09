@@ -37,7 +37,7 @@ unset MARLIN_DLL
 
 INFILE=../RecoFiles/$1.slcio
 
-Marlin ../../tracking/scripts/Diagnostics.xml \
+Marlin ./Diagnostics.xml \
     --global.LCIOInputFiles=$INFILE \
     --MyAIDAProcessor.FileName=diag_$1 \
     > diag_$1.out 2>&1 
