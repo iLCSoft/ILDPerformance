@@ -1,0 +1,77 @@
+#!/bin/bash
+#
+#(make sure the right shell will be used)
+#$ -S /bin/bash
+#
+#execute the job from the current directory and not relative to your home directory
+#$ -cwd
+
+# sld6 for bird on NAF2
+#$ -l arch=amd64
+#$ -l os=sld6
+
+#$ -l h_rt=167:59:00
+#$ -l h_vmem=6G
+
+#set the email address
+##$ -M username@.desy.de
+
+#$ -o logSIM_PARTICLE_ENERGYGeV_RANDOMSEED.txt
+#$ -e logSIM_PARTICLE_ENERGYGeV_RANDOMSEED.txt
+
+#
+#send email when job aborts or when job ends
+#$ -m ae
+
+###==============================================================
+
+
+echo "############################################################################"
+echo "                             System information"
+echo "                             =================="
+
+echo "Host:"
+hostname -f
+
+echo "CPU(s):"
+cat /proc/cpuinfo | grep "model name" | cut -b 14-
+
+echo "RAM:"
+cat /proc/meminfo | grep "MemTotal" | cut -b 10-
+
+echo "Swap:"
+cat /proc/meminfo | grep "SwapTotal" | cut -b 11-
+
+echo "############################################################################"
+echo "Group:      ${GROUP}"
+
+echo "Hosttype:   ${HOSTTYPE}"
+
+echo "JobID:      ${JOB_ID}"
+
+echo "JobName:    ${JOB_NAME}"
+
+echo "Job_Script: ${JOB_SCRIPT}"
+
+echo "User:       ${LOGNAME}"
+
+echo "Queue:      ${QUEUE}"
+
+echo "Shell:      ${SHELL}"
+
+echo "TMP:        ${TMP}"
+
+echo "TMPDIR:     ${TMPDIR}"
+
+echo "User:       ${USER}"
+
+echo "Working_DIR:${PWD}"
+
+echo "############################################################################"
+echo
+echo "############################################################################"
+echo
+
+source /afs/desy.de/project/ilcsoft/sw/x86_64_gcc49_sl6/ILCSOFT/init_ilcsoft.sh
+
+ddsim --steeringFile ddsim_steering_PARTICLE_ENERGYGeV_RANDOMSEED.py --outputFile=SIM.DETECTOR.gun_PARTICLE_ENERGYGeV_RANDOMSEED.slcio --compactFile $lcgeo_DIR/ILD/compact/DETECTOR/DETECTOR.xml --numberOfEvents=NEVENTS
