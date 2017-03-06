@@ -239,8 +239,8 @@ void sigma(){
     Muon_plot_omega10 -> SetMarkerSize(1);
     Muon_plot_omega10 -> GetXaxis() -> SetTitle("P (GeV)");
     Muon_plot_omega10 -> GetYaxis() -> SetTitle("#sigma = f(P,#theta)");
-    Muon_plot_omega10 -> SetMinimum( 0.50 );
-    Muon_plot_omega10 -> SetMaximum( 1.70 );
+    Muon_plot_omega10 -> SetMinimum( 0.75 );
+    Muon_plot_omega10 -> SetMaximum( 1.65 );
     Muon_plot_omega10 -> Draw("AP");
     
     
@@ -273,8 +273,8 @@ void sigma(){
     Muon_plot_tanlambda10 -> SetMarkerSize(1);
     Muon_plot_tanlambda10 -> GetXaxis() -> SetTitle("P (GeV)");
     Muon_plot_tanlambda10 -> GetYaxis() -> SetTitle("#sigma = f(P,#theta)");
-    Muon_plot_tanlambda10 -> SetMinimum( 0.50 );
-    Muon_plot_tanlambda10 -> SetMaximum( 1.70 );
+    Muon_plot_tanlambda10 -> SetMinimum( 0.80 );
+    Muon_plot_tanlambda10 -> SetMaximum( 1.40 );
     Muon_plot_tanlambda10 -> Draw("AP");
     
     
@@ -307,8 +307,8 @@ void sigma(){
     Muon_plot_phi10 -> SetMarkerSize(1);
     Muon_plot_phi10 -> GetXaxis() -> SetTitle("P (GeV)");
     Muon_plot_phi10 -> GetYaxis() -> SetTitle("#sigma = f(P,#theta)");
-    Muon_plot_phi10 -> SetMinimum( 0.50 );
-    Muon_plot_phi10 -> SetMaximum( 1.70 );
+    Muon_plot_phi10 -> SetMinimum( 0.80 );
+    Muon_plot_phi10 -> SetMaximum( 1.40 );
     Muon_plot_phi10 -> Draw("AP");
     
     
@@ -344,8 +344,8 @@ void sigma(){
     Muon_plot_d010 -> SetMarkerSize(1);
     Muon_plot_d010 -> GetXaxis() -> SetTitle("P (GeV)");
     Muon_plot_d010 -> GetYaxis() -> SetTitle("#sigma = f(P,#theta)");
-    Muon_plot_d010 -> SetMinimum( 0.50 );
-    Muon_plot_d010 -> SetMaximum( 1.70 );
+    Muon_plot_d010 -> SetMinimum( 0.80 );
+    Muon_plot_d010 -> SetMaximum( 1.40 );
     Muon_plot_d010 -> Draw("AP");
     
 
@@ -380,8 +380,8 @@ void sigma(){
     Muon_plot_z010 -> SetMarkerSize(1);
     Muon_plot_z010 -> GetXaxis() -> SetTitle("P (GeV)");
     Muon_plot_z010 -> GetYaxis() -> SetTitle("#sigma = f(P,#theta)");
-    Muon_plot_z010 -> SetMinimum( 0.50 );
-    Muon_plot_z010 -> SetMaximum( 1.70 );
+    Muon_plot_z010 -> SetMinimum( 0.80 );
+    Muon_plot_z010 -> SetMaximum( 1.40 );
     Muon_plot_z010 -> Draw("AP");
     
     
