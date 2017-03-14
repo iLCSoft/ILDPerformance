@@ -1,5 +1,5 @@
 #unset MARLIN_DLL
-#. /afs/desy.de/project/ilcsoft/sw/x86_64_gcc41_sl5/v01-17-06/init_ilcsoft.sh
+#. /afs/desy.de/project/ilcsoft/sw/x86_64_gcc48_sl6/v01-17-11/init_ilcsoft.sh
 
 ##set -A PolarAngles 10 20 40 85
 ##set -A y_dir 0.173 0.342 0.643 0.996
@@ -13,7 +13,7 @@ z_dir=('0.985' '0.94'  '0.766' '0.087')
 Mom=( '1' '3' '5' '10' '15' '25' '50' '100' )
 
 # set the correct path to ILDConfig and copy the configuration files from there
-ILDCONFIG=/nfs/dust/ilc/user/voutsina/testarea/v011710/gcc44/DD4hep/ILDConfig/v01-17-10-p01
+ILDCONFIG=/afs/desy.de/project/ilcsoft/sw/ILDConfig/v01-17-11
 #cp -rp ${ILDCONFIG}/StandardConfig/current/* .
 
 for i in {1..4}
@@ -95,13 +95,15 @@ INFILE=../Results/SimFiles/MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio
 echo $INFILE
 
 #=================================================
+# Do not use "BgOverlay" for single Muon particle gun
 
 Marlin bbudsc_3evt_stdreco.xml \
     --global.LCIOInputFiles=$INFILE \
     --global.GearXMLFile=GearOutput.xml \
     --MyLCIOOutputProcessor.LCIOOutputFile=Marlin_Reco_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio \
     --global.MaxRecordNumber=1000 \
-    --global.SkipNEvents=0 
+    --global.SkipNEvents=0 \
+    --MyRecoMCTruthLinker.UsingParticleGun=true
 
 mv Marlin_Reco_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio ../Results/RecoFiles
 
@@ -117,9 +119,8 @@ Marlin Diagnostics.xml \
     --global.GearXMLFile=GearOutput.xml \
     --MyAIDAProcessor.FileName=analysis_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
     --global.MaxRecordNumber=1000 \
-    --global.SkipNEvents=0
-#    --MCProcessor.TracksMCTruthLinkCollectionName=MarlinTrkTracksMCTruthLink \
-#    --MCProcessor.TracksMCTruthLinkCollectionName=MCTruthMarlinTrkTracksLink \
+    --global.SkipNEvents=0 \
+    --MyDiagnostics.PhysSampleOn=false
 
 mv analysis_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.root ../Results/Analysis
 
