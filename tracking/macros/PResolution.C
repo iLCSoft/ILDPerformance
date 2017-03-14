@@ -33,19 +33,21 @@ void PResolution(){
   for(int ii = 0; ii < SIZE_PA; ii++){
     for (int i = 0; i < SIZE_M; i++){
       TFile *f = new TFile(Form("../Results/Analysis/analysis_MuonsAngle_%d_Mom_%d.root",PA[ii],Mom[i]), "read");
-	TTree *EvalTree = (TTree*)f->Get("EvalTree");
+      //TTree *EvalTree = (TTree*)f->Get("EvalTree");
+        TTree *EvalTree;
+        f->GetObject("EvalTree", EvalTree);
 
 	printf( " I am studying file analysis_MuonsAngle_%d_Mom_%d.root ",PA[ii],Mom[i]);
 
-	vector<float> *PtReco;
-	vector<float> *PtMCP; 
+	vector<float> *PtReco = 0;
+	vector<float> *PtMCP = 0; 
 
 	EvalTree->SetBranchAddress("PtReco", &PtReco);
 	EvalTree->SetBranchAddress("PtMCP", &PtMCP);
 	
-	int num_entries = EvalTree->GetEntries(); 
-
-	EvalTree->GetEntry(0);
+	EvalTree->SetBranchStatus("*",0); //disable all branches
+	EvalTree->SetBranchStatus("PtReco",1);
+	EvalTree->SetBranchStatus("PtMCP",1);
 
 	
 	//getting the correct size of the axis for a good fitting
@@ -80,8 +82,9 @@ void PResolution(){
 
 	TH1F* h1 = new TH1F("h1","Momentum Resolution",100, (-1)*LimAxis, LimAxis); 
 	
-	for (int j = 0; j < num_entries; j++ ){
-	  EvalTree->GetEntry(j);
+	Long64_t nentries = EvalTree->GetEntriesFast(); 
+	for (Long64_t jentry=0; jentry<nentries;jentry++) {
+	  EvalTree->GetEntry(jentry);
 	  for (int unsigned k = 0; k < PtReco->size(); k++){
 	    float MomentumResolution = (PtReco->at(k) - PtMCP->at(k))/pow(PtMCP->at(k), 2);
 	    h1->Fill( MomentumResolution);

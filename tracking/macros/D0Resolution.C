@@ -46,18 +46,22 @@ void D0Resolution(){
     for (int i = 0; i < SIZE_M; i++){
 
       TFile *f = new TFile(Form("../Results/Analysis/analysis_MuonsAngle_%d_Mom_%d.root",PA[ii],Mom[i]), "read");
-      TTree *EvalTree = (TTree*)f->Get("EvalTree");
+      //TTree *EvalTree = (TTree*)f->Get("EvalTree");
+      TTree *EvalTree;
+      f->GetObject("EvalTree", EvalTree);
 
       printf( " I am studying file analysis_MuonsAngle_%d_Mom_%d.root ",PA[ii],Mom[i]);    
 
-      vector<float> *recoD0;
-      vector<float> *trueD0; 
+      vector<float> *recoD0 = 0;
+      vector<float> *trueD0 = 0; 
 	
       //Loading the branches in EvalTree
       EvalTree->SetBranchAddress("recoD0", &recoD0);
       EvalTree->SetBranchAddress("trueD0", &trueD0);
-      
-      int num_entries = EvalTree->GetEntries(); 
+
+      EvalTree->SetBranchStatus("*",0); //disable all branches
+      EvalTree->SetBranchStatus("recoD0",1);
+      EvalTree->SetBranchStatus("trueD0",1);
       
       //getting the correct size of the axis for a good fitting
       if ( (Momentum[i]/PA[ii]) > 1 || (Mom[i] == 15 && PA[ii] == 10) ){
@@ -76,8 +80,9 @@ void D0Resolution(){
       
       TH1F* h1 = new TH1F("h1","Impact Parameter Resolution",100, (-1)*LimAxis, LimAxis); 
       
-      for (int j = 0; j < num_entries; j++ ){
-	EvalTree->GetEntry(j);
+      Long64_t nentries = EvalTree->GetEntriesFast(); 
+      for (Long64_t jentry=0; jentry<nentries;jentry++) {
+	EvalTree->GetEntry(jentry);
 	for (int unsigned k = 0; k < recoD0->size(); k++){
 	  float DistanceResolution = (recoD0->at(k) - trueD0->at(k));
 	  h1->Fill( DistanceResolution );
