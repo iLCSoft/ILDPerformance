@@ -485,9 +485,9 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	
 	//APPLY_CUT( DEBUG, cut, e.rho()==0.0  || e.rho() > 400.   ) ; // end at rho > 40 cm
 	
-	//APPLY_CUT( DEBUG, cut, p.rho() > _pCut ) ; //FIXME 1. Gev <->  pt> 100 MeV
+	APPLY_CUT( DEBUG, cut, p.r() > _pCut ) ; 
 	
-	//APPLY_CUT( DEBUG, cut, pt > _ptCut ) ; 
+	APPLY_CUT( DEBUG, cut, p.rho() > _ptCut ) ; 
 	
 	APPLY_CUT( DEBUG, cut, fabs( cos( p.theta() ) )  < _cosTheta  ) ; //FIXME 0.9 <=> .99  //  | cos( theta ) | > 0.99
 
