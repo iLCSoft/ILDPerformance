@@ -20,6 +20,7 @@
 #include <UTIL/LCRelationNavigator.h>
 #include <IMPL/TrackStateImpl.h>
 
+#include "UTIL/LCTrackerConf.h"
 #include "UTIL/ILDConf.h"
 #include <TMath.h>
 

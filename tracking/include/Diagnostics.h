@@ -15,6 +15,7 @@
 #include "UTIL/LCIterator.h"
 #include "UTIL/Operators.h"
 #include <UTIL/BitField64.h>
+#include "UTIL/LCTrackerConf.h"
 #include <UTIL/ILDConf.h>
 #include <UTIL/BitSet32.h>
 
