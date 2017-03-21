@@ -113,7 +113,7 @@ void Residuals::processEvent( LCEvent * evt ) {
   streamlog_out(DEBUG4) << " ################# new event $$$$$$$$$$$$$$$$$$$ " << _nEvt << std::endl ;
 
 
-  UTIL::BitField64 idDecoder(ILDCellID0::encoder_string) ;
+  UTIL::BitField64 idDecoder(LCTrackerCellID::encoding_string()) ;
 
   LCCollection* MarlinTrks = evt->getCollection( _trks );
   int MarlinTracks = MarlinTrks->getNumberOfElements();
@@ -166,7 +166,7 @@ void Residuals::processEvent( LCEvent * evt ) {
       //----------------------------------------------------------------------------------------
     }
     
-    UTIL::BitField64 cellID_encoder( lcio::ILDCellID0::encoder_string ) ;
+    UTIL::BitField64 cellID_encoder( lcio::LCTrackerCellID::encoding_string() ) ;
     
     for (std::vector< std::pair<float, EVENT::TrackerHit*> >::iterator it=r_values.begin(); it!=r_values.end(); ++it) {
       initialHits.push_back(it->second);
@@ -209,12 +209,12 @@ void Residuals::processEvent( LCEvent * evt ) {
 	idDecoder.setValue(hitid) ;
 	
 
-	DetLayer.push_back(idDecoder[lcio::ILDCellID0::layer]);
-	SubDet.push_back(idDecoder[ lcio::ILDCellID0::subdet]);
+	DetLayer.push_back(idDecoder[lcio::LCTrackerCellID::layer()]);
+	SubDet.push_back(idDecoder[ lcio::LCTrackerCellID::subdet()]);
 
 	double testRadius = sqrt(((*lhit)->getPosition()[0])*((*lhit)->getPosition()[0]) + ((*lhit)->getPosition()[1])*((*lhit)->getPosition()[1])) ;
 
-	streamlog_out(DEBUG4) << " subdetector " << idDecoder[ lcio::ILDCellID0::subdet] << " layer " << idDecoder[lcio::ILDCellID0::layer] << " Z position " << (*lhit)->getPosition()[2]  << std::endl;
+	streamlog_out(DEBUG4) << " subdetector " << idDecoder[ lcio::LCTrackerCellID::subdet()] << " layer " << idDecoder[lcio::LCTrackerCellID::layer()] << " Z position " << (*lhit)->getPosition()[2]  << std::endl;
 		
 
 	const aidaTT::ISurface* surf3 = surfMap[ hitid ] ;
@@ -266,7 +266,7 @@ void Residuals::processEvent( LCEvent * evt ) {
 
 	    TrackerHitPlane* planarhit3 = dynamic_cast<TrackerHitPlane*>(*lhit);
 	    TrackerHit* tpchit3 =  dynamic_cast<TrackerHit*>(*lhit);
-	    if ( idDecoder[ lcio::ILDCellID0::subdet] != 4 ){   // not TPC
+	    if ( idDecoder[ lcio::LCTrackerCellID::subdet()] != 4 ){   // not TPC
 	      if(planarhit3 != NULL) {
 		TrackHitResidualsU.push_back(resU);
 		TrackHitResidualsV.push_back(resV);

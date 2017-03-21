@@ -394,12 +394,12 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	    SimTrackerHit* simHit = (SimTrackerHit*) col->getElementAt( j ) ; 
 	    MCParticle* mcp = simHit->getMCParticle() ;
 	    
-	    UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ;
+	    UTIL::BitField64 encoder( lcio::LCTrackerCellID::encoding_string() ) ;
 	    encoder.reset();
 	    encoder.setValue(simHit->getCellID0()) ;
 	    
 	    int layer = 0 ;  
-	    layer = encoder[lcio::ILDCellID0::layer] ;
+	    layer = encoder[lcio::LCTrackerCellID::layer()] ;
 	    
 	    streamlog_out(DEBUG2) << " MC particle " << mcp << " creates hit " << simHit << " in layer " << layer << std::endl ;
 	    
@@ -570,13 +570,13 @@ void Diagnostics::processEvent( LCEvent * evt ) {
 	  
 	  EVENT::TrackerHit *TestHit = *it ;
 	  
-	  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ;
+	  UTIL::BitField64 encoder( lcio::LCTrackerCellID::encoding_string() ) ;
 	  encoder.reset();
 	  encoder.setValue(TestHit->getCellID0()) ;
 	  
 	  int layer = 0 ;  int det_id = 0 ;
-	  layer = encoder[lcio::ILDCellID0::layer] ;
-	  det_id  = encoder[lcio::ILDCellID0::subdet] ;
+	  layer = encoder[lcio::LCTrackerCellID::layer()] ;
+	  det_id  = encoder[lcio::LCTrackerCellID::subdet()] ;
 	  
 	  // Checking propagation from SIT to VXD
 	  if ( det_id == lcio::ILDDetID::VXD && layer == 0 ){
