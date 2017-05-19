@@ -31,7 +31,7 @@ Residuals::Residuals() : Processor("Residuals") {
 
 
   registerProcessorParameter( "TrackSystemName",
-			      "Name of the track fitting system to be used (KalTest, DDKalTest, aidaTT, ... )",
+			      "Name of the track fitting system to be used (DDKalTest, aidaTT, ... )",
 			      _trkSystemName,
 			      std::string("DDKalTest") );
 
@@ -57,7 +57,7 @@ void Residuals::init() {
   _trkSystem =  MarlinTrk::Factory::createMarlinTrkSystem( _trkSystemName , marlin::Global::GEAR , "" ) ;
 
 
-  if( _trkSystem == 0 ) throw EVENT::Exception( std::string("  Cannot initialize MarlinTrkSystem of Type: ") + std::string("KalTest" )  ) ;
+  if( _trkSystem == 0 ) throw EVENT::Exception( std::string("  Cannot initialize MarlinTrkSystem of Type: ") + std::string("DDKalTest" )  ) ;
   
   
   // set the options   
