@@ -156,9 +156,9 @@
   <!--Maximum costheta of examined MCParticles sample-->
   <parameter name="CosThetaCut" type="double"> 0.99 </parameter>
   <!--Minimum momentum of examined MCParticles sample (in GeV)-->
-  <parameter name="PCut" type="double"> 0.3 </parameter>
+  <parameter name="PCut" type="double"> 0.0 </parameter>
   <!--Minimum transverse momentum of examined MCParticles sample (in GeV)-->
-  <parameter name="PTCut" type="double"> 0.3 </parameter>
+  <parameter name="PTCut" type="double"> 0.0 </parameter>
   <!--Maximum distance from IP of examined MCParticles sample (in mm)-->
   <parameter name="DistFromIP" type="double"> 10.0 </parameter>
   <!--ratio of hits belonging to the dominant MC particle to total number of track hits-->
