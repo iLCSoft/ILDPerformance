@@ -69,16 +69,16 @@ void Residuals::init() {
   _trkSystem->init() ;
  
 
-  DD4hep::Geometry::LCDD& lcdd = DD4hep::Geometry::LCDD::getInstance();
+  dd4hep::Detector& theDetector = dd4hep::Detector::getInstance();
 
   const double pos[3]={0,0,0}; 
   double bFieldVec[3]={0,0,0}; 
-  lcdd.field().magneticField(pos,bFieldVec); // get the magnetic field vector from DD4hep
+  theDetector.field().magneticField(pos,bFieldVec); // get the magnetic field vector from DD4hep
   _bField = bFieldVec[2]/dd4hep::tesla; // z component at (0,0,0)
 
 
   // create map of surfaces
-  DD4hep::Geometry::DetElement world = lcdd.world() ;
+  dd4hep::DetElement world = theDetector.world() ;
   const aidaTT::IGeometry* geom  = & aidaTT::IGeometry::instance() ;
   const std::vector<const aidaTT::ISurface*>& surfaces = geom->getSurfaces() ;
   for(std::vector<const aidaTT::ISurface*>::const_iterator surf = surfaces.begin() ; surf != surfaces.end() ; ++surf){
