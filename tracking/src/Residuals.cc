@@ -232,7 +232,7 @@ void Residuals::processEvent( LCEvent * evt ) {
 	  aidaTT::Vector3D globalPos2(globpos2) ;
 	    
 	  //aidaTT::Vector2D* localPos2 = new Vector2D() ;
-	  DDSurfaces::Vector2D localPos2 = surf3->globalToLocal( globalPos2 ) ;	    
+	  dd4hep::rec::Vector2D localPos2 = surf3->globalToLocal( globalPos2 );
 	    
 	  double s2 = 0.;
 	  int ndf = 0;
@@ -253,7 +253,7 @@ void Residuals::processEvent( LCEvent * evt ) {
 	    //streamlog_out(DEBUG4) << " surface " << *surf3 << std::endl ;
 	    streamlog_out(DEBUG4) << " Global coordinates: track x point " << xx[0] << ", " << xx[1] << ", " << xx[2] << "hit position " << globpos2[0] << ", " << globpos2[1] << ", " << globpos2[2] << std::endl;	  
 
-	    DDSurfaces::Vector2D localUV2 = surf3->globalToLocal( xx ) ;
+	    dd4hep::rec::Vector2D localUV2 = surf3->globalToLocal( xx ) ;
 	      
 	    double U = localPos2.u();
 	    double V = localPos2.v();
