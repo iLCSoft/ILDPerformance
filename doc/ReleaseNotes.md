@@ -1,3 +1,16 @@
+# v01-03
+
+* 2017-06-20 Andre Sailer ([PR#3](https://github.com/iLCSoft/ILDPerformance/pull/3))
+  - ignore warnings from external header files
+  - Adapt to changes in namespaces and LCDD -->  Detector
+
+* 2017-06-07 Shaojun Lu ([PR#2](https://github.com/iLCSoft/ILDPerformance/pull/2))
+  - "PCut" and "PTCut" have been added as Marlin steerable parameters.
+  - Update Diagnostics.xml to set 'PCut' and 'PTCut' to 0.0
+
+* 2017-06-26 Andre Sailer ([PR#4](https://github.com/iLCSoft/ILDPerformance/pull/4))
+  - Adapt to dd4hep namespace changes
+
 # v01-02
 
 
