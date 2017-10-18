@@ -1,3 +1,6 @@
+# prepare the working folders
+source prepareWorkingFolders.sh
+
 PolarAngles=('10' '20' '40' '85')
 Mom=( '1' '3' '5' '10' '15' '25' '50' '100' )
 
