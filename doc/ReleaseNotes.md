@@ -1,3 +1,9 @@
+# v01-03-01
+
+* 2017-11-08 Shaojun Lu ([PR#6](https://github.com/ilcsoft/ILDPerformance/pull/6))
+  - Add one script to prepare the working directory.
+      - no error if existing, make parent directories as needed.
+
 # v01-03
 
 * 2017-06-20 Andre Sailer ([PR#3](https://github.com/iLCSoft/ILDPerformance/pull/3))
