@@ -1,3 +1,10 @@
+# v01-04
+
+* 2017-11-08 Shaojun Lu ([PR#5](https://github.com/ilcsoft/ILDPerformance/pull/5))
+  - New implementation adapted to DD4hep framework for accessing geometry and BField.
+      - keep the old with accessing gear geometry and BField as reference.
+  - initialise/add more quantity/quality monitor plots.
+
 # v01-03-01
 
 * 2017-11-08 Shaojun Lu ([PR#6](https://github.com/ilcsoft/ILDPerformance/pull/6))
