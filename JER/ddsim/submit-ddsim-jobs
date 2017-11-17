@@ -1,0 +1,44 @@
+
+
+# ILCSoft version. It should point to a valid version in 
+# AFS according to the path /afs/desy.de/project/ilcsoft/sw/x86_64_gcc49_sl6/
+ilcsoft="v01-19-05"
+
+# ILDConfig version, branch or commit. A wget is performed in the 
+# job script as :
+#     wget https://github.com/iLCSoft/ILDConfig/blob/${ildconfig}/StandardConfig/production/DDSim/ddsim_steer.py
+# The ildconfig value can be e.g "master", "2eadbc691b98110caf60a7e22f8212cfb0170c53" or
+# version "v01-19-05".
+ildconfig="master"
+
+# ILD detector model. Must be a valid detector model from lcgeo
+# Compact file select according to $lcgeo_DIR/ILD/compact/${detector}/${detector}.xml 
+detector="ILD_l5_v02"
+
+# The input CMS energy. This is used to point to the input stdhep files
+# located in /pnfs/desy.de/ilc/user/s/sgreen/StdHepFiles/Z_uds/
+# Valid energies are 30 40 60 91 120 160 200 240 300 350 360 400 500
+# It is usually no necessary to process all these energies, 5 points are 
+# generally enough to have good final plots ...
+energies="40 91 200 360 500"
+
+# The run ids. They are used for selecting the stdhep input file (see energy)
+# The form of the file name is Zuds${energy}_0${run}.stdhep
+# Valid run ids are from 0 to 9. Again, as for the energies, it is not necessary 
+# to process all input files to have good final plots ...
+runs="0 1 2 3 4"
+
+# The output directory where the simulated file will goes
+outputDirectory="/afs/desy.de/group/flc/pool/$USER/ILDPerformance/JER/SIM"
+
+# Send the jobs with qsub
+for run in ${runs}
+do
+  for energy in ${energies}
+  do
+    for skip in 0 1 2 3 4 5 6 7 8 9
+    do
+      qsub ./run-ddsim-uds ${ilcsoft} ${ildconfig} ${detector} ${energy} ${outputDirectory} ${run} ${skip}
+    done
+  done
+done
