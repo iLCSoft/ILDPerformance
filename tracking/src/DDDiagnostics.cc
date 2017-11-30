@@ -1,4 +1,5 @@
 #include "DDDiagnostics.h"
+#include <GeometryUtil.h>
 
 //------------------------------------------------------------------------------------------------------------
 struct WSort {  // sort track segments wtr to higher inverse relative weight
@@ -25,17 +26,6 @@ struct invWSort {  // sort track segments wtr to higher inverse relative weight
 //======================================================================================================
 
 DDDiagnostics aDDDiagnostics ;
-
-double getFieldFromCompact(){
-
-  dd4hep::Detector& mainDetector = dd4hep::Detector::getInstance();
-  const double position[3]={0,0,0}; // position to calculate magnetic field at (the origin in this case)
-  double magneticFieldVector[3]={0,0,0}; // initialise object to hold magnetic field
-  mainDetector.field().magneticField(position,magneticFieldVector); // get the magnetic field vector from DD4hep
-
-  return magneticFieldVector[2]/dd4hep::tesla; // z component at (0,0,0)
-
-}
 
 void DDDiagnostics::initTree(void) {
   streamlog_out(DEBUG4) << " initialise EvalTree " << std::endl;
@@ -492,7 +482,7 @@ void DDDiagnostics::init() {
   printParameters() ;
   nEvt = 0;
 
-  _bField = getFieldFromCompact() ;
+  _bField = MarlinUtil::getBzAtOrigin();
 
   ghostCounter = 0 ;
 
@@ -524,7 +514,7 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
   typedef std::map< Track* , int> TrackMap;
   TrackMap MarlinTrkMap ;
 
-  int flagTrack = 0; int flagSiRel = 0; int flagRecoToTrue = 0 ; int  flagTrueToReco = 0 ;
+  int flagTrack = 0; int flagRecoToTrue = 0 ; int  flagTrueToReco = 0 ; //int flagSiRel = 0;
   int  flagBCALPart = 0 ;     int  flagBCALCluster = 0 ;   int flagPFO = 0 ;
 
   const StringVec*  colNames = evt->getCollectionNames() ;
@@ -533,8 +523,8 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
     if  ( _trackColName == *it )
       flagTrack = 1 ;
 
-    if  ( _vxdTrkHitRelations == *it )
-      flagSiRel = 1 ;
+    //if  ( _vxdTrkHitRelations == *it )
+    //  flagSiRel = 1 ;
 
     if  ( _recoToTrue == *it )
       flagRecoToTrue = 1 ;

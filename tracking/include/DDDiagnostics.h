@@ -61,6 +61,9 @@ class DDDiagnostics : public Processor {
   
   
   DDDiagnostics() ;
+  DDDiagnostics(const DDDiagnostics&) = delete;
+  DDDiagnostics& operator=(const DDDiagnostics&) = delete;
+
   
   /** Called at the begin of the job before anything is read.
    * Use to initialize the processor, e.g. book histograms.
@@ -107,156 +110,156 @@ class DDDiagnostics : public Processor {
 
   /** Input collection name.
    */
-  std::string _trueToReco ;
-  std::string _recoToTrue ;
-  std::string _mcParticleCollectionName ;
-  StringVec   _simTrkHitCollectionNames ;
-  std::string _trackColName ;
-  std::string _sitSpacePoints ;
-  std::string _sitTrkHitRelations ;
-  std::string _vxdTrackerHits ;
-  std::string _vxdTrkHitRelations ;
-  std::string _BCALParticleCollectionName ;
-  std::string _BCALClusterCollectionName ;
-  std::string _pandoraPFOs ;
+  std::string _trueToReco = "";
+  std::string _recoToTrue = "";
+  std::string _mcParticleCollectionName = "";
+  StringVec   _simTrkHitCollectionNames = {};
+  std::string _trackColName = "";
+  std::string _sitSpacePoints = "";
+  std::string _sitTrkHitRelations = "";
+  std::string _vxdTrackerHits = "";
+  std::string _vxdTrkHitRelations = "";
+  std::string _BCALParticleCollectionName = "";
+  std::string _BCALClusterCollectionName = "";
+  std::string _pandoraPFOs = "";
 
-  int nEvt ;
-  int OutSitBkgHit ;
-  int OutSitPhysHit ;
-  int OutVxdBkgHit ;
-  int OutVxdPhysHit ;
+  int nEvt = 0;
+  int OutSitBkgHit = 0;
+  int OutSitPhysHit = 0;
+  int OutVxdBkgHit = 0;
+  int OutVxdPhysHit = 0;
 
-  int ghostCounter ;
+  int ghostCounter = 0;
 
-  float _bField ;
+  float _bField = 0.0;
 
-  bool _trkEffOn ; 
-  bool _siTrkEffOn ;
-  bool _physSampleOn ;
-  double _pCut ;
-  double _ptCut ;
-  double _originCut ;
-  double _cosTheta ;
-  double _minPurity ;
-  int _minSiHits ;
-  bool _reqInnVXDHit ;
-  bool _fillBigTTree ;
+  bool _trkEffOn = false;
+  bool _siTrkEffOn = false;
+  bool _physSampleOn = false;
+  double _pCut = 0.0;
+  double _ptCut = 0.0;
+  double _originCut = 0.0;
+  double _cosTheta = 0.0;
+  double _minPurity = 0.0;
+  int _minSiHits = 0;
+  bool _reqInnVXDHit = false;
+  bool _fillBigTTree = false;
 
  private:
 
   // declaration of trees
-  TTree *EvalTree ;
-  vector<int> foundTrk;
-  vector<int> TrackSiHits;
-  vector<int> SiHitsSiTrk ;
-  vector<int> MarlinTrkHits ;
-  vector<int> VXDHits ;
-  vector<int> SITHits ;
-  vector<int> FTDHits ;
-  vector<int> TPCHits ;
-  vector<float> foundTrkChi2OverNdof ;
-  vector<float> CluChi2OverNdof ;
-  vector<float> SiTrkChi2OverNdof ;
-  vector<float> PtReco;
-  vector<float> CosThetaReco;
-  vector<float> SiTrksPt;
-  vector<float> PtMCP;
-  vector<float> CosThetaMCP;
-  vector<float> Wgt;
-  vector<float> InvWgt;
-  vector<float> trueD0;
-  vector<float> trueZ0;
-  vector<float> trueOmega;
-  vector<float> truePhi;
-  vector<float> trueTanLambda;
-  vector<float> recoD0;
-  vector<float> recoZ0;
-  vector<float> recoD0Error;
-  vector<float> recoZ0Error;
-  vector<float> recoOmega;
-  vector<float> recoPhi;
-  vector<float> recoTanLambda;
-  vector<float> recoD0error;
-  vector<float> recoZ0error;
-  vector<float> recoOmegaError;
-  vector<float> recoPhiError;
-  vector<float> recoTanLambdaError;
-  vector<float> siTrksCosTheta;
+  TTree *EvalTree = NULL;
+  vector<int> foundTrk = {};
+  vector<int> TrackSiHits = {};
+  vector<int> SiHitsSiTrk  = {};
+  vector<int> MarlinTrkHits  = {};
+  vector<int> VXDHits  = {};
+  vector<int> SITHits  = {};
+  vector<int> FTDHits  = {};
+  vector<int> TPCHits  = {};
+  vector<float> foundTrkChi2OverNdof  = {};
+  vector<float> CluChi2OverNdof  = {};
+  vector<float> SiTrkChi2OverNdof  = {};
+  vector<float> PtReco = {};
+  vector<float> CosThetaReco = {};
+  vector<float> SiTrksPt = {};
+  vector<float> PtMCP = {};
+  vector<float> CosThetaMCP = {};
+  vector<float> Wgt = {};
+  vector<float> InvWgt = {};
+  vector<float> trueD0 = {};
+  vector<float> trueZ0 = {};
+  vector<float> trueOmega = {};
+  vector<float> truePhi = {};
+  vector<float> trueTanLambda = {};
+  vector<float> recoD0 = {};
+  vector<float> recoZ0 = {};
+  vector<float> recoD0Error = {};
+  vector<float> recoZ0Error = {};
+  vector<float> recoOmega = {};
+  vector<float> recoPhi = {};
+  vector<float> recoTanLambda = {};
+  vector<float> recoD0error = {};
+  vector<float> recoZ0error = {};
+  vector<float> recoOmegaError = {};
+  vector<float> recoPhiError = {};
+  vector<float> recoTanLambdaError = {};
+  vector<float> siTrksCosTheta = {};
 
-  TTree *GhostTree ;
-  vector<float> ghostPt;
-  vector<float> ghostCosTheta;
-  vector<float> ghostTrkChi2OverNdof ;
-  vector<float> ghostWgt;
-  vector<int>   ghost_hits;
-  vector<int>   generatorStatus;
-  vector<int>   DecayedInTracker;
-  vector<float> doubleCountingPt;
-  vector<float> doubleCountingCosTheta;
-  vector<float> BadTrksD0 ;
-  vector<float> BadTrksZ0 ;
+  TTree *GhostTree = NULL;
+  vector<float> ghostPt = {};
+  vector<float> ghostCosTheta = {};
+  vector<float> ghostTrkChi2OverNdof  = {};
+  vector<float> ghostWgt = {};
+  vector<int>   ghost_hits = {};
+  vector<int>   generatorStatus = {};
+  vector<int>   DecayedInTracker = {};
+  vector<float> doubleCountingPt = {};
+  vector<float> doubleCountingCosTheta = {};
+  vector<float> BadTrksD0  = {};
+  vector<float> BadTrksZ0  = {};
 
 
-  int MarlinTracks;
-  int SeedTracks;
-  int SiliconTracks;
-  int BCalParts;
-  int BCalCls;
-  int pfos ;
+  int MarlinTracks = 0;
+  int SeedTracks = 0;
+  int SiliconTracks = 0;
+  int BCalParts = 0;
+  int BCalCls = 0;
+  int pfos  = 0;
 
-  TH1F *OmegaPull; 
-  TH1F *PhiPull; 
-  TH1F *TanLambdaPull; 
-  TH1F *d0pull; 
-  TH1F *z0pull; 
+  TH1F *OmegaPull = NULL;
+  TH1F *PhiPull = NULL;
+  TH1F *TanLambdaPull = NULL;
+  TH1F *d0pull = NULL;
+  TH1F *z0pull = NULL;
 
-  TH1F *OmegaResidual; 
-  TH1F *PhiResidual; 
-  TH1F *TanLambdaResidual; 
-  TH1F *d0Residual; 
-  TH1F *z0Residual; 
+  TH1F *OmegaResidual = NULL;
+  TH1F *PhiResidual = NULL;
+  TH1F *TanLambdaResidual = NULL;
+  TH1F *d0Residual = NULL;
+  TH1F *z0Residual = NULL;
 
   static const int nBins = 13 ;
 
-  TH1F *hist_pt_t ;
-  TH1F *hist_pt_f ;
-  TH1F *hist_p_t ;
-  TH1F *hist_p_f ;
-  TH1F *hist_th_t ;
-  TH1F *hist_th_f ;
-  TH1F *hist_thm_t ;
-  TH1F *hist_thm_f ;
+  TH1F *hist_pt_t  = NULL;
+  TH1F *hist_pt_f  = NULL;
+  TH1F *hist_p_t  = NULL;
+  TH1F *hist_p_f  = NULL;
+  TH1F *hist_th_t  = NULL;
+  TH1F *hist_th_f  = NULL;
+  TH1F *hist_thm_t  = NULL;
+  TH1F *hist_thm_f  = NULL;
 
-  TH1F *hist_pt_allMarTrk ;
-  TH1F *hist_pt_fakeMarTrk ;
-  TH1F *hist_p_allMarTrk ;
-  TH1F *hist_p_fakeMarTrk ;
-  TH1F *hist_th_allMarTrk ;
-  TH1F *hist_th_fakeMarTrk ;
-  TH1F *hist_thm_allMarTrk ;
-  TH1F *hist_thm_fakeMarTrk ;
+  TH1F *hist_pt_allMarTrk  = NULL;
+  TH1F *hist_pt_fakeMarTrk  = NULL;
+  TH1F *hist_p_allMarTrk  = NULL;
+  TH1F *hist_p_fakeMarTrk  = NULL;
+  TH1F *hist_th_allMarTrk  = NULL;
+  TH1F *hist_th_fakeMarTrk  = NULL;
+  TH1F *hist_thm_allMarTrk  = NULL;
+  TH1F *hist_thm_fakeMarTrk  = NULL;
 
-  TCanvas *pulls;
-  TCanvas *residuals;
-  TCanvas *eff;
-  TCanvas *Rfake;
-  TCanvas *effPM;
-  TCanvas *RfakePM;
+  TCanvas *pulls = NULL;
+  TCanvas *residuals = NULL;
+  TCanvas *eff = NULL;
+  TCanvas *Rfake = NULL;
+  TCanvas *effPM = NULL;
+  TCanvas *RfakePM = NULL;
 
-  TF1 *myfunc ;
+  TF1 *myfunc  = NULL;
 
-  TGraphAsymmErrors *gpt;
-  TGraphAsymmErrors *gp;
-  TGraphAsymmErrors *gth;
-  TGraphAsymmErrors *gthm;
+  TGraphAsymmErrors *gpt = NULL;
+  TGraphAsymmErrors *gp = NULL;
+  TGraphAsymmErrors *gth = NULL;
+  TGraphAsymmErrors *gthm = NULL;
 
-  TGraphAsymmErrors *gptfake;
-  TGraphAsymmErrors *gpfake;
-  TGraphAsymmErrors *gthfake;
-  TGraphAsymmErrors *gthmfake;
+  TGraphAsymmErrors *gptfake = NULL;
+  TGraphAsymmErrors *gpfake = NULL;
+  TGraphAsymmErrors *gthfake = NULL;
+  TGraphAsymmErrors *gthmfake = NULL;
 
-  double PI;
-  double TWOPI;
+  double PI    = 3.1415926535897;
+  double TWOPI = 6.2831853071794;
 
 } ;
 

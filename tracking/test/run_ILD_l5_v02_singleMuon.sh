@@ -172,7 +172,11 @@ mv  analysis_${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_*_Mom_*.root ../Results/Analys
 # generate monitor plots
 
 cd ../macros
-./generate_monitor_plot.sh
+
+root -b -q D0ResolutionL5.C
+root -b -q PResolutionL5.C
+root -b -q meanL5.C
+root -b -q sigmaL5.C
 
 mkdir -p ~/www/ILDPerformance_${ILCSOFTVER}
 
