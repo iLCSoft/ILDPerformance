@@ -90,7 +90,7 @@ ddsim \
     --inputFiles Results/GenFiles/mcparticles_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio  \
     --outputFile ${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
     --compactFile $lcgeo_DIR/ILD/compact/${ILDMODEL}/${ILDMODEL}.xml \
-    --steeringFile DDSim/ddsim_steer.py \
+    --steeringFile ddsim_steer.py \
     --numberOfEvents 1000 &
 done
 wait
@@ -108,7 +108,8 @@ do
 for j in {0..7}
 do
 
-Marlin ProductionSteeringFiles/MarlinStdReco_ILD_l5_o1_v02.xml \
+Marlin MarlinStdReco.xml \
+    --constant..DetectorModel=ILD_l5_o1_v02 \
     --global.LCIOInputFiles=Results/SimFiles/${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
     --constant.lcgeo_DIR=$lcgeo_DIR \
     --constant.OutputBaseName=${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
