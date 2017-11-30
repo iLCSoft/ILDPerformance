@@ -70,7 +70,7 @@ ddsim \
     --inputFiles $INFILE  \
     --outputFile ${ILDMODEL}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_${i}_SIM.slcio \
     --compactFile $lcgeo_DIR/ILD/compact/${ILDMODEL}/${ILDMODEL}.xml \
-    --steeringFile DDSim/ddsim_steer.py \
+    --steeringFile ddsim_steer.py \
     --numberOfEvents 100  \
     --skipNEvents ${NSkip} &
 
@@ -86,7 +86,8 @@ mv ${ILDMODEL}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_
 for i in {0..9}
 do
 
-Marlin ProductionSteeringFiles/MarlinStdReco_ILD_l5_o1_v02.xml \
+Marlin MarlinStdReco.xml \
+    --constant..DetectorModel=ILD_l5_o1_v02 \
     --global.LCIOInputFiles=Results/SimFiles/${ILDMODEL}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_${i}_SIM.slcio \
     --constant.lcgeo_DIR=$lcgeo_DIR \
     --constant.OutputBaseName=${ILDMODEL}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_${i} \
