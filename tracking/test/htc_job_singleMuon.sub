@@ -4,7 +4,7 @@
  ######################################################
 
 # Run your script:
-Executable = /MyPathTo/ILDPerformance_v01-19-05/tracking/test/run_ILD_l5_v02_singleMuon.sh
+Executable = $ENV(PWD)/run_ILD_l5_v02_singleMuon.sh
 #
 # Infos from your job:
 Output = $(Cluster).$(Process).out
@@ -22,7 +22,7 @@ Universe = vanilla
 Should_Transfer_Files = NO
 #
 # Defaults to submit dir:
-InitialDir = /MyPathTo/ILDPerformance_v01-19-05/tracking/test
+InitialDir = $ENV(PWD)
 #InitialDir = $ENV(HOME)
 #
 # Test it:

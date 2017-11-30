@@ -134,5 +134,5 @@ root -b -q EfficiencyL5.C
 
 mkdir -p ~/www/ILDPerformance_${ILCSOFTVER}
 
-cp trkEff_${ILDMODEL}_${ILCSOFTVER}.png ~/www/ILDPerformance_${ILCSOFTVER}
-cp trkEff_v02_${ILDMODEL}_${ILCSOFTVER}.png ~/www/ILDPerformance_${ILCSOFTVER}
+cp trkEff_pt_ttbar_${ILDMODEL}_${ILCSOFTVER}.png ~/www/ILDPerformance_${ILCSOFTVER}
+cp trkEff_theta_ttbar_${ILDMODEL}_${ILCSOFTVER}.png ~/www/ILDPerformance_${ILCSOFTVER}
