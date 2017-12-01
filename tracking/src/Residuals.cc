@@ -92,6 +92,8 @@ void Residuals::init() {
 
 void Residuals::processRunHeader( LCRunHeader* run) { 
 
+  streamlog_out( DEBUG4 ) << " processRun "  << run->getRunNumber()
+			  << std::endl ;
   _nRun++ ;
 
 } 
@@ -296,6 +298,8 @@ void Residuals::processEvent( LCEvent * evt ) {
 
 
 void Residuals::check( LCEvent * evt ) { 
+  streamlog_out(DEBUG4) << " Residuals::check event "
+			<< evt->getEventNumber() <<std::endl;
   // nothing to check here - could be used to fill checkplots in reconstruction processor
 }
 
