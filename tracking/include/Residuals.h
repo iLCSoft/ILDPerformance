@@ -82,6 +82,8 @@ class Residuals : public Processor {
   
   
   Residuals() ;
+  Residuals(const Residuals&) = delete;
+  Residuals& operator=(const Residuals&) = delete;
   
   /** Called at the begin of the job before anything is read.
    * Use to initialize the processor, e.g. book histograms.
@@ -108,23 +110,26 @@ class Residuals : public Processor {
 
   /** Input collection name.
    */
-  std::string _trks ;
+  std::string _trks = "";
 
-  MarlinTrk::IMarlinTrkSystem* _trkSystem;
+  MarlinTrk::IMarlinTrkSystem* _trkSystem = NULL;
 
-  TTree *ResiduTree;
-  vector<double> TrackHitResidualsU ;
-  vector<double> TrackHitResidualsV ;
-  vector<int> DetLayer ;
-  vector<int> SubDet ;
+  TTree *ResiduTree = NULL;
+  vector<double> TrackHitResidualsU = {};
+  vector<double> TrackHitResidualsV = {};
+  vector<int> DetLayer = {};
+  vector<int> SubDet = {};
 
-  int _nRun ;
-  int _nEvt ;
-  bool _MSOn, _ElossOn, _SmoothOn, _sortRad ;
-  float _bField;
+  int _nRun = 0;
+  int _nEvt = 0;
+  bool _MSOn = false;
+  bool _ElossOn = false;
+  bool _SmoothOn = false;
+  bool _sortRad = false;
+  float _bField = 0.0;
 
-  std::map< long, const aidaTT::ISurface* > surfMap ;
-  std::string _trkSystemName ;
+  std::map< long, const aidaTT::ISurface* > surfMap = {};
+  std::string _trkSystemName ="";
 
 } ;
 
