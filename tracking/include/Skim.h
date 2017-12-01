@@ -48,14 +48,14 @@ protected:
   void keepMCParticle( MCParticle* mcp, bool save_parents=true ) ; 
 
 
-  std::string _mcpColName ;
-  std::string _mcpSkimColName;
+  std::string _mcpColName = "";
+  std::string _mcpSkimColName = "";
 
-  int _nRun ;
-  int _nEvt ;
+  int _nRun = 0;
+  int _nEvt = 0;
 
-  double _thetaMin;
-  double _thetaMax;
+  double _thetaMin = 0.0;
+  double _thetaMax = 0.0;
 
 } ;
 
