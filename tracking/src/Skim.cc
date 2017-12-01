@@ -76,7 +76,9 @@ void Skim::init() {
 
 
 void Skim::processRunHeader( LCRunHeader* run) { 
-  
+
+  streamlog_out( DEBUG4 ) << " processRun "  << run->getRunNumber()
+			  << std::endl ;
   _nRun++ ;
 } 
 
@@ -152,7 +154,8 @@ void Skim::processEvent( LCEvent * evt ) {
 
 
 void Skim::check( LCEvent * evt ) { 
-  
+  streamlog_out(DEBUG4) << " Skim::check event "
+			<< evt->getEventNumber() <<std::endl;
 }
 
 
