@@ -10,6 +10,7 @@ void plotPIDLike(const char* _filename ) {
   ildStyle->SetMarkerStyle(1);
 
   TFile *treefile = new TFile(_filename);
+  TTree *hermTree = (TTree*) treefile->Get("hermTree");
 
   const int nBins = 100 ;
   const double maxX  = 10 ;
@@ -61,8 +62,8 @@ gPad->SetLogy() ;
   h2->GetXaxis()->SetTitleSize( 0.04 ) ;
   h2->GetXaxis()->SetTitleOffset( 1.5 );
  
- h2->Draw( "hist");
- h1->Draw( "hist same");
+ h1->Draw( "hist");
+ h2->Draw( "hist same");
  //h1->Draw() ;
   //h2->Draw("same");
 

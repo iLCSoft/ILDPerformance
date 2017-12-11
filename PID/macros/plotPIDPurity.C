@@ -57,8 +57,6 @@ void plotPIDPurity(const char* _filename) {
   TFile *treefile = new TFile(_filename);
   TTree *tree = (TTree*) treefile->Get("hermTree");
 
-
-  
   
   const double maxX  = 0. ;
   const double minX  = -200;
@@ -78,22 +76,21 @@ void plotPIDPurity(const char* _filename) {
     //**********************************************************************************************  
     // read branches
     int npart;
-    vector<int> *truePDG;
-    vector<double> *isSeen;
-    vector<int> *basicPDG;
-    vector<int> *dEdxPDG;
-    vector<int> *showerPDG;
-    vector<int> *likeliPDG;
-    vector<int> *lowmomPDG;
-    vector<double> *trueCharge;
-    vector<double> *seenCharge;
-    vector<double> *trueP;
-    vector<double> * trueTheta;
-    vector<double> * seenTheta;
-    vector<double> * seenP;
-    vector<double> * seenDEdx;
-
-    vector<double> * likelihood ;
+    vector<int>    *truePDG = new vector<int> ;
+    vector<double> *isSeen = new vector<double> ;
+    vector<int>    *basicPDG =  new vector<int> ;
+    vector<int>    *dEdxPDG =   new vector<int> ;
+    vector<int>    *showerPDG = new vector<int> ;
+    vector<int>    *likeliPDG = new vector<int> ;
+    vector<int>    *lowmomPDG = new vector<int> ;
+    vector<double> *trueCharge = new vector<double> ;
+    vector<double> *seenCharge = new vector<double> ;
+    vector<double> *trueP = new vector<double> ;
+    vector<double> *trueTheta = new vector<double> ;
+    vector<double> *seenTheta = new vector<double> ;
+    vector<double> *seenP = new vector<double> ;
+    vector<double> *seenDEdx = new vector<double> ;
+    vector<double> *likelihood  = new vector<double> ;
 
     tree->SetBranchAddress("nMCParticles", &npart);        
     tree->SetBranchAddress("trueCharge", &trueCharge); 
