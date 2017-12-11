@@ -1,6 +1,5 @@
 #include "TH1.h"
 /** Very simply plotting of dEdx as a function of beta*gamma (p/m).
- *  Should add colors for standard PDG types ...
  * 
  */
 void plotdEdx(const char* _filename ) {
@@ -10,6 +9,7 @@ void plotdEdx(const char* _filename ) {
   ildStyle->SetMarkerStyle(1);
 
   TFile *treefile = new TFile(_filename);
+  TTree *hermTree = (TTree*) treefile->Get("hermTree");
 
   const int nBins = 10000 ;
   const double minX  = 0.1 ;
