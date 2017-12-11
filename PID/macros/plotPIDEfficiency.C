@@ -8,17 +8,48 @@
 
 using namespace std;
 
+void make_plots(const char* _filename, const char* pidName, int pdgCode, const TString& pdfFile ) ;
 
-void plotPIDEfficiency(const char* _filename, int pdgCode) {
 
-  // ----- define some variables defining what to plot -----
-  //int pdgCode = 13 ;  // muon
-  //int pdgCode = 211 ;  // pion
-  //int pdgCode = 11 ; //electron
-  //int pdgCode = 321 ; //kaon
-  //int pdgCode = 2212 ; //protons
+void plotPIDEfficiency(const char* filename) {
 
-  std::string pName("unkown") ;
+  TString pdfFile("../Results/PID_efficiencies_all.pdf") ;
+
+  make_plots( filename, "basicPDG", 11  , pdfFile+"(" );  // first plot
+  make_plots( filename, "basicPDG", 13  , pdfFile );
+  make_plots( filename, "basicPDG", 211 , pdfFile );
+  make_plots( filename, "basicPDG", 321 , pdfFile );
+  make_plots( filename, "basicPDG", 2212, pdfFile );
+
+  make_plots( filename, "dEdxPDG", 11  , pdfFile );
+  make_plots( filename, "dEdxPDG", 13  , pdfFile );
+  make_plots( filename, "dEdxPDG", 211 , pdfFile );
+  make_plots( filename, "dEdxPDG", 321 , pdfFile );
+  make_plots( filename, "dEdxPDG", 2212, pdfFile );
+  
+  make_plots( filename, "showerPDG", 11  , pdfFile );
+  make_plots( filename, "showerPDG", 13  , pdfFile );
+  make_plots( filename, "showerPDG", 211 , pdfFile );
+  make_plots( filename, "showerPDG", 321 , pdfFile );
+  make_plots( filename, "showerPDG", 2212, pdfFile );
+  
+  make_plots( filename, "likeliPDG", 11  , pdfFile );
+  make_plots( filename, "likeliPDG", 13  , pdfFile );
+  make_plots( filename, "likeliPDG", 211 , pdfFile );
+  make_plots( filename, "likeliPDG", 321 , pdfFile );
+  make_plots( filename, "likeliPDG", 2212, pdfFile );   
+  
+  make_plots( filename, "lowmomPDG", 11  , pdfFile );
+  make_plots( filename, "lowmomPDG", 13  , pdfFile );
+  make_plots( filename, "lowmomPDG", 211 , pdfFile );
+  make_plots( filename, "lowmomPDG", 321 , pdfFile );
+  make_plots( filename, "lowmomPDG", 2212, pdfFile+")" ); // last plot
+}
+
+
+void make_plots(const char* _filename, const char* pidName, int pdgCode, const TString& pdfFile) {
+
+  std::string pName("unknown") ;
   switch( pdgCode ){
   case 11:
     pName = "electrons" ;
@@ -97,11 +128,7 @@ void plotPIDEfficiency(const char* _filename, int pdgCode) {
   int npart;
   vector<int>      *truePDG = new vector<int> ;
   vector<double>   *isSeen = new vector<double> ;
-  vector<int>      *basicPDG = new vector<int> ;
-  vector<int>      *dEdxPDG = new vector<int> ;
-  vector<int>      *showerPDG = new vector<int> ;
-  vector<int>      *likeliPDG = new vector<int> ;
-  vector<int>      *lowmomPDG = new vector<int> ;
+  vector<int>      *thePDG = new vector<int> ;
   vector<double>   *trueCharge = new vector<double> ;
   vector<double>   *seenCharge = new vector<double> ;
   vector<double>   *trueP = new vector<double> ;
@@ -113,34 +140,25 @@ void plotPIDEfficiency(const char* _filename, int pdgCode) {
   tree->SetBranchAddress("truePDG",    &truePDG);  
   tree->SetBranchAddress("isSeen",     &isSeen);  
   tree->SetBranchAddress("seenCharge", &seenCharge); 
-  tree->SetBranchAddress("basicPDG",   &basicPDG);  
-  tree->SetBranchAddress("dEdxPDG",    &dEdxPDG);  
-  tree->SetBranchAddress("showerPDG",  &showerPDG);  
-  tree->SetBranchAddress("likeliPDG",  &likeliPDG);  
-  tree->SetBranchAddress("lowmomPDG",  &lowmomPDG); 
+
+  tree->SetBranchAddress(pidName,  &thePDG); 
+
   tree->SetBranchAddress("trueP", &trueP);
   tree->SetBranchAddress("trueTheta", &trueTheta);
   tree->SetBranchAddress("seenTheta", &seenTheta);
   tree->SetBranchAddress("seenP", &seenP);
    
 
-  //cout << "after branch addressing "  << endl;
 
   // ************************* loop over events and particles in tree *****************************
   int nevts = tree->GetEntries();
   
-  std::cout << " nevts :  " << nevts << std::endl ;
-
   for (int ievt = 0; ievt < nevts; ++ievt) {
     
     tree->GetEntry(ievt);
     
-    std::cout << " npart :  " << npart << std::endl ;
-
     for (int ipart = 0; ipart < npart; ipart++) {  
       
-      std::cout << " ievt: " << ievt << " ipart : " << ipart << std::cout ;
-
       if ( isSeen->at(ipart ) < 0.5 ) continue ;// require MC-truth link weight to be > 0.5
       
       if( seenCharge->at( ipart ) == 0 ) continue; // only look at charged
@@ -151,7 +169,7 @@ void plotPIDEfficiency(const char* _filename, int pdgCode) {
       
       hist_th_t->Fill( cos( trueTheta->at(ipart) ) ) ;
       
-      if( std::abs( likeliPDG->at(ipart)) != pdgCode ) continue;
+      if( std::abs( thePDG->at(ipart)) != pdgCode ) continue;
       
       hist_Sp_t->Fill( trueP->at(ipart) );
       
@@ -171,7 +189,7 @@ void plotPIDEfficiency(const char* _filename, int pdgCode) {
       
       hist_th_tnot ->Fill( cos( trueTheta->at(ipart) ) ) ;
       
-      if( std::abs( likeliPDG->at(ipart)) != pdgCode  ) continue;
+      if( std::abs( thePDG->at(ipart)) != pdgCode  ) continue;
       
       hist_Failed_p->Fill( trueP->at(ipart) );
       
@@ -179,49 +197,29 @@ void plotPIDEfficiency(const char* _filename, int pdgCode) {
       
     }
 
-
-
-   
-
-    // for (int ipart = 0; ipart < npart; ipart++){
-
-    //   if ( std::abs( truePDG->at( ipart ) ) != pdgCode && 
-    // 	   std::abs(likeliPDG->at(ipart)) == pdgCode ){
-
-    // 	hist_Failed_p->Fill( trueP->at(ipart) ) ;
-	
-    // 	hist_Failed_th->Fill( cos( trueTheta->at(ipart) ) ); 
-    //   }
-    //   else continue;
-    // }	
-
-
-}
- 
-
-  // **********   now plot the histotgrams *********************************************
-
-  //TCanvas* c  = new TCanvas( " PID eff." , " xxx "  ,750,750);
-   TCanvas* c  = new TCanvas( " PID efficiency" , "Efficiency" ,750 ,750);
-   c->Divide(2,3) ;
+  }
   
-   c->cd(1) ;
-   gPad->SetLogx() ;
   
-
-   hist_p_t->GetXaxis()->SetTitle("true P/GeV" );
-   hist_p_t->GetXaxis()->SetTitleSize( 0.04 ) ;
-   hist_p_t->GetXaxis()->SetTitleOffset( 1.2 );
-
-   hist_p_t->Draw() ;
-
-   c->cd(2) ;
-
-   hist_th_t->GetXaxis()->SetTitle( "true cos(#theta)" );
-   hist_th_t->GetXaxis()->SetTitleSize( 0.04 ) ;
-   hist_th_t->GetXaxis()->SetTitleOffset( 1.3 );
-   hist_th_t->Draw() ;
-
+  TCanvas* c  = new TCanvas( " PID efficiency" , "Efficiency" ,750 ,750);
+  c->Divide(2,3) ;
+  
+  c->cd(1) ;
+  gPad->SetLogx() ;
+  
+  
+  hist_p_t->GetXaxis()->SetTitle("true P/GeV" );
+  hist_p_t->GetXaxis()->SetTitleSize( 0.04 ) ;
+  hist_p_t->GetXaxis()->SetTitleOffset( 1.2 );
+  
+  hist_p_t->Draw() ;
+  
+  c->cd(2) ;
+  
+  hist_th_t->GetXaxis()->SetTitle( "true cos(#theta)" );
+  hist_th_t->GetXaxis()->SetTitleSize( 0.04 ) ;
+  hist_th_t->GetXaxis()->SetTitleOffset( 1.3 );
+  hist_th_t->Draw() ;
+  
   
 
    c->cd(3) ;
@@ -289,7 +287,7 @@ void plotPIDEfficiency(const char* _filename, int pdgCode) {
    outfile +=  pdgCode ;
    //c->Print(TString(outfile+".pdf"));
    
- TCanvas* k  = new TCanvas( " PID Failed " , " PID Failed " ,750 ,750);
+   TCanvas* k  = new TCanvas( " PID Failed " , " PID Failed " ,750 ,750);
    k->Divide(2,3) ;
 
    k->cd(1);
@@ -371,9 +369,9 @@ void plotPIDEfficiency(const char* _filename, int pdgCode) {
    float maxct = 1. ;
    
    std::stringstream pTitleS ;
-   pTitleS << "Efficiency/Fake rate against P - " << pName ;
+   pTitleS << "PID efficiency/fake rate vs P [" << pidName << "] - " << pName ;
    std::stringstream cTitleS ;
-   cTitleS << "Efficiency/Fake rate against  cos(theta) - " << pName ;
+   cTitleS << "PID efficiency/fake rate vs cos(theta) [" << pidName << "] - " << pName ;
 
    TH2F* hpt = new TH2F( "hpt", pTitleS.str().c_str() ,10, minpt, maxpt, 10, minEff , maxEff  ) ;
    TH2F* hth = new TH2F( "hth", cTitleS.str().c_str() , 10, minct, maxct, 10, minEff , maxEff  ) ;
@@ -440,10 +438,41 @@ void plotPIDEfficiency(const char* _filename, int pdgCode) {
    hist_FailRate_th->Draw("P") ;
    hist_FailRate_th->Draw("P") ;   
 
-   outfile = "../Results/Eff_FakeRate";
+   outfile = "../Results/PID_efficiency_";
+   outfile += pidName ;
    outfile += "_pdg";
    outfile +=  pdgCode ;
-   c2->Print(TString(outfile+".pdf"));
+
+
+   TString fName = pdfFile.Length() > 0 ? pdfFile : TString(outfile+".pdf") ;
+
+   c2->Print( fName );
+
+
+
+   // cleanup...
+
+   delete truePDG ;
+   delete isSeen ;
+   delete thePDG ;
+   delete trueCharge ;
+   delete seenCharge ;
+   delete trueP ;
+   delete trueTheta ;
+   delete seenTheta ;
+   delete seenP ;
+
+   delete hist_eff_p ;
+   delete hist_eff_th ;
+   delete k ;
+   delete hist_FailRate_p ;
+   delete hist_FailRate_th ;
+   delete hpt ;
+   delete hth ;
+   delete c ;
+   delete c2 ;
+
+   treefile->Close() ;
 
    return;
   
