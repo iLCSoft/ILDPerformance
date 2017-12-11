@@ -1,10 +1,5 @@
 <!--
-      Example steering file to run a standard reconstruction on the 3 ttbar events 
-      simulated with Mokka in this example dierectory.
-
-      Works with ilcsoft v01-16 (DBD production release)
-
-      Defines the standard reconstruction for ILD.
+   Example steering file for creating a ROOT TTree with PID information
 -->
 
 
@@ -15,17 +10,19 @@
      <processor name="MyPIDTree"/>
    </execute>
 
-<!--      /afs/desy.de/user/b/boehmej/afspool/boehmej/MarlinWorkdir6/ILDConfig/StandardConfig/current/rv01-17-09-pre_nooverlay.sv01-14-01-p00.mILD_o1_v05.E500-TDR_ws.I106519.Pn1n1hh.eL.pR-00001-DST.slcio  -->
-
    <global>       
       <parameter name="LCIOInputFiles"> 
-      /afs/desy.de/user/b/boehmej/afspool/boehmej/MarlinWorkdir7/ILDConfig/StandardConfig/current/rHEAD-2016-07-21_nooverlay.sv01-14-01-p00.mILD_o1_v05.E500-TDR_ws.I106519.Pn1n1hh.eL.pR-00001-DST.slcio 
-      </parameter>
-      <parameter name="GearXMLFile" value="GearOutput.xml"/>
+/pnfs/desy.de/ilc/prod/ilc/mc-opt/ild/rec/calib/single_PDGpm11/ILD_l5_o1_v02_nobg/v01-19-05-p01/u034/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDGpm11_RandomP.n010_1.d_rec_u034.slcio
+/pnfs/desy.de/ilc/prod/ilc/mc-opt/ild/rec/calib/single_PDGpm13/ILD_l5_o1_v02_nobg/v01-19-05-p01/u034/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDGpm13_RandomP.n002_1.d_rec_u034.slcio
+/pnfs/desy.de/ilc/prod/ilc/mc-opt/ild/rec/calib/single_PDGpm211/ILD_l5_o1_v02_nobg/v01-19-05-p01/u034/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDGpm211_RandomP.n001_1.d_rec_u034.slcio
+/pnfs/desy.de/ilc/prod/ilc/mc-opt/ild/rec/calib/single_PDGpm321/ILD_l5_o1_v02_nobg/v01-19-05-p01/u034/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDGpm321_RandomP.n002_1.d_rec_u034.slcio     
+/pnfs/desy.de/ilc/prod/ilc/mc-opt/ild/rec/calib/single_PDGpm2212/ILD_l5_o1_v02_nobg/v01-19-05-p01/u034/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDGpm2212_RandomP.n002_1.d_rec_u034.slcio
+ </parameter>
+      <parameter name="GearXMLFile" value=""/>
       <parameter name="MaxRecordNumber" value="0"/>
       <parameter name="SkipNEvents" value="0"/>
       <parameter name="SupressCheck" value="false"/>
-      <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT"> DEBUG </parameter>
+      <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT"> DEBUG7 </parameter>
       <parameter name="RandomSeed" value="1234567890" />
    </global>
 
@@ -35,7 +32,7 @@
   <!-- compression of output file 0: false >0: true (default) -->
   <parameter name="Compress" type="int" value="1"/>
   <!-- filename without extension-->
-  <parameter name="FileName" type="string" value="../Results/PID_output_n1n1hh"/>
+  <parameter name="FileName" type="string" value="PID_tree"/>
   <!-- type of output file xml (default) or root ( only OpenScientist)-->
   <parameter name="FileType" type="string" value="root "/>
 </processor>
@@ -50,7 +47,7 @@
   <!--Name of the MCParticle input collection-->
   <parameter name="MCParticleCollection" type="string" lcioInType="MCParticle"> MCParticlesSkimmed </parameter>
   <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
-  <parameter name="Verbosity" type="string"> DEBUG </parameter>
+  <!-- <parameter name="Verbosity" type="string"> DEBUG7 </parameter> -->
 </processor>
 
   
