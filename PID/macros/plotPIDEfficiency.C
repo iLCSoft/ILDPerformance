@@ -1,4 +1,5 @@
 #include <vector>
+#include <sstream>
 
 #include "TTree.h"
 #include "TFile.h"
@@ -16,6 +17,26 @@ void plotPIDEfficiency(const char* _filename, int pdgCode) {
   //int pdgCode = 11 ; //electron
   //int pdgCode = 321 ; //kaon
   //int pdgCode = 2212 ; //protons
+
+  std::string pName("unkown") ;
+  switch( pdgCode ){
+  case 11:
+    pName = "electrons" ;
+    break ;
+  case 13:
+    pName = "muons" ;
+    break ;
+  case 211:
+    pName = "pions" ;
+    break ;
+  case 321:
+    pName = "kaons" ;
+    break ;
+  case 2212:
+    pName = "protons" ;
+    break ;
+  }
+
 
   gROOT->SetStyle("ildStyle");
   ildStyle->SetOptTitle(1);
@@ -58,11 +79,11 @@ void plotPIDEfficiency(const char* _filename, int pdgCode) {
 
 
 
-   TH1F* hist_p_t = new TH1F( "hist_p_t", "P of true muons", nBins , bins ) ;
-   TH1F* hist_Sp_t = new TH1F( "hist_Sp_t", "P of observed muons", nBins , bins ) ;
+   TH1F* hist_p_t = new TH1F( "hist_p_t", "P of true particles", nBins , bins ) ;
+   TH1F* hist_Sp_t = new TH1F( "hist_Sp_t", "P of observed particles", nBins , bins ) ;
    
-   TH1F* hist_th_t  = new TH1F( "hist_th_t", "Cos theta of true muons", 11, -1., 1. ) ;
-   TH1F* hist_Sth_t = new TH1F( "hist_Sth_t", "Cos theta of observed muons", 11, -1., 1. ) ;
+   TH1F* hist_th_t  = new TH1F( "hist_th_t", "Cos theta of true particles", 11, -1., 1. ) ;
+   TH1F* hist_Sth_t = new TH1F( "hist_Sth_t", "Cos theta of observed particles", 11, -1., 1. ) ;
    
    TH1F* hist_p_tnot = new TH1F("hist_p_tnot", "P of true particles which are not of the type in question", nBins, bins );
    TH1F* hist_th_tnot = new TH1F("hist_th_tnot", "Cos theta of true particles which are not of the type in question", 11, -1., 1. ) ;
@@ -74,19 +95,19 @@ void plotPIDEfficiency(const char* _filename, int pdgCode) {
   //**********************************************************************************************  
   // read branches
   int npart;
-  vector<int> *truePDG;
-  vector<double> *isSeen;
-  vector<int> *basicPDG;
-  vector<int> *dEdxPDG;
-  vector<int> *showerPDG;
-  vector<int> *likeliPDG;
-  vector<int> *lowmomPDG;
-  vector<double> *trueCharge;
-  vector<double> *seenCharge;
-  vector<double> *trueP;
-  vector<double> * trueTheta;
-  vector<double> * seenTheta;
-  vector<double> * seenP;
+  vector<int>      *truePDG = new vector<int> ;
+  vector<double>   *isSeen = new vector<double> ;
+  vector<int>      *basicPDG = new vector<int> ;
+  vector<int>      *dEdxPDG = new vector<int> ;
+  vector<int>      *showerPDG = new vector<int> ;
+  vector<int>      *likeliPDG = new vector<int> ;
+  vector<int>      *lowmomPDG = new vector<int> ;
+  vector<double>   *trueCharge = new vector<double> ;
+  vector<double>   *seenCharge = new vector<double> ;
+  vector<double>   *trueP = new vector<double> ;
+  vector<double>   *trueTheta = new vector<double> ;
+  vector<double>   *seenTheta = new vector<double> ;
+  vector<double>   *seenP = new vector<double> ;            
   tree->SetBranchAddress("nMCParticles", &npart);        
   tree->SetBranchAddress("trueCharge", &trueCharge); 
   tree->SetBranchAddress("truePDG",    &truePDG);  
@@ -97,7 +118,6 @@ void plotPIDEfficiency(const char* _filename, int pdgCode) {
   tree->SetBranchAddress("showerPDG",  &showerPDG);  
   tree->SetBranchAddress("likeliPDG",  &likeliPDG);  
   tree->SetBranchAddress("lowmomPDG",  &lowmomPDG); 
-
   tree->SetBranchAddress("trueP", &trueP);
   tree->SetBranchAddress("trueTheta", &trueTheta);
   tree->SetBranchAddress("seenTheta", &seenTheta);
@@ -109,13 +129,18 @@ void plotPIDEfficiency(const char* _filename, int pdgCode) {
   // ************************* loop over events and particles in tree *****************************
   int nevts = tree->GetEntries();
   
+  std::cout << " nevts :  " << nevts << std::endl ;
 
   for (int ievt = 0; ievt < nevts; ++ievt) {
     
     tree->GetEntry(ievt);
     
+    std::cout << " npart :  " << npart << std::endl ;
+
     for (int ipart = 0; ipart < npart; ipart++) {  
       
+      std::cout << " ievt: " << ievt << " ipart : " << ipart << std::cout ;
+
       if ( isSeen->at(ipart ) < 0.5 ) continue ;// require MC-truth link weight to be > 0.5
       
       if( seenCharge->at( ipart ) == 0 ) continue; // only look at charged
@@ -329,7 +354,7 @@ void plotPIDEfficiency(const char* _filename, int pdgCode) {
  
    hist_FailRate_th->SetName(" hist_FailRate_th" ) ;
    
-   TString outfile = "../Results/PID_Failed";
+   outfile = "../Results/PID_Failed";
    outfile += "_pdg";
    outfile +=  pdgCode ;
    //   k->Print(TString(outfile+".pdf"));
@@ -344,8 +369,14 @@ void plotPIDEfficiency(const char* _filename, int pdgCode) {
    float maxpt = 100. ;
    float minct = -1. ;
    float maxct = 1. ;
-   TH2F* hpt = new TH2F( "hpt", "Efficiency/Fake rate against P" ,10, minpt, maxpt, 10, minEff , maxEff  ) ;
-   TH2F* hth = new TH2F( "hth", "Efficiency/Fake rate against cos Theta" , 10, minct, maxct, 10, minEff , maxEff  ) ;
+   
+   std::stringstream pTitleS ;
+   pTitleS << "Efficiency/Fake rate against P - " << pName ;
+   std::stringstream cTitleS ;
+   cTitleS << "Efficiency/Fake rate against  cos(theta) - " << pName ;
+
+   TH2F* hpt = new TH2F( "hpt", pTitleS.str().c_str() ,10, minpt, maxpt, 10, minEff , maxEff  ) ;
+   TH2F* hth = new TH2F( "hth", cTitleS.str().c_str() , 10, minct, maxct, 10, minEff , maxEff  ) ;
 
 
    TCanvas* c2  = new TCanvas( "c2" , "Efficiency and Fake Rate" ,750 ,750);
@@ -386,7 +417,7 @@ void plotPIDEfficiency(const char* _filename, int pdgCode) {
    // -------------
 
    c2->cd(2) ;
-    hth->Draw() ;
+   hth->Draw() ;
   
    hth->GetYaxis()->SetTitle( "#epsilon_{PID}" );
    hth->GetYaxis()->SetTitleSize( 0.06 ) ;
@@ -409,7 +440,7 @@ void plotPIDEfficiency(const char* _filename, int pdgCode) {
    hist_FailRate_th->Draw("P") ;
    hist_FailRate_th->Draw("P") ;   
 
- TString outfile = "../Results/Eff_FakeRate";
+   outfile = "../Results/Eff_FakeRate";
    outfile += "_pdg";
    outfile +=  pdgCode ;
    c2->Print(TString(outfile+".pdf"));
