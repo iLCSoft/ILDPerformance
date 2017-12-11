@@ -13,7 +13,7 @@ PIDTree aPIDTree ;
 PIDTree::PIDTree() : Processor("PIDTree") {
   
   // modify processor description
-  _description = "PIDTree does whatever it does ..." ;
+  _description = "PIDTree create a ROOT TTree with PID parameters" ;
 
   
   // register steering parameters: name, description, class-variable, default value
@@ -93,7 +93,7 @@ void PIDTree::processRunHeader( LCRunHeader* run) {
 
 void PIDTree::processEvent( LCEvent * evt ) { 
 
-  streamlog_out(MESSAGE) << " start processing event " << std::endl;
+  streamlog_out(DEBUG3)  << "=================================  start processing event " << nEvt << std::endl ;
 
   if( isFirstEvent() ) { 
     hermTree = new TTree("hermTree","hermTree");
@@ -201,9 +201,9 @@ void PIDTree::processEvent( LCEvent * evt ) {
     
     imcp++;
     if (mcp->getGeneratorStatus() == 1) {
-      streamlog_out(MESSAGE) << "=========================================================================================" << std::endl;  
+      streamlog_out(DEBUG3) << "=========================================================================================" << std::endl;  
     }
-    streamlog_out(MESSAGE) << " mcparticle " << imcp << " has PDG = " << mcp->getPDG() << " and genstat = " << mcp->getGeneratorStatus() << std::endl;  
+    streamlog_out(DEBUG3) << " mcparticle " << imcp << " has PDG = " << mcp->getPDG() << " and genstat = " << mcp->getGeneratorStatus() << std::endl;  
     
     bool keep = false;
     // keep stable generator particles 
@@ -236,7 +236,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
     
       streamlog_out(DEBUG) << " get reco particle " << std::endl;  
       const EVENT::LCObjectVec& recovec = mc2recoNav.getRelatedToObjects(mcp);
-      streamlog_out(MESSAGE) << " recovec has length " << recovec.size() << std::endl;  
+      streamlog_out(DEBUG3) << " recovec has length " << recovec.size() << std::endl;  
       const EVENT::FloatVec& recoweightvec = mc2recoNav.getRelatedToWeights(mcp);
       streamlog_out(DEBUG) << " recoweightvec has length " << recoweightvec.size() << std::endl;  
       double maxtrckweight = 0;
@@ -247,7 +247,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
       for (unsigned int irel = 0; irel < recovec.size(); irel++) {
         trckweight = double((int(recoweightvec.at(irel))%10000)/1000.);
         caloweight = double((int(recoweightvec.at(irel))/10000)/1000.);
-        streamlog_out(DEBUG) << " irel " << irel << ", recoweight = " << int(recoweightvec.at(irel)) 
+        streamlog_out(DEBUG3) << " irel " << irel << ", recoweight = " << int(recoweightvec.at(irel)) 
                              << ", recoweight%10000 = " << trckweight
                              << ", recoweight/10000 = " << caloweight << std::endl;  
         if (trckweight > maxtrckweight) {
@@ -260,8 +260,8 @@ void PIDTree::processEvent( LCEvent * evt ) {
         }
       }
       
-      streamlog_out(MESSAGE) << " found reco particle for mcp at imaxtrackweight = " << imaxtrckweight << " with weight = " << maxtrckweight << std::endl ;
-      streamlog_out(MESSAGE) << " found reco particle for mcp at imaxcaloweight = " << imaxcaloweight << " with weight = " << maxcaloweight << std::endl ;
+      streamlog_out(DEBUG3) << " found reco particle for mcp at imaxtrackweight = " << imaxtrckweight << " with weight = " << maxtrckweight << std::endl ;
+      streamlog_out(DEBUG3) << " found reco particle for mcp at imaxcaloweight = " << imaxcaloweight << " with weight = " << maxcaloweight << std::endl ;
       
       
       // NOW check backwards relation as well:
@@ -270,43 +270,43 @@ void PIDTree::processEvent( LCEvent * evt ) {
       double mcptrckweight = -1;
       if ( imaxtrckweight > -1 && imaxtrckweight < recovec.size() ) {
         ReconstructedParticle* rcptrck =  (ReconstructedParticle*) recovec.at(imaxtrckweight); 
-        streamlog_out(MESSAGE) << " get MC particle for track " << std::endl;  
+        streamlog_out(DEBUG3) << " get MC particle for track " << std::endl;  
         const EVENT::LCObjectVec& mcptrckvec = reco2mcNav.getRelatedToObjects(rcptrck);
-        streamlog_out(MESSAGE) << " mcptrckvec has length " << mcptrckvec.size() << std::endl;  
+        streamlog_out(DEBUG3) << " mcptrckvec has length " << mcptrckvec.size() << std::endl;  
         const EVENT::FloatVec& mcptrckweightvec = reco2mcNav.getRelatedToWeights(rcptrck);
-        streamlog_out(MESSAGE) << " mcptrckweightvec has length " << mcptrckweightvec.size() << std::endl; 
+        streamlog_out(DEBUG3) << " mcptrckweightvec has length " << mcptrckweightvec.size() << std::endl; 
       
         // check whether track vector contains original MCP
         for (int imcptrck = 0; imcptrck < mcptrckvec.size(); imcptrck++ ) {
           if ( mcptrckvec.at(imcptrck) == mcp ) { 
             mcptrckweight = double((int(mcptrckweightvec.at(imcptrck))%10000)/1000.);
-            streamlog_out(MESSAGE) << " found original MCP in mcptrckvec at position " << imcptrck << " with weight " << mcptrckweight << std::endl; 
+            streamlog_out(DEBUG3) << " found original MCP in mcptrckvec at position " << imcptrck << " with weight " << mcptrckweight << std::endl; 
           } 
         }
       }  
       else {
-        streamlog_out(MESSAGE) << " imaxtrckweight out of range, skipping backwards check " << std::endl;  
+        streamlog_out(DEBUG3) << " imaxtrckweight out of range, skipping backwards check " << std::endl;  
       }
       
       double mcpcaloweight = -1;
       if ( imaxcaloweight > -1 && imaxcaloweight < recovec.size() ) {
         ReconstructedParticle* rcpcalo =  (ReconstructedParticle*) recovec.at(imaxcaloweight); 
-        streamlog_out(MESSAGE) << " get MC particle for cluster " << std::endl;  
+        streamlog_out(DEBUG3) << " get MC particle for cluster " << std::endl;  
         const EVENT::LCObjectVec& mcpcalovec = reco2mcNav.getRelatedToObjects(rcpcalo);
-        streamlog_out(MESSAGE) << " mcpcalovec has length " << mcpcalovec.size() << std::endl;  
+        streamlog_out(DEBUG3) << " mcpcalovec has length " << mcpcalovec.size() << std::endl;  
         const EVENT::FloatVec& mcpcaloweightvec = reco2mcNav.getRelatedToWeights(rcpcalo);
-        streamlog_out(MESSAGE) << " mcpcaloweightvec has length " << mcpcaloweightvec.size() << std::endl;  
+        streamlog_out(DEBUG3) << " mcpcaloweightvec has length " << mcpcaloweightvec.size() << std::endl;  
       
         // check whether calo vector contains original MCP
         for (int imcpcalo = 0; imcpcalo < mcpcalovec.size(); imcpcalo++ ) {
           if ( mcpcalovec.at(imcpcalo) == mcp ) { 
             mcpcaloweight = double((int(mcpcaloweightvec.at(imcpcalo))/10000)/1000.);
-            streamlog_out(MESSAGE) << " found original MCP in mcpcalovec at position " << imcpcalo << " with weight " << mcpcaloweight << std::endl; 
+            streamlog_out(DEBUG3) << " found original MCP in mcpcalovec at position " << imcpcalo << " with weight " << mcpcaloweight << std::endl; 
           } 
         }
       }
       else {
-        streamlog_out(MESSAGE) << " imaxcaloweight out of range, skipping backwards check " << std::endl;  
+        streamlog_out(DEBUG3) << " imaxcaloweight out of range, skipping backwards check " << std::endl;  
       }
        
       
@@ -320,13 +320,13 @@ void PIDTree::processEvent( LCEvent * evt ) {
         imaxweight = imaxtrckweight;
         maxweight = maxtrckweight;
         maxbackweight = mcptrckweight;
-        streamlog_out(MESSAGE) << " found reco particle for mcp with bi-directional track link at imaxweight = " << imaxweight << " with weight = " << maxweight << std::endl ;
+        streamlog_out(DEBUG3) << " found reco particle for mcp with bi-directional track link at imaxweight = " << imaxweight << " with weight = " << maxweight << std::endl ;
       }
       else if ( maxcaloweight > weightcut && mcpcaloweight > weightcut ) {
         imaxweight = imaxcaloweight;
         maxweight = maxcaloweight;
         maxbackweight = mcpcaloweight;
-        streamlog_out(MESSAGE) << " found reco particle for mcp with bi-directional calo link at imaxweight = " << imaxweight << " with weight = " << maxweight << std::endl ;
+        streamlog_out(DEBUG3) << " found reco particle for mcp with bi-directional calo link at imaxweight = " << imaxweight << " with weight = " << maxweight << std::endl ;
       }
       else {
         streamlog_out(WARNING) << " neither track nor cluster link have a weight larger than " << weightcut << " in _both_ directions: " << std::endl ;
@@ -349,7 +349,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
     
       // IMPROVE HERE: use directly MCTruthTrackRelation and choose track with larger weight for dE/dx
         const EVENT::LCObjectVec& trackvec = mc2trackNav.getRelatedToObjects(mcp);
-        streamlog_out(MESSAGE) << " trackvec has length = " << trackvec.size() << " for true PDG " << mcp->getPDG() << std::endl ;
+        streamlog_out(DEBUG3) << " trackvec has length = " << trackvec.size() << " for true PDG " << mcp->getPDG() << std::endl ;
         const EVENT::FloatVec& trackweightvec = mc2trackNav.getRelatedToWeights(mcp);
         double dedx = 0.;
         double dedxerr = 0.;
@@ -357,19 +357,19 @@ void PIDTree::processEvent( LCEvent * evt ) {
         for ( int itrack = 0; itrack < trackvec.size(); itrack++ ) {
           Track *track = (Track *) trackvec.at(itrack);
           if ( fabs (trackweightvec.at(itrack) - maxtrckweight) < 0.001  ) { 
-            streamlog_out(MESSAGE) << " found track with weight " << trackweightvec.at(itrack) << ", filling dE/dx !" << std::endl; 
+            streamlog_out(DEBUG3) << " found track with weight " << trackweightvec.at(itrack) << ", filling dE/dx !" << std::endl; 
             dedx = track->getdEdx();
             dedxerr = track->getdEdxError();
             weightdedx = maxtrckweight;
           } 
           else {
-            streamlog_out(MESSAGE) << " not taking track with weight " << trackweightvec.at(itrack) << " since difference with maxtrckweight = " << fabs (trackweightvec.at(itrack) - maxtrckweight) << std::endl; 
+            streamlog_out(DEBUG3) << " not taking track with weight " << trackweightvec.at(itrack) << " since difference with maxtrckweight = " << fabs (trackweightvec.at(itrack) - maxtrckweight) << std::endl; 
           }
           if (trackvec.size() > 1) {
-            streamlog_out(MESSAGE) << " ===> track " << itrack << " has innermost hit at " << track->getRadiusOfInnermostHit () << std::endl ;
+            streamlog_out(DEBUG3) << " ===> track " << itrack << " has innermost hit at " << track->getRadiusOfInnermostHit () << std::endl ;
             if ( mcp->getDaughters().size() > 0 ) {
               for ( int idaughter = 0; idaughter < mcp->getDaughters().size(); idaughter++ ) {
-                streamlog_out(MESSAGE) << " ===> mcp daughter " << idaughter << " has PDG " << mcp->getDaughters()[idaughter]->getPDG() << std::endl ;
+                streamlog_out(DEBUG3) << " ===> mcp daughter " << idaughter << " has PDG " << mcp->getDaughters()[idaughter]->getPDG() << std::endl ;
               }
             }
           }
@@ -396,7 +396,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
 //         ParticleIDVec likeliPID = pidh->getParticleIDs(rcp, pidh->getAlgorithmID("LikelihoodPID"));
 //         
 //         int hypcounter[5] = {0,0,0,0,0};
-//         streamlog_out(MESSAGE) << " this ParticleIDVec has a size of = " << likeliPID.size() << endl;
+//         streamlog_out(DEBUG3) << " this ParticleIDVec has a size of = " << likeliPID.size() << endl;
 //         for (int ihyp = 0; ihyp < likeliPID.size(); ihyp++) {
 //           int pdg = abs(likeliPID[ihyp]->getPDG());
 //           switch (pdg) {
@@ -438,7 +438,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
           for ( int ihyp = 0 ; ihyp < 5; ihyp++ ) {
             likelihood[ihyp] = likeliPID->getParameters()[ihyp];
             if ( std::isinf(likelihood[ihyp]) ) {
-              streamlog_out(MESSAGE) << " likelihood [" << ihyp << "] = " << likelihood[ihyp] << endl;
+              streamlog_out(DEBUG3) << " likelihood [" << ihyp << "] = " << likelihood[ihyp] << endl;
               likelihood[ihyp] = 888.;
             }  
           }
@@ -449,7 +449,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
           streamlog_out(DEBUG) << " proton hyp = "   << likelihood[4] << endl;
         }
         else {
-          streamlog_out(MESSAGE) << " likeliPID has = " << likeliPID->getParameters().size() << " parameters " << endl;
+          streamlog_out(DEBUG3) << " likeliPID has = " << likeliPID->getParameters().size() << " parameters " << endl;
         }
         LiPDG_el.push_back(likelihood[0]); 
         LiPDG_mu.push_back(likelihood[1]); 
@@ -464,14 +464,14 @@ void PIDTree::processEvent( LCEvent * evt ) {
           for ( int ihyp = 0 ; ihyp < 5; ihyp++ ) {
             dedxlikeli[ihyp] = dedxPID->getParameters()[ihyp];
             if ( std::isinf(likelihood[ihyp]) ) {
-              streamlog_out(MESSAGE) << " dedxlikeli [" << ihyp << "] = " << dedxlikeli[ihyp] << endl;
+              streamlog_out(DEBUG3) << " dedxlikeli [" << ihyp << "] = " << dedxlikeli[ihyp] << endl;
               dedxlikeli[ihyp] = 888.;
             }  
             distance[ihyp] = dedxPID->getParameters()[13+ihyp];
             if ( std::isinf(distance[ihyp]) ) {
               distance[ihyp] = 888.;
             }  
-            streamlog_out(MESSAGE) << pidh->getParameterNames(pidh->getAlgorithmID("dEdxPID"))[13+ihyp] << " = " << distance[ihyp] << endl;
+            streamlog_out(DEBUG3) << pidh->getParameterNames(pidh->getAlgorithmID("dEdxPID"))[13+ihyp] << " = " << distance[ihyp] << endl;
           }
           streamlog_out(DEBUG) << " dEdx liklihood electron hyp = " << dedxlikeli[0] << endl;
           streamlog_out(DEBUG) << " dEdx liklihood muon hyp = "     << dedxlikeli[1] << endl;
@@ -480,7 +480,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
           streamlog_out(DEBUG) << " dEdx liklihood proton hyp = "   << dedxlikeli[4] << endl;
         }
         else {
-          streamlog_out(MESSAGE) << " dedxPID has = " << dedxPID->getParameters().size() << " parameters " << endl;
+          streamlog_out(DEBUG3) << " dedxPID has = " << dedxPID->getParameters().size() << " parameters " << endl;
         }
         dedxdist_el.push_back(distance[0]); 
         dedxdist_mu.push_back(distance[1]); 
@@ -536,8 +536,9 @@ void PIDTree::processEvent( LCEvent * evt ) {
   
   hermTree->Fill(); 
   nEvt++;
-  
-  cout << "======================================== event " << nEvt << std::endl ;
+
+    if( ! (nEvt % 100)  )
+      streamlog_out(MESSAGE)  << "================================ events processed:  " << nEvt << std::endl ;
   
 }
 
