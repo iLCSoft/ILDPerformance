@@ -7,8 +7,11 @@
 
 using namespace std;
 
+void getPDGHistos (TH1F **hist, TTree *tree, int &pdg, int &itruecut) ;
+
 
 void plotPIDs(const char* _filename) {
+
   gROOT->SetStyle("ildStyle");
   ildStyle->SetOptTitle(1);
   ildStyle->SetHistLineWidth(2);
@@ -77,9 +80,9 @@ void plotPIDs(const char* _filename) {
     }  
 
 
-    TString outfile = "../Results/PIDs_n1n1hh";
+    TString outfile = "../Results/PIDs";
     outfile += "_pdg";
-    outfile += ipdg;
+    outfile += kpdg[ipdg];
     outfile += "_cut";
     outfile += icut;
     //cout << outfile << endl;
@@ -94,7 +97,6 @@ void plotPIDs(const char* _filename) {
 }
 
 void getPDGHistos (TH1F **hist, TTree *tree, int &pdg, int &itruecut) {
-
   cout << "pdg = " << pdg << ", itruecut = " << itruecut << endl;
   TString partname = "";
   switch (pdg) {
@@ -154,16 +156,16 @@ void getPDGHistos (TH1F **hist, TTree *tree, int &pdg, int &itruecut) {
   
   // read branches
   int npart;
-  vector<double> *cutvar;
-  vector<int> *truePDG;
-  vector<double> *isSeen;
-  vector<int> *basicPDG;
-  vector<int> *dEdxPDG;
-  vector<int> *showerPDG;
-  vector<int> *likeliPDG;
-  vector<int> *lowmomPDG;
-  vector<double> *trueCharge;
-  vector<double> *seenCharge;
+  vector<double> *cutvar = new vector<double> ;
+  vector<int>    *truePDG = new vector<int> ;
+  vector<double> *isSeen = new vector<double> ;
+  vector<int>    *basicPDG =  new vector<int> ;
+  vector<int>    *dEdxPDG =   new vector<int> ;
+  vector<int>    *showerPDG = new vector<int> ;
+  vector<int>    *likeliPDG = new vector<int> ;
+  vector<int>    *lowmomPDG = new vector<int> ;
+  vector<double> *trueCharge = new vector<double> ;
+  vector<double> *seenCharge = new vector<double> ;
   tree->SetBranchAddress("nMCParticles", &npart);        
   tree->SetBranchAddress(cutname,      &cutvar);  
   tree->SetBranchAddress("trueCharge", &trueCharge); 
