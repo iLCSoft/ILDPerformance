@@ -5,11 +5,14 @@
 #include "TH1F.h"
 #include "TString.h"
 
+#include "PIDHelper.h"
+
 using namespace std;
 
 void getPDGHistos (TH1F **hist, TTree *tree, int &pdg, int &itruecut) ;
 
 
+/// Create PID plots for four different algorithms in directory where ROOT file is found
 void plotPIDs(const char* _filename) {
 
   gROOT->SetStyle("ildStyle");
@@ -80,8 +83,8 @@ void plotPIDs(const char* _filename) {
     }  
 
 
-    TString outfile = "../Results/PIDs";
-    outfile += "_pdg";
+    TString outfile = getPathPrefix(_filename ) ;
+    outfile += "PIDs_pdg";
     outfile += kpdg[ipdg];
     outfile += "_cut";
     outfile += icut;

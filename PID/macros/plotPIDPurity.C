@@ -1,6 +1,8 @@
 
 #include <vector>
 
+#include "PIDHelper.h"
+
 #include "TTree.h"
 #include "TFile.h"
 #include "TH1F.h"
@@ -277,7 +279,9 @@ void plotPIDPurity(const char* _filename) {
    
   h5->Draw() ;
 
-  TString outfile = "../Results/Eff_Purity";
+
+  TString outfile =  getPathPrefix( _filename ) ;
+  outfile += "Eff_Purity";
   c->Print(TString(outfile+".pdf"));
 
   return;
