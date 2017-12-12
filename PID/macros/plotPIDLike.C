@@ -2,8 +2,6 @@
 #include "PIDHelper.h"
 
 /** Very simple plotting of likelihood PDG
- *  Should add colors for standard PDG types ...
- * 
  */
 void plotPIDLike(const char* _filename ) {
 
