@@ -6,9 +6,13 @@
 
 #include <math.h>
 
+#include "DDRec/Vector3D.h"
 
 PIDTree aPIDTree ;
 
+using namespace lcio ;
+//using namespace marlin ;
+//using namespace std ;
 
 PIDTree::PIDTree() : Processor("PIDTree") {
   
@@ -87,7 +91,7 @@ void PIDTree::init() {
   gROOT->ProcessLine("#include <vector>");
 }
 
-void PIDTree::processRunHeader( LCRunHeader* run) { 
+void PIDTree::processRunHeader( LCRunHeader*) { 
     
 } 
 
@@ -214,9 +218,9 @@ void PIDTree::processEvent( LCEvent * evt ) {
     
       nMCParticles++;
     
-      gear::Vector3D v( mcp->getVertex()[0], mcp->getVertex()[1], mcp->getVertex()[2] );
-      gear::Vector3D e( mcp->getEndpoint()[0], mcp->getEndpoint()[1], mcp->getEndpoint()[2] );
-      gear::Vector3D p( mcp->getMomentum()[0], mcp->getMomentum()[1], mcp->getMomentum()[2] );
+      dd4hep::rec::Vector3D v( mcp->getVertex()[0], mcp->getVertex()[1], mcp->getVertex()[2] );
+      dd4hep::rec::Vector3D e( mcp->getEndpoint()[0], mcp->getEndpoint()[1], mcp->getEndpoint()[2] );
+      dd4hep::rec::Vector3D p( mcp->getMomentum()[0], mcp->getMomentum()[1], mcp->getMomentum()[2] );
     
       streamlog_out(DEBUG) << " start push_back " << std::endl;  
       trueP.push_back(p.r());
@@ -268,7 +272,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
       // catch cases where a PFO fully contains the MCP, but the MCP is only a small contribution to the PFO                     
       
       double mcptrckweight = -1;
-      if ( imaxtrckweight > -1 && imaxtrckweight < recovec.size() ) {
+      if ( imaxtrckweight > -1 && imaxtrckweight < (int)recovec.size() ) {
         ReconstructedParticle* rcptrck =  (ReconstructedParticle*) recovec.at(imaxtrckweight); 
         streamlog_out(DEBUG3) << " get MC particle for track " << std::endl;  
         const EVENT::LCObjectVec& mcptrckvec = reco2mcNav.getRelatedToObjects(rcptrck);
@@ -277,7 +281,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
         streamlog_out(DEBUG3) << " mcptrckweightvec has length " << mcptrckweightvec.size() << std::endl; 
       
         // check whether track vector contains original MCP
-        for (int imcptrck = 0; imcptrck < mcptrckvec.size(); imcptrck++ ) {
+        for (unsigned imcptrck = 0; imcptrck < mcptrckvec.size(); imcptrck++ ) {
           if ( mcptrckvec.at(imcptrck) == mcp ) { 
             mcptrckweight = double((int(mcptrckweightvec.at(imcptrck))%10000)/1000.);
             streamlog_out(DEBUG3) << " found original MCP in mcptrckvec at position " << imcptrck << " with weight " << mcptrckweight << std::endl; 
@@ -289,7 +293,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
       }
       
       double mcpcaloweight = -1;
-      if ( imaxcaloweight > -1 && imaxcaloweight < recovec.size() ) {
+      if ( imaxcaloweight > -1 && imaxcaloweight < (int)recovec.size() ) {
         ReconstructedParticle* rcpcalo =  (ReconstructedParticle*) recovec.at(imaxcaloweight); 
         streamlog_out(DEBUG3) << " get MC particle for cluster " << std::endl;  
         const EVENT::LCObjectVec& mcpcalovec = reco2mcNav.getRelatedToObjects(rcpcalo);
@@ -298,7 +302,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
         streamlog_out(DEBUG3) << " mcpcaloweightvec has length " << mcpcaloweightvec.size() << std::endl;  
       
         // check whether calo vector contains original MCP
-        for (int imcpcalo = 0; imcpcalo < mcpcalovec.size(); imcpcalo++ ) {
+        for (unsigned imcpcalo = 0; imcpcalo < mcpcalovec.size(); imcpcalo++ ) {
           if ( mcpcalovec.at(imcpcalo) == mcp ) { 
             mcpcaloweight = double((int(mcpcaloweightvec.at(imcpcalo))/10000)/1000.);
             streamlog_out(DEBUG3) << " found original MCP in mcpcalovec at position " << imcpcalo << " with weight " << mcpcaloweight << std::endl; 
@@ -337,10 +341,10 @@ void PIDTree::processEvent( LCEvent * evt ) {
       isTrue.push_back(maxbackweight);
       isSeen.push_back(maxweight);
       
-      if (maxweight > 0 && imaxweight > -1 && imaxweight < recovec.size()) {
+      if (maxweight > 0 && imaxweight > -1 && imaxweight < (int) recovec.size()) {
     
         ReconstructedParticle* rcp =  (ReconstructedParticle*) recovec.at(imaxweight); 
-        gear::Vector3D rp( rcp->getMomentum()[0], rcp->getMomentum()[1], rcp->getMomentum()[2] );
+        dd4hep::rec::Vector3D rp( rcp->getMomentum()[0], rcp->getMomentum()[1], rcp->getMomentum()[2] );
         seenP.push_back(rp.r());
         seenPt.push_back(rp.trans());
         seenTheta.push_back(rp.theta());
@@ -354,7 +358,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
         double dedx = 0.;
         double dedxerr = 0.;
         double weightdedx = 0.;
-        for ( int itrack = 0; itrack < trackvec.size(); itrack++ ) {
+        for ( unsigned itrack = 0; itrack < trackvec.size(); itrack++ ) {
           Track *track = (Track *) trackvec.at(itrack);
           if ( fabs (trackweightvec.at(itrack) - maxtrckweight) < 0.001  ) { 
             streamlog_out(DEBUG3) << " found track with weight " << trackweightvec.at(itrack) << ", filling dE/dx !" << std::endl; 
@@ -368,7 +372,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
           if (trackvec.size() > 1) {
             streamlog_out(DEBUG3) << " ===> track " << itrack << " has innermost hit at " << track->getRadiusOfInnermostHit () << std::endl ;
             if ( mcp->getDaughters().size() > 0 ) {
-              for ( int idaughter = 0; idaughter < mcp->getDaughters().size(); idaughter++ ) {
+              for ( unsigned idaughter = 0; idaughter < mcp->getDaughters().size(); idaughter++ ) {
                 streamlog_out(DEBUG3) << " ===> mcp daughter " << idaughter << " has PDG " << mcp->getDaughters()[idaughter]->getPDG() << std::endl ;
               }
             }
@@ -396,7 +400,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
 //         ParticleIDVec likeliPID = pidh->getParticleIDs(rcp, pidh->getAlgorithmID("LikelihoodPID"));
 //         
 //         int hypcounter[5] = {0,0,0,0,0};
-//         streamlog_out(DEBUG3) << " this ParticleIDVec has a size of = " << likeliPID.size() << endl;
+//         streamlog_out(DEBUG3) << " this ParticleIDVec has a size of = " << likeliPID.size() << std::endl;
 //         for (int ihyp = 0; ihyp < likeliPID.size(); ihyp++) {
 //           int pdg = abs(likeliPID[ihyp]->getPDG());
 //           switch (pdg) {
@@ -421,12 +425,12 @@ void PIDTree::processEvent( LCEvent * evt ) {
 //               hypcounter[4]++;
 //               break;
 //             default :
-//               streamlog_out(WARNING) << " found unknown PID hypothesis with pdg = " << pdg << endl;
+//               streamlog_out(WARNING) << " found unknown PID hypothesis with pdg = " << pdg << std::endl;
 //               break;
 //           }  
 //           if (ihyp == likeliPID.size() - 1) {
 //             for (int jhyp = 0; jhyp < 5; jhyp++) {
-//               if (hypcounter[jhyp] != 1) streamlog_out(ERROR) << " found wrong number of hypotheses: hypcounter [" << jhyp << "] = " << hypcounter[jhyp] << endl;
+//               if (hypcounter[jhyp] != 1) streamlog_out(ERROR) << " found wrong number of hypotheses: hypcounter [" << jhyp << "] = " << hypcounter[jhyp] << std::endl;
 //             }
 //           }
 //         }
@@ -438,18 +442,18 @@ void PIDTree::processEvent( LCEvent * evt ) {
           for ( int ihyp = 0 ; ihyp < 5; ihyp++ ) {
             likelihood[ihyp] = likeliPID->getParameters()[ihyp];
             if ( std::isinf(likelihood[ihyp]) ) {
-              streamlog_out(DEBUG3) << " likelihood [" << ihyp << "] = " << likelihood[ihyp] << endl;
+              streamlog_out(DEBUG3) << " likelihood [" << ihyp << "] = " << likelihood[ihyp] << std::endl;
               likelihood[ihyp] = 888.;
             }  
           }
-          streamlog_out(DEBUG) << " electron hyp = " << likelihood[0] << endl;
-          streamlog_out(DEBUG) << " muon hyp = "     << likelihood[1] << endl;
-          streamlog_out(DEBUG) << " pion hyp = "     << likelihood[2] << endl;
-          streamlog_out(DEBUG) << " kaon hyp = "     << likelihood[3] << endl;
-          streamlog_out(DEBUG) << " proton hyp = "   << likelihood[4] << endl;
+          streamlog_out(DEBUG) << " electron hyp = " << likelihood[0] << std::endl;
+          streamlog_out(DEBUG) << " muon hyp = "     << likelihood[1] << std::endl;
+          streamlog_out(DEBUG) << " pion hyp = "     << likelihood[2] << std::endl;
+          streamlog_out(DEBUG) << " kaon hyp = "     << likelihood[3] << std::endl;
+          streamlog_out(DEBUG) << " proton hyp = "   << likelihood[4] << std::endl;
         }
         else {
-          streamlog_out(DEBUG3) << " likeliPID has = " << likeliPID->getParameters().size() << " parameters " << endl;
+          streamlog_out(DEBUG3) << " likeliPID has = " << likeliPID->getParameters().size() << " parameters " << std::endl;
         }
         LiPDG_el.push_back(likelihood[0]); 
         LiPDG_mu.push_back(likelihood[1]); 
@@ -464,23 +468,23 @@ void PIDTree::processEvent( LCEvent * evt ) {
           for ( int ihyp = 0 ; ihyp < 5; ihyp++ ) {
             dedxlikeli[ihyp] = dedxPID->getParameters()[ihyp];
             if ( std::isinf(likelihood[ihyp]) ) {
-              streamlog_out(DEBUG3) << " dedxlikeli [" << ihyp << "] = " << dedxlikeli[ihyp] << endl;
+              streamlog_out(DEBUG3) << " dedxlikeli [" << ihyp << "] = " << dedxlikeli[ihyp] << std::endl;
               dedxlikeli[ihyp] = 888.;
             }  
             distance[ihyp] = dedxPID->getParameters()[13+ihyp];
             if ( std::isinf(distance[ihyp]) ) {
               distance[ihyp] = 888.;
             }  
-            streamlog_out(DEBUG3) << pidh->getParameterNames(pidh->getAlgorithmID("dEdxPID"))[13+ihyp] << " = " << distance[ihyp] << endl;
+            streamlog_out(DEBUG3) << pidh->getParameterNames(pidh->getAlgorithmID("dEdxPID"))[13+ihyp] << " = " << distance[ihyp] << std::endl;
           }
-          streamlog_out(DEBUG) << " dEdx liklihood electron hyp = " << dedxlikeli[0] << endl;
-          streamlog_out(DEBUG) << " dEdx liklihood muon hyp = "     << dedxlikeli[1] << endl;
-          streamlog_out(DEBUG) << " dEdx liklihood pion hyp = "     << dedxlikeli[2] << endl;
-          streamlog_out(DEBUG) << " dEdx liklihood kaon hyp = "     << dedxlikeli[3] << endl;
-          streamlog_out(DEBUG) << " dEdx liklihood proton hyp = "   << dedxlikeli[4] << endl;
+          streamlog_out(DEBUG) << " dEdx liklihood electron hyp = " << dedxlikeli[0] << std::endl;
+          streamlog_out(DEBUG) << " dEdx liklihood muon hyp = "     << dedxlikeli[1] << std::endl;
+          streamlog_out(DEBUG) << " dEdx liklihood pion hyp = "     << dedxlikeli[2] << std::endl;
+          streamlog_out(DEBUG) << " dEdx liklihood kaon hyp = "     << dedxlikeli[3] << std::endl;
+          streamlog_out(DEBUG) << " dEdx liklihood proton hyp = "   << dedxlikeli[4] << std::endl;
         }
         else {
-          streamlog_out(DEBUG3) << " dedxPID has = " << dedxPID->getParameters().size() << " parameters " << endl;
+          streamlog_out(DEBUG3) << " dedxPID has = " << dedxPID->getParameters().size() << " parameters " << std::endl;
         }
         dedxdist_el.push_back(distance[0]); 
         dedxdist_mu.push_back(distance[1]); 
@@ -544,7 +548,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
 
 
 
-void PIDTree::check( LCEvent * evt ) { 
+void PIDTree::check( LCEvent*) { 
 
 }
 
