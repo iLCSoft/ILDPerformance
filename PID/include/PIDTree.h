@@ -15,18 +15,9 @@
 #include "UTIL/LCTrackerConf.h"
 #include <UTIL/BitSet32.h>
 
-// STUFF needed for GEAR
-#include <marlin/Global.h>
-#include <gear/GEAR.h>
-#include <gear/VXDParameters.h>
-#include <gear/VXDLayerLayout.h>
-#include "gear/BField.h"
 
 #include <TTree.h>
 
-using namespace lcio ;
-using namespace marlin ;
-using namespace std ;
 
 /** PIDTree processor
  * fills a ROOT tree with mcparticle - reco / PID info
@@ -34,10 +25,12 @@ using namespace std ;
  * authors: Jenny List
 */
 
-class PIDTree : public Processor {
+class PIDTree : public marlin::Processor {
   
  public:
  
+  PIDTree(const PIDTree&) = delete ;
+  PIDTree& operator=(const PIDTree&) = delete ; 
 
   virtual Processor*  newProcessor() { return new PIDTree ; }
   
@@ -72,69 +65,67 @@ class PIDTree : public Processor {
 
   /** Input collection name.
    */
-  std::string _trueToReco ;
-  std::string _trueToTrack ;
-  std::string _recoToTrue ;
-  std::string _mcParticleCollectionName ;
-  std::string _trackColName ;
-  std::string _BCALParticleCollectionName ;
-  std::string _BCALClusterCollectionName ;
-  std::string _pandoraPFOs ;
+  std::string _trueToReco {};
+  std::string _trueToTrack {};
+  std::string _recoToTrue {};
+  std::string _mcParticleCollectionName {};
+  std::string _trackColName {};
+  std::string _BCALParticleCollectionName {};
+  std::string _BCALClusterCollectionName {};
+  std::string _pandoraPFOs {};
 
-  int nEvt ;
+  int nEvt = 0;
 
-  float _bField ;
+  float _bField = 0.;
 
 
  private:
 
   // declaration of trees
-  TTree *hermTree ;
-  int    nMCParticles;
+  TTree *hermTree = nullptr ;
+  int    nMCParticles = 0;
   
-  vector<double> trueP;
-  vector<double> trueMass;
-  vector<double> truePt ;
-  vector<double> trueTheta ;
-  vector<double> truePhi ;
-  vector<double> trueCharge;
-  vector<int>    truePDG;
-  vector<int>    trueMother;
-  
-  vector<double> isTrue;  // store max weight of reco -> truth
-  vector<double> isSeen;  // store max weight of truth -> reco
-  vector<double> isSeenDEdx ;  // store max weight of truth -> track
-  vector<double> seenP;
-  vector<double> seenPt ;
-  vector<double> seenTheta ;
-  vector<double> seenPhi ;
-  vector<double> seenDEdx ;
-  vector<double> seenDEdxErr ;
-  vector<double> seenCharge ;
-  vector<int> basicPDG;
-  vector<int> dEdxPDG;
-  vector<int> showerPDG;
-  vector<int> likeliPDG;
-  vector<int> lowmomPDG;
-  
-  // dEdz distance for each hypothesis
-  vector<float> dedxdist_el;
-  vector<float> dedxdist_mu;
-  vector<float> dedxdist_pi;
-  vector<float> dedxdist_ka;
-  vector<float> dedxdist_pr;
+  std::vector<double> trueP{};
+  std::vector<double> trueMass{};
+  std::vector<double> truePt {};
+  std::vector<double> trueTheta {};
+  std::vector<double> truePhi {};
+  std::vector<double> trueCharge{};
+  std::vector<int>    truePDG{};
+  std::vector<int>    trueMother{};
+  std::vector<double> isTrue{};  // store max weight of reco -> truth
+  std::vector<double> isSeen{};  // store max weight of truth -> reco
+  std::vector<double> isSeenDEdx {};  // store max weight of truth -> track
+  std::vector<double> seenP{};
+  std::vector<double> seenPt {};
+  std::vector<double> seenTheta {};
+  std::vector<double> seenPhi {};
+  std::vector<double> seenDEdx {};
+  std::vector<double> seenDEdxErr {};
+  std::vector<double> seenCharge {};
+  std::vector<int> basicPDG{};
+  std::vector<int> dEdxPDG{};
+  std::vector<int> showerPDG{};
+  std::vector<int> likeliPDG{};
+  std::vector<int> lowmomPDG{};
+
+  std::vector<float> dedxdist_el{};
+  std::vector<float> dedxdist_mu{};
+  std::vector<float> dedxdist_pi{};
+  std::vector<float> dedxdist_ka{};
+  std::vector<float> dedxdist_pr{};
 
   // individual likelihoods for each hypothesis
-  vector<float> LiPDG_el;
-  vector<float> LiPDG_mu;
-  vector<float> LiPDG_pi;
-  vector<float> LiPDG_ka;
-  vector<float> LiPDG_pr;
-  vector<float> dedxPDG_el;
-  vector<float> dedxPDG_mu;
-  vector<float> dedxPDG_pi;
-  vector<float> dedxPDG_ka;
-  vector<float> dedxPDG_pr;
+  std::vector<float> LiPDG_el{};
+  std::vector<float> LiPDG_mu{};
+  std::vector<float> LiPDG_pi{};
+  std::vector<float> LiPDG_ka{};
+  std::vector<float> LiPDG_pr{};
+  std::vector<float> dedxPDG_el{};
+  std::vector<float> dedxPDG_mu{};
+  std::vector<float> dedxPDG_pi{};
+  std::vector<float> dedxPDG_ka{};
+  std::vector<float> dedxPDG_pr{};
 
 } ;
 
