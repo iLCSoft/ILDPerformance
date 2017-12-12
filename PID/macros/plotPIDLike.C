@@ -1,5 +1,7 @@
 #include "TH1.h"
-/** Very simply plotting of likely PDG
+#include "PIDHelper.h"
+
+/** Very simple plotting of likelihood PDG
  *  Should add colors for standard PDG types ...
  * 
  */
@@ -128,7 +130,8 @@ h9->SetLineColor( kBlue);
  h9->Draw( "hist same");
 
 
-TString outfile = "../Results/Likely_PDG";
-   c2->Print(TString(outfile+".pdf"));
+ TString outfile =  getPathPrefix( _filename ) ;
+ outfile += "Likely_PDG";
+ c2->Print(TString(outfile+".pdf"));
   
 }

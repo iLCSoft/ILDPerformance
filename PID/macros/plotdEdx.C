@@ -1,4 +1,6 @@
 #include "TH1.h"
+#include "PIDHelper.h"
+
 /** Very simply plotting of dEdx as a function of beta*gamma (p/m).
  * 
  */
@@ -126,7 +128,8 @@ h5->Draw();
 
  h6->Draw();
   
- TString outfile = "../Results/dEdx_plots_output";
-   c2->Print(TString(outfile+".pdf"));
+ TString outfile =  getPathPrefix( _filename ) ;
+ outfile += "dEdx_plots_output";
+ c2->Print(TString(outfile+".pdf"));
 
 }

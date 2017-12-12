@@ -6,14 +6,17 @@
 #include "TH1F.h"
 #include "TString.h"
 
+#include "PIDHelper.h"
+
 using namespace std;
 
-void make_plots(const char* _filename, const char* pidName, int pdgCode, const TString& pdfFile ) ;
+void make_plots(const char* filename, const char* pidName, int pdgCode, const TString& pdfFile ) ;
 
-
+/// plot the PID efficiency and fake rate for a given particle type for various PID algorithms as function of momentum and polar angle
 void plotPIDEfficiency(const char* filename) {
 
-  TString pdfFile("../Results/PID_efficiencies_all.pdf") ;
+  TString pdfFile = getPathPrefix( filename ) ;
+  pdfFile += "PID_efficiencies_all.pdf" ;
 
   make_plots( filename, "basicPDG", 11  , pdfFile+"(" );  // first plot
   make_plots( filename, "basicPDG", 13  , pdfFile );
@@ -47,7 +50,7 @@ void plotPIDEfficiency(const char* filename) {
 }
 
 
-void make_plots(const char* _filename, const char* pidName, int pdgCode, const TString& pdfFile) {
+void make_plots(const char* filename, const char* pidName, int pdgCode, const TString& pdfFile) {
 
   std::string pName("unknown") ;
   switch( pdgCode ){
@@ -94,7 +97,7 @@ void make_plots(const char* _filename, const char* pidName, int pdgCode, const T
 
   // --- open the file -----
 
-  TFile *treefile = new TFile(_filename);
+  TFile *treefile = new TFile(filename);
   TTree *tree = (TTree*) treefile->Get("hermTree");
 
 
@@ -282,8 +285,8 @@ void make_plots(const char* _filename, const char* pidName, int pdgCode, const T
    hist_eff_th->GetXaxis()->SetTitleOffset( 0.9 );
   
   
-   TString outfile = "../Results/PID_efficiencies";
-   outfile += "_pdg";
+   TString outfile = getPathPrefix( filename ) ;
+   outfile += "PID_efficiencies_pdg";
    outfile +=  pdgCode ;
    //c->Print(TString(outfile+".pdf"));
    
@@ -352,10 +355,10 @@ void make_plots(const char* _filename, const char* pidName, int pdgCode, const T
  
    hist_FailRate_th->SetName(" hist_FailRate_th" ) ;
    
-   outfile = "../Results/PID_Failed";
-   outfile += "_pdg";
+   outfile =  getPathPrefix( filename ) ;
+   outfile += "PID_Failed_pdg";
    outfile +=  pdgCode ;
-   //   k->Print(TString(outfile+".pdf"));
+   // k->Print(TString(outfile+".pdf"));
 
    // ------ draw them both in one plot --------------------
 
@@ -438,7 +441,8 @@ void make_plots(const char* _filename, const char* pidName, int pdgCode, const T
    hist_FailRate_th->Draw("P") ;
    hist_FailRate_th->Draw("P") ;   
 
-   outfile = "../Results/PID_efficiency_";
+   outfile =  getPathPrefix( filename ) ;
+   outfile += "PID_efficiency_";
    outfile += pidName ;
    outfile += "_pdg";
    outfile +=  pdgCode ;
