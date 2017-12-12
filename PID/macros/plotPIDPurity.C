@@ -10,7 +10,7 @@
 
 using namespace std;
 
-
+/// plot the likelihood PID and the resulting efficicency vs purity 
 void plotPIDPurity(const char* _filename) {
   
   const int nBins = 100 ; 
@@ -60,9 +60,12 @@ void plotPIDPurity(const char* _filename) {
   TTree *tree = (TTree*) treefile->Get("hermTree");
 
   
-  const double maxX  = 0. ;
+  const double maxX  = 10. ;
   const double minX  = -200;
   
+  TString outfile =  getPathPrefix( _filename ) ;
+  outfile += "Eff_Purity.pdf";
+
   for (int i = 0; i < 5; ++i) { // loop over 5 PDG types
 
   // -- create the histograms 
@@ -149,10 +152,10 @@ void plotPIDPurity(const char* _filename) {
     } // ----- loop over events 
 
     for(int iBins=0; iBins<nBins; iBins++){
-      
-      BinCentre_ht[iBins]  = ht[i]->GetBinCenter (iBins)  ;
+        
+      //BinCentre_ht[iBins]  = ht[i]->GetBinCenter (iBins)  ;
       BinContent_ht[iBins] = ht[i]->GetBinContent(iBins+1) ;
-      BinCentre_hf[iBins]  = hf[i]->GetBinCenter (iBins)  ;
+      //BinCentre_hf[iBins]  = hf[i]->GetBinCenter (iBins)  ;
       BinContent_hf[iBins] = hf[i]->GetBinContent(iBins+1) ;
     }
     
@@ -177,6 +180,12 @@ void plotPIDPurity(const char* _filename) {
       
       eff[ iBins ] =  sum_t_ge_c / (sum_t_ge_c + sum_t_lt_c )  ;
       pur[ iBins ] =  sum_t_ge_c / (sum_t_ge_c + sum_f_ge_c )  ;
+
+      if( pur[ iBins ] != pur[ iBins ] ) 
+	pur[ iBins ] = 0. ;
+
+      std::cout << particleName[i] << " ibin : " << iBins << " eff: " <<  eff[ iBins ] << " - pur: " <<  pur[ iBins ] << std::endl ;
+
     }
       
       
@@ -196,9 +205,14 @@ void plotPIDPurity(const char* _filename) {
   c0->Divide(2,3) ;
   for(int i=0 ; i<5; ++i){
     c0->cd(i+1) ;
-    hf[i]->Draw() ;
-    ht[i]->Draw("same") ;
+    gPad->SetLogy() ;
+    ht[i]->SetLineColor( kBlue);
+    hf[i]->SetLineColor( kRed);
+    ht[i]->Draw() ;
+    hf[i]->Draw("same") ;
   }
+
+  c0->Print( outfile+"(" ) ;
 
   // and now the eff vs. pur. 
   TGraph*  h1 = h[0] ;
@@ -280,9 +294,7 @@ void plotPIDPurity(const char* _filename) {
   h5->Draw() ;
 
 
-  TString outfile =  getPathPrefix( _filename ) ;
-  outfile += "Eff_Purity";
-  c->Print(TString(outfile+".pdf"));
+  c->Print( outfile+")" );
 
   return;
   

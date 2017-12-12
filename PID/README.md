@@ -21,23 +21,18 @@ source /cvmfs/ilc.desy.de/sw/x86_64_gcc49_sl6/v01-19-05/init_ilcsoft.sh
 
 cd ILDPerformance/PID
 
-# create an output directory for the plots
+# IMPORTANT: create an output directory for the plots, e.g. 
 mkdir Results
 ```
 
-All plots will be created in this directory. Thus you can optionally create a 
-dedicated working directory for your current sample and link to this, e.g.
 
-```sh 
-mkdir my_results_ttbar_v01-19-05
-ln -s  my_results_ttbar_v01-19-05 Results
-```
 
 Now you can create the required Root tree:
 
 ```sh    	
-Marlin ./scripts/PIDTree.xml --global.LCIOInputFiles=myttbarfile.slcio
+Marlin ./scripts/PIDTree.xml --global.LCIOInputFiles=myttbarfile.slcio --MyAIDAProcessor.FileName=./Results/PID_tree
 ```
+
 This creates the file `./Results/PID_tree.root`.
 
 As ususal, you can of course change parameters via the command line or edit the steering file accordingly.
@@ -106,8 +101,17 @@ creates plots of efficiency vs purity from using the PID likelihood directly
 
 --------------------------------------------------------------------------------------
 
+## Create all plots
 
+You can also create all plots for a given LCIO file in on go, e.g.:
 
+```sh
+cd ILDPerformance/PID
+
+. ./run_all.sh /pnfs/desy.de/ilc/prod/ilc/mc-opt/ild/rec/calib/uds/ILD_l5_o1_v02_nobg/v01-19-05-p01/u035/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Puds500.n07.d_rec_u035.slcio PID_uds500
+```
+
+this creates the root tree and pdf files with plots in directory *PID_uds500*
 
 
 
