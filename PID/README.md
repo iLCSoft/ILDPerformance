@@ -36,7 +36,7 @@ ln -s  my_results_ttbar_v01-19-05 Results
 Now you can create the required Root tree:
 
 ```sh    	
-Marlin ./scripts/PIDTree.xml --global.LCIOInputFiles=myttbarfile.slcio --MyAIDAProcessor.FileName=mytree
+Marlin ./scripts/PIDTree.xml --global.LCIOInputFiles=myttbarfile.slcio
 ```
 This creates the file `./Results/PID_tree.root`.
 
