@@ -42,7 +42,9 @@ class Pi0Tree : public Processor {
 
   virtual Processor*  newProcessor() { return new Pi0Tree ; }
   
-  
+  Pi0Tree(const Pi0Tree&) = delete ;
+  Pi0Tree& operator=(const Pi0Tree&) = delete ;
+
   Pi0Tree() ;
   
   /** Called at the begin of the job before anything is read.
@@ -73,45 +75,45 @@ class Pi0Tree : public Processor {
 
   /** Input collection name.
    */
-  std::string _trueToReco ;
-  std::string _recoToTrue ;
-  std::string _mcParticleCollectionName ;
-  std::string _gammaGammaParticleCollectionName ;
+  std::string _trueToReco {};
+  std::string _recoToTrue {};
+  std::string _mcParticleCollectionName {};
+  std::string _gammaGammaParticleCollectionName {};
 
-  int nEvt ;
+  int nEvt {};
 
-  float _bField ;
+  float _bField {};
 
 
  private:
 
   // declaration of trees
-  TTree *pi0Tree ;
-  int    nMCPi0;
+  TTree *pi0Tree {};
+  int    nMCPi0{};
     
-  vector<double> trueE;
-  vector<double> trueP;
-  vector<double> truePt ;
-  vector<double> trueTheta ;
-  vector<double> truePhi ;
-  vector<int>    truePDG;
-  vector<int>    trueMother;
-  vector<double> daughtersSeen;  // found photons?  
-  vector<double> isSeen;  // both photons point to PFOs ?
-  vector<double> isSeenAsPhotons;  // both photons point to photon PFOs?
-  vector<double> weightToPhotons;  // sum of weigths
+  vector<double> trueE{};
+  vector<double> trueP{};
+  vector<double> truePt {};
+  vector<double> trueTheta {};
+  vector<double> truePhi {};
+  vector<int>    truePDG{};
+  vector<int>    trueMother{};
+  vector<double> daughtersSeen{};  // found photons?  
+  vector<double> isSeen{};  // both photons point to PFOs ?
+  vector<double> isSeenAsPhotons{};  // both photons point to photon PFOs?
+  vector<double> weightToPhotons{};  // sum of weigths
 
-  int    nRecoPi0;
-  vector<int> nTruePhotons;      
-  vector<int> nTrueMeson;      
-  vector<int> isTrue;        // 1= one photon from true meson 2= both photons from true meson
-  vector<double> recoE;         // energy of gammagamma candidate (after constrained fit)
-  vector<double> pfoE;          // energy of the two photons
-  vector<double> trueEofSeen;    // energy of the true meson
-  vector<double> recoMass;
-  vector<double> pfoMass;
-  vector<double> trueMassofSeen;
-  vector<double> truePDGofSeen;
+  int    nRecoPi0{};
+  vector<int> nTruePhotons{};      
+  vector<int> nTrueMeson{};      
+  vector<int> isTrue{};        // 1= one photon from true meson 2= both photons from true meson
+  vector<double> recoE{};         // energy of gammagamma candidate (after constrained fit)
+  vector<double> pfoE{};          // energy of the two photons
+  vector<double> trueEofSeen{};    // energy of the true meson
+  vector<double> recoMass{};
+  vector<double> pfoMass{};
+  vector<double> trueMassofSeen{};
+  vector<double> truePDGofSeen{};
   
   
 } ;
