@@ -44,7 +44,7 @@ void validatePilotProcessor::init() {
   return;
 }
 
-void validatePilotProcessor::processRunHeader( LCRunHeader* run) {
+void validatePilotProcessor::processRunHeader( LCRunHeader* ) {
   cout << "hello from validatePilotProcessor::processRunHeader" << endl;
 }
 
@@ -135,7 +135,7 @@ void validatePilotProcessor::processEvent( LCEvent * evt ) {
       CalorimeterHit* calhit=0;
       TrackerHit* trkhit=0;
 
-      for (int j=0; j<col->getNumberOfElements(); j++) {
+      for (int jj=0; jj<col->getNumberOfElements(); jj++) {
 
         energy=-999;
         for (int i=0; i<3; i++) pos[i]=0;
@@ -144,7 +144,7 @@ void validatePilotProcessor::processEvent( LCEvent * evt ) {
 
         switch ( objtype ) {
         case SIMCALO: // simcalohit
-          simcalhit = dynamic_cast<SimCalorimeterHit*> (col->getElementAt(j));
+          simcalhit = dynamic_cast<SimCalorimeterHit*> (col->getElementAt(jj));
           energy=simcalhit->getEnergy();
           for (int i=0; i<3; i++)
             pos[i] = simcalhit->getPosition()[i];
@@ -159,7 +159,7 @@ void validatePilotProcessor::processEvent( LCEvent * evt ) {
 	  }
           break;
         case SIMTRK: // simtrackerhit
-          simtrkhit = dynamic_cast<SimTrackerHit*> (col->getElementAt(j));
+          simtrkhit = dynamic_cast<SimTrackerHit*> (col->getElementAt(jj));
           energy=simtrkhit->getEDep();
           for (int i=0; i<3; i++)
             pos[i] = simtrkhit->getPosition()[i];
@@ -173,7 +173,7 @@ void validatePilotProcessor::processEvent( LCEvent * evt ) {
 	  }
           break;
         case CALO: // calorimeterhit
-          calhit = dynamic_cast<CalorimeterHit*> (col->getElementAt(j));
+          calhit = dynamic_cast<CalorimeterHit*> (col->getElementAt(jj));
           energy=calhit->getEnergy();
           for (int i=0; i<3; i++)
             pos[i] = calhit->getPosition()[i];
@@ -188,7 +188,7 @@ void validatePilotProcessor::processEvent( LCEvent * evt ) {
 	  }
           break;
         case TRK: // trackerhit
-          trkhit = dynamic_cast<TrackerHit*> (col->getElementAt(j));
+          trkhit = dynamic_cast<TrackerHit*> (col->getElementAt(jj));
           energy=trkhit->getEDep();
           for (int i=0; i<3; i++)
             pos[i] = trkhit->getPosition()[i];
@@ -276,7 +276,7 @@ void validatePilotProcessor::processEvent( LCEvent * evt ) {
 
 
 
-void validatePilotProcessor::check( LCEvent * evt ) {
+void validatePilotProcessor::check( LCEvent * ) {
   // nothing to check here - could be used to fill checkplots in reconstruction processor
 }
 

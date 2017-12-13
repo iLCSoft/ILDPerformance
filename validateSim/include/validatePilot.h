@@ -21,7 +21,10 @@ class validatePilotProcessor : public Processor {
  public:
   
   virtual Processor*  newProcessor() { return new validatePilotProcessor ; }
-  
+
+  validatePilotProcessor(const validatePilotProcessor&) = delete ;
+  validatePilotProcessor& operator=(const validatePilotProcessor& ) = delete ;
+
   validatePilotProcessor() ;
   
   /** Called at the begin of the job before anything is read.
@@ -45,18 +48,18 @@ class validatePilotProcessor : public Processor {
 
  protected:
 
-  std::string _outfile;
+  std::string _outfile{};
 
-  std::map < std::string , std::vector < std::pair < std::string, std::pair<int, int> > > > _indxCode;
+  std::map < std::string , std::vector < std::pair < std::string, std::pair<int, int> > > > _indxCode{};
 
-  CellIDDecoder <SimCalorimeterHit> * _SimCalorimeterHitDecoder;
-  CellIDDecoder <SimTrackerHit> *     _SimTrackerHitDecoder;
-  CellIDDecoder <CalorimeterHit> *    _CalorimeterHitDecoder;
-  CellIDDecoder <TrackerHit> *        _TrackerHitDecoder;
+  CellIDDecoder <SimCalorimeterHit> * _SimCalorimeterHitDecoder{};
+  CellIDDecoder <SimTrackerHit> *     _SimTrackerHitDecoder{};
+  CellIDDecoder <CalorimeterHit> *    _CalorimeterHitDecoder{};
+  CellIDDecoder <TrackerHit> *        _TrackerHitDecoder{};
 
-  std::map < std::string , validatePilotProcessor_maxMin > _allranges;
+  std::map < std::string , validatePilotProcessor_maxMin > _allranges{};
 
-  std::map < std::string , int > _colTypes;
+  std::map < std::string , int > _colTypes{};
 
   enum {SIMCALO=0, SIMTRK, CALO, TRK};
 
