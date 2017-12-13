@@ -201,8 +201,6 @@ class DDDiagnostics : public Processor {
 
 
   int MarlinTracks = 0;
-  int SeedTracks = 0;
-  int SiliconTracks = 0;
   int BCalParts = 0;
   int BCalCls = 0;
   int pfos  = 0;
