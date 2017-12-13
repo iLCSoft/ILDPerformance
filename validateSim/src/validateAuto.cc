@@ -357,7 +357,7 @@ void validateAutoProcessor::init() {
   return;
 }
 
-void validateAutoProcessor::processRunHeader( LCRunHeader* run) {
+void validateAutoProcessor::processRunHeader( LCRunHeader* ) {
   cout << "hello from validateAutoProcessor::processRunHeader" << endl;
 }
 
@@ -545,7 +545,7 @@ void validateAutoProcessor::processEvent( LCEvent * evt ) {
 
 
 
-void validateAutoProcessor::check( LCEvent * evt ) {
+void validateAutoProcessor::check( LCEvent * ) {
   // nothing to check here - could be used to fill checkplots in reconstruction processor
 }
 
