@@ -78,7 +78,6 @@ void Residuals::init() {
 
 
   // create map of surfaces
-  dd4hep::DetElement world = theDetector.world() ;
   const aidaTT::IGeometry* geom  = & aidaTT::IGeometry::instance() ;
   const std::vector<const aidaTT::ISurface*>& surfaces = geom->getSurfaces() ;
   for(std::vector<const aidaTT::ISurface*>::const_iterator surf = surfaces.begin() ; surf != surfaces.end() ; ++surf){
@@ -197,7 +196,7 @@ void Residuals::processEvent( LCEvent * evt ) {
       }
     }
     
-    int init_status = marlin_trk->initialise( *init_trk_st, _bField, IMarlinTrack::backward ) ;
+    marlin_trk->initialise( *init_trk_st, _bField, IMarlinTrack::backward ) ;
     int fit_status = marlin_trk->fit() ; 
     
     if ( fit_status == 0 ){
@@ -213,8 +212,6 @@ void Residuals::processEvent( LCEvent * evt ) {
 
 	DetLayer.push_back(idDecoder[lcio::LCTrackerCellID::layer()]);
 	SubDet.push_back(idDecoder[ lcio::LCTrackerCellID::subdet()]);
-
-	double testRadius = sqrt(((*lhit)->getPosition()[0])*((*lhit)->getPosition()[0]) + ((*lhit)->getPosition()[1])*((*lhit)->getPosition()[1])) ;
 
 	streamlog_out(DEBUG4) << " subdetector " << idDecoder[ lcio::LCTrackerCellID::subdet()] << " layer " << idDecoder[lcio::LCTrackerCellID::layer()] << " Z position " << (*lhit)->getPosition()[2]  << std::endl;
 		
@@ -239,7 +236,7 @@ void Residuals::processEvent( LCEvent * evt ) {
 	  int ndf = 0;
 	  double chi2= 0. ;
 	  TrackStateImpl ts_at_detel ;
-	  int paok = marlin_trk->getTrackState(testhit3 , ts_at_detel,  chi2, ndf ) ;
+	  marlin_trk->getTrackState(testhit3 , ts_at_detel,  chi2, ndf ) ;
 	    
 	  const aidaTT::Vector5 hp( ts_at_detel.getOmega() / dd4hep::mm, ts_at_detel.getTanLambda(), ts_at_detel.getPhi(), ts_at_detel.getD0() * dd4hep::mm, ts_at_detel.getZ0() * dd4hep::mm ) ;
 	  aidaTT::Vector3D xx ;
