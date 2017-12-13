@@ -60,7 +60,7 @@ void Pi0Tree::init() {
   gROOT->ProcessLine("#include <vector>");
 }
 
-void Pi0Tree::processRunHeader( LCRunHeader* run) { 
+void Pi0Tree::processRunHeader( LCRunHeader*) { 
     
 } 
 
@@ -488,7 +488,7 @@ void Pi0Tree::processEvent( LCEvent * evt ) {
 
 
 
-void Pi0Tree::check( LCEvent * evt ) { 
+void Pi0Tree::check( LCEvent * ) { 
 
 }
 
