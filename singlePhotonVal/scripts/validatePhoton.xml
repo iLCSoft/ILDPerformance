@@ -1,0 +1,67 @@
+<marlin>
+  <execute>
+    <processor name="myPhotonVal"/>
+  </execute>
+
+  <global>
+    <parameter name="LCIOInputFiles">
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM0p1GeV.n001_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM0p1GeV.n002_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM0p2GeV.n001_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM0p2GeV.n002_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM0p4GeV.n001_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM0p7GeV.n001_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM0p7GeV.n002_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM001GeV.n001_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM001GeV.n002_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM002GeV.n001_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM002GeV.n002_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM005GeV.n001_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM005GeV.n002_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM010GeV.n001_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM010GeV.n001_2.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM010GeV.n002_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM010GeV.n002_2.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM020GeV.n001_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM020GeV.n002_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM020GeV.n003_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM020GeV.n004_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM050GeV.n001_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM050GeV.n002_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM050GeV.n003_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM050GeV.n004_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM050GeV.n005_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM050GeV.n007_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM050GeV.n008_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM050GeV.n009_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM050GeV.n010_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM100GeV.n001_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM100GeV.n001_2.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM100GeV.n002_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM100GeV.n003_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM100GeV.n003_2.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM100GeV.n004_2.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM100GeV.n005_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM100GeV.n005_2.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM100GeV.n006_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM100GeV.n006_2.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM100GeV.n007_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM100GeV.n007_2.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM100GeV.n008_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM100GeV.n008_2.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM100GeV.n009_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM100GeV.n009_2.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM100GeV.n010_1.d_dst_u036.slcio
+/hsm/ilc/grid/storm/prod/ilc/mc-opt.dsk/ild/dst/calib/single_PDG22/ILD_l5_o1_v02_nobg/v01-19-05-p01/u036/rv01-19-05-p01.sv01-19-05.mILD_l5_o1_v02_nobg.Pmcparticles_PDG22_MOM100GeV.n010_2.d_dst_u036.slcio
+    </parameter>
+    <parameter name="MaxRecordNumber" value="0"/>
+    <parameter name="SkipNEvents" value="0"/>
+    <parameter name="SupressCheck" value="false"/>
+    <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT"> MESSAGE </parameter>
+  </global>
+
+  <processor name="myPhotonVal" type="validateDST_SinglePhotonProcessor">
+    <parameter name="outputFilename"> photons_validate_ILD_l5_o1_v02_nobg.root </parameter>
+  </processor>
+
+</marlin>
