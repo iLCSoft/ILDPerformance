@@ -53,7 +53,7 @@ See the following section for documentation on how to run the various performanc
 - [Tracking](./tracking/README)
 - [Pi0](pi0/README)
 - [validateSim](validateSim/doc/README)
-
+- [singlePhotonVal](singlePhotonVal/README.md)
 
 ## License and Copyright
 Copyright (C), ILDPerformance Authors
