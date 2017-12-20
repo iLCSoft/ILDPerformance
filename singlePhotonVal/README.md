@@ -3,28 +3,11 @@ simple validation of single photon samples
 
 checks of
 - number of PFOs
-- energy resposnse
+- energy response vs theta, phi, etc
 - energy resolution
 ----------------------
 
-instructions:
-
-source your favourite ilcsoft installation: e.g.
-
-> source /cvmfs/ilc.desy.de/sw/x86_64_gcc49_sl6/v01-19-05/init_ilcsoft.sh 
-> cd ...*/singlePhotonVal  [this directory]
-> mkdir build
-> cd build
-> cmake -C $ILCSOFT/ILCSoft.cmake ..
-> make 
-[check that there are no errors reported in the compilation]
-> make install
-
-add the newly created liobrary to the MARLIN_DLL env. valiable
-> export MARLIN_DLL=$PWD/../lib/libvalidateSinglePhotonDST.so:$MARLIN_DLL
-
-
-then go to the scripts directory
+go to the scripts directory
 > cd ../scripts
 
 edit the file validatePhoton.xml :
