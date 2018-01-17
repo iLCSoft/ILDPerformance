@@ -46,8 +46,8 @@ void TrackerHitCounter::init() {
 
   for(dd4hep::DetElement element : detElements) {
 
-    streamlog_out(MESSAGE) << "*********************************************************************\n";
-          streamlog_out(MESSAGE) << "Detector element \'" << element.name() << "\' of type \'"
+    streamlog_out(DEBUG7) << "*********************************************************************\n";
+          streamlog_out(DEBUG7) << "Detector element \'" << element.name() << "\' of type \'"
         << element.type() << "\':\n";
 
     _hitCounters[element.id()] = new SystemHitCounter;
@@ -59,47 +59,47 @@ void TrackerHitCounter::init() {
       // We assume that layer numbering always starts from 0.
       int ilay = 0;
       for ( auto layer : layering->layers ) {
-          streamlog_out(MESSAGE) << "  Layer " << ilay+1 << ":\n";
+          streamlog_out(DEBUG7) << "  Layer " << ilay+1 << ":\n";
           double ls = layer.zHalfSensitive*2;
           double ws = layer.widthSensitive;
           int nModules = layer.ladderNumber;
           double area = ls*ws*nModules;
           (*_hitCounters.at(element.id()))[ilay] = new LayerHitCounter(area);
-          streamlog_out(MESSAGE) << "    Length of sensitive area: " << ls/dd4hep::mm << " mm\n";
-          streamlog_out(MESSAGE) << "    Width of sensitive area: " << ws/dd4hep::mm << " mm\n";
-          streamlog_out(MESSAGE) << "    Number of ladders: " << nModules << "\n";
-          streamlog_out(MESSAGE) << "    Total sensitive area: " << area/dd4hep::cm2 << " cm^2\n";
-          //streamlog_out(MESSAGE) << "    Sensors per ladder: " << layer.sensorsPerLadder << "\n";
+          streamlog_out(DEBUG7) << "    Length of sensitive area: " << ls/dd4hep::mm << " mm\n";
+          streamlog_out(DEBUG7) << "    Width of sensitive area: " << ws/dd4hep::mm << " mm\n";
+          streamlog_out(DEBUG7) << "    Number of ladders: " << nModules << "\n";
+          streamlog_out(DEBUG7) << "    Total sensitive area: " << area/dd4hep::cm2 << " cm^2\n";
+          //streamlog_out(DEBUG7) << "    Sensors per ladder: " << layer.sensorsPerLadder << "\n";
           ilay++;
       }
     }
     catch ( std::exception &e) {
-      streamlog_out(DEBUG) << "Caught exception " << e.what() << std::endl;
+      streamlog_out(DEBUG7) << "Caught exception " << e.what() << std::endl;
       try {
-            streamlog_out(DEBUG) << "Trying ZDiskPetalsData.\n";
+            streamlog_out(DEBUG7) << "Trying ZDiskPetalsData.\n";
             dd4hep::rec::ZDiskPetalsData *layering = element.extension<dd4hep::rec::ZDiskPetalsData>() ;
             // We assume that layer numbering always starts from 0.
             int ilay = 0;
             for ( auto layer : layering->layers ) {
-                streamlog_out(MESSAGE) << "  Layer " << ilay+1 << ":\n";
+                streamlog_out(DEBUG7) << "  Layer " << ilay+1 << ":\n";
                 double ls = layer.lengthSensitive;
                 double wsi = layer.widthInnerSensitive;
                 double wso = layer.widthOuterSensitive;
                 int nModules = layer.petalNumber;
                 double area = ls*(wsi+wso)*nModules/2;
                 (*_hitCounters.at(element.id()))[ilay] = new LayerHitCounter(area);
-                streamlog_out(MESSAGE) << "    Length of sensitive area: " << ls/dd4hep::mm << " mm\n";
-                streamlog_out(MESSAGE) << "    Inner width of sensitive area: " << wsi/dd4hep::mm << " mm\n";
-                streamlog_out(MESSAGE) << "    Outer width of sensitive area: " << wso/dd4hep::mm << " mm\n";
-                streamlog_out(MESSAGE) << "    Number of petals: " << nModules << "\n";
-                streamlog_out(MESSAGE) << "    Total sensitive area: " << area/dd4hep::cm2 << " cm^2\n";
-                //streamlog_out(MESSAGE) << "    Sensors per petal: " << layer.sensorsPerPetal << "\n";
+                streamlog_out(DEBUG7) << "    Length of sensitive area: " << ls/dd4hep::mm << " mm\n";
+                streamlog_out(DEBUG7) << "    Inner width of sensitive area: " << wsi/dd4hep::mm << " mm\n";
+                streamlog_out(DEBUG7) << "    Outer width of sensitive area: " << wso/dd4hep::mm << " mm\n";
+                streamlog_out(DEBUG7) << "    Number of petals: " << nModules << "\n";
+                streamlog_out(DEBUG7) << "    Total sensitive area: " << area/dd4hep::cm2 << " cm^2\n";
+                //streamlog_out(DEBUG7) << "    Sensors per petal: " << layer.sensorsPerPetal << "\n";
                 ilay++;
             }
           }
       catch ( std::exception &e1) {
-        streamlog_out(DEBUG) << "Caught exception " << e1.what() << std::endl;
-        streamlog_out(MESSAGE) << "  No layering extension in the "
+        streamlog_out(DEBUG7) << "Caught exception " << e1.what() << std::endl;
+        streamlog_out(DEBUG7) << "  No layering extension in the "
                 "detector element \'" << element.name() << "\'.\nTotal hits will be counted.\n";
         (*_hitCounters.at(element.id()))[0] = new LayerHitCounter(-1.);
       }
@@ -115,9 +115,9 @@ void TrackerHitCounter::init() {
 // Performed at the end of each run (file)
 void TrackerHitCounter::processRunHeader( LCRunHeader*) {
   _nRun++;
-  streamlog_out(MESSAGE) << "Processing run " << _nRun << "\n";
+  streamlog_out(DEBUG7) << "Processing run " << _nRun << "\n";
   markRun();
-  streamlog_out(MESSAGE) << std::endl;
+  streamlog_out(DEBUG7) << std::endl;
 }
 
 
@@ -196,7 +196,7 @@ void TrackerHitCounter::end() {
 
 
     if (hitctr->size() == 1) {
-      streamlog_out(MESSAGE) << "  Reporting total hits in detector element:\n";
+      streamlog_out(MESSAGE) << "  Reporting total hits in the detector element:\n";
     }
 
     for (auto layerpair : *hitctr ) {

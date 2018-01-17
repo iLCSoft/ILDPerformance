@@ -81,7 +81,7 @@ ENDIF()
 #ADD_DEFINITIONS( "-Wno-long-long" )
 
 # include directories
-INCLUDE_DIRECTORIES( ./tracking/include  ./PID/include  ./pi0/include ./validateSim/include ./singlePhotonVal/include )
+INCLUDE_DIRECTORIES( ./tracking/include  ./PID/include  ./pi0/include ./validateSim/include ./singlePhotonVal/include ./trackerHitCtr/include)
 #INSTALL_DIRECTORY( ./include DESTINATION . FILES_MATCHING PATTERN "*.h" )
 
 # add library
@@ -90,6 +90,7 @@ AUX_SOURCE_DIRECTORY( ./PID/src library_sources )
 AUX_SOURCE_DIRECTORY( ./pi0/src library_sources )
 AUX_SOURCE_DIRECTORY( ./validateSim/src library_sources )
 AUX_SOURCE_DIRECTORY( ./singlePhotonVal/src library_sources )
+AUX_SOURCE_DIRECTORY( ./trackerHitCtr/src library_sources )
 ADD_SHARED_LIBRARY( ${PROJECT_NAME} ${library_sources} )
 INSTALL_SHARED_LIBRARY( ${PROJECT_NAME} DESTINATION lib )
 
