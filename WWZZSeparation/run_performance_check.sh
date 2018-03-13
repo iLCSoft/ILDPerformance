@@ -47,4 +47,7 @@ chmod u+x ${WORKING_DIR}/scripts/run_sim_and_rec.sh
 
 echo "Starting main script."
 echo ""
+cd scripts
 ./run_complete_analysis.sh -N=${N_EVENTS} --DetectorModel=${DETECTOR_MODEL}
+cd ${WORKING_DIR}
+

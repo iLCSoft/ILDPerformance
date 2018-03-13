@@ -96,9 +96,9 @@ void WWZZProcessor::processEvent( LCEvent * evt ) {
     // this gets called for every event 
     // usually the working horse ...
 
-	// Clear memory
-	memset( &_info, 0, sizeof(_info) );
+	// Reset event variables to default, will be set within processor
 	_info.init();
+
 	_info.evtN = _nEvt;
 
 	// (Get information from the event header (e.g. cross-section))
