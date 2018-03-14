@@ -125,4 +125,13 @@ void create_mjjmjjplots(
 
 	string plot_name_h2 = input_directory + "/m_m.pdf";
 	canvas_h2->Print(plot_name_h2.c_str());
+
+	// Avoid memory leaks
+	delete h1_WW;
+	delete h2_WW;
+	delete h1_ZZ;
+	delete h2_ZZ;
+	delete canvas_h1;
+	delete canvas_h1;
+
 }
