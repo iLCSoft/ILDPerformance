@@ -45,9 +45,17 @@ chmod u+x ${WORKING_DIR}/scripts/run_complete_analysis.sh
 chmod u+x ${WORKING_DIR}/scripts/run_plotting.sh
 chmod u+x ${WORKING_DIR}/scripts/run_sim_and_rec.sh
 
+# Make sure all necessary directories are here
+if [[ ! -d ${WORKING_DIR}/log ]] ; then
+	mkdir ${WORKING_DIR}/log
+fi
+if [[ ! -d ${WORKING_DIR}/output ]] ; then
+	mkdir ${WORKING_DIR}/output
+fi
+
 echo "Starting main script."
 echo ""
-cd scripts
+cd ${WORKING_DIR}/scripts
 ./run_complete_analysis.sh -N=${N_EVENTS} --DetectorModel=${DETECTOR_MODEL}
 cd ${WORKING_DIR}
 
