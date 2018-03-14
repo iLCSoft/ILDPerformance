@@ -146,8 +146,8 @@ void WWZZProcessor::check( LCEvent * /*evt*/ ) {
 void WWZZProcessor::end(){ 
 
     _otfile->cd();
-	_tree->Write();
+    _tree->Write();
     _otfile->Close();
-
+    delete _otfile;
 }
 
