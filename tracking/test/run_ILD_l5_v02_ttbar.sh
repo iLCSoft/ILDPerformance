@@ -4,59 +4,11 @@
 # Running shell script in parallel over multiple cores
 #==============================================================
 
-echo "############################################################################"
-echo "                             System information"
-echo "                             =================="
-
-echo "Host:"
-hostname -f
-
-echo "CPU(s):"
-cat /proc/cpuinfo | grep "model name" | cut -b 14-
-
-echo "RAM:"
-cat /proc/meminfo | grep "MemTotal" | cut -b 10-
-
-echo "Swap:"
-cat /proc/meminfo | grep "SwapTotal" | cut -b 11-
-
-echo "############################################################################"
-echo "Group:      ${GROUP}"
-
-echo "Hosttype:   ${HOSTTYPE}"
-
-echo "JobID:      ${JOB_ID}"
-
-echo "JobName:    ${JOB_NAME}"
-
-echo "Job_Script: ${JOB_SCRIPT}"
-
-echo "User:       ${LOGNAME}"
-
-echo "Queue:      ${QUEUE}"
-
-echo "Shell:      ${SHELL}"
-
-echo "TMP:        ${TMP}"
-
-echo "TMPDIR:     ${TMPDIR}"
-
-echo "User:       ${USER}"
-
-echo "Working_DIR:${PWD}"
-
-echo "############################################################################"
-echo
-echo "############################################################################"
-echo
-
 ILDMODEL=ILD_l5_v02
 ILCSOFTVER=v01-19-05
 
 . /afs/desy.de/project/ilcsoft/sw/x86_64_gcc49_sl6/${ILCSOFTVER}/init_ilcsoft.sh
 
-#INFILE=/nfs/dust/ilc/user/voutsina/GenFiles/E250-TDR_ws.Pe2e2h_mumu.Gwhizard-1_95.eL.pR.I108009.001.stdhep
-#INFILE=/nfs/dust/ilc/group/ild/dbd-data/250/higgs/E250-TDR_ws.Pe2e2h_mumu.Gwhizard-1_95.eL.pR.I108009.001.stdhep
 INFILE=/nfs/dust/ilc/group/ild/dbd-data/500/6f/E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05.stdhep
 
 #==================================================
@@ -110,6 +62,7 @@ rm ${ILDMODEL}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_
 # diagnostics
 
 Marlin Diagnostics_ILD_l5_v02_ttbar.xml \
+    --constant.lcgeo_DIR=$lcgeo_DIR \
     --MyAIDAProcessor.FileName=analysis_${ILDMODEL}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05 \
     --MyDiagnostics.PhysSampleOn=true \
 > DIAG_${ILDMODEL}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05.out
@@ -133,7 +86,8 @@ mv  analysis_${ILDMODEL}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.
 cd ../macros
 root -b -q EfficiencyL5.C
 
-mkdir -p ~/www/ILDPerformance_${ILCSOFTVER}
+OUTPUTPATH=~/www/ILDPerformance_${ILCSOFTVER}
+mkdir -p ${OUTPUTPATH}
 
-cp trkEff_pt_ttbar_${ILDMODEL}_${ILCSOFTVER}.png ~/www/ILDPerformance_${ILCSOFTVER}
-cp trkEff_theta_ttbar_${ILDMODEL}_${ILCSOFTVER}.png ~/www/ILDPerformance_${ILCSOFTVER}
+cp trkEff_pt_ttbar_${ILDMODEL}_${ILCSOFTVER}.png ${OUTPUTPATH}
+cp trkEff_theta_ttbar_${ILDMODEL}_${ILCSOFTVER}.png ${OUTPUTPATH}
