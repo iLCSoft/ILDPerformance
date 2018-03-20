@@ -129,8 +129,6 @@ class DDDiagnostics : public Processor {
   int OutVxdBkgHit = 0;
   int OutVxdPhysHit = 0;
 
-  int ghostCounter = 0;
-
   float _bField = 0.0;
 
   bool _trkEffOn = false;
@@ -186,20 +184,6 @@ class DDDiagnostics : public Processor {
   vector<float> recoTanLambdaError = {};
   vector<float> siTrksCosTheta = {};
 
-  TTree *GhostTree = NULL;
-  vector<float> ghostPt = {};
-  vector<float> ghostCosTheta = {};
-  vector<float> ghostTrkChi2OverNdof  = {};
-  vector<float> ghostWgt = {};
-  vector<int>   ghost_hits = {};
-  vector<int>   generatorStatus = {};
-  vector<int>   DecayedInTracker = {};
-  vector<float> doubleCountingPt = {};
-  vector<float> doubleCountingCosTheta = {};
-  vector<float> BadTrksD0  = {};
-  vector<float> BadTrksZ0  = {};
-
-
   int MarlinTracks = 0;
   int BCalParts = 0;
   int BCalCls = 0;
@@ -228,15 +212,6 @@ class DDDiagnostics : public Processor {
   TH1F *hist_thm_t  = NULL;
   TH1F *hist_thm_f  = NULL;
 
-  TH1F *hist_pt_allMarTrk  = NULL;
-  TH1F *hist_pt_fakeMarTrk  = NULL;
-  TH1F *hist_p_allMarTrk  = NULL;
-  TH1F *hist_p_fakeMarTrk  = NULL;
-  TH1F *hist_th_allMarTrk  = NULL;
-  TH1F *hist_th_fakeMarTrk  = NULL;
-  TH1F *hist_thm_allMarTrk  = NULL;
-  TH1F *hist_thm_fakeMarTrk  = NULL;
-
   TCanvas *pulls = NULL;
   TCanvas *residuals = NULL;
   TCanvas *eff = NULL;
@@ -250,11 +225,6 @@ class DDDiagnostics : public Processor {
   TGraphAsymmErrors *gp = NULL;
   TGraphAsymmErrors *gth = NULL;
   TGraphAsymmErrors *gthm = NULL;
-
-  TGraphAsymmErrors *gptfake = NULL;
-  TGraphAsymmErrors *gpfake = NULL;
-  TGraphAsymmErrors *gthfake = NULL;
-  TGraphAsymmErrors *gthmfake = NULL;
 
   double PI    = 3.1415926535897;
   double TWOPI = 6.2831853071794;
