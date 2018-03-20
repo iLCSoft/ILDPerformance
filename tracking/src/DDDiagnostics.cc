@@ -66,24 +66,6 @@ void DDDiagnostics::initTree(void) {
   EvalTree->Branch("recoTanLambdaError",&recoTanLambdaError) ;
   EvalTree->Branch("MarlinTrkHits",&MarlinTrkHits) ;
 
-  streamlog_out(DEBUG4) << " initialise EvalTree " << std::endl;
-
-  GhostTree = new TTree("GhostTree","GhostTree");
-  GhostTree->Branch("ghostPt",&ghostPt) ;
-  GhostTree->Branch("ghostCosTheta",&ghostCosTheta) ;
-  GhostTree->Branch("ghostTrkChi2OverNdof",&ghostTrkChi2OverNdof);
-  GhostTree->Branch("ghostWgt",&ghostWgt) ;
-  GhostTree->Branch("ghost_hits",&ghost_hits) ;
-  GhostTree->Branch("doubleCountingPt",&doubleCountingPt) ;
-  GhostTree->Branch("doubleCountingCosTheta",&doubleCountingCosTheta) ;
-  GhostTree->Branch("BadTrksD0",&BadTrksD0) ;
-  GhostTree->Branch("BadTrksZ0",&BadTrksZ0) ;
-  GhostTree->Branch("generatorStatus",&generatorStatus) ;
-  GhostTree->Branch("DecayedInTracker",&DecayedInTracker) ;
-
-  //EvalTree->SetMaxTreeSize(1000000000LL); // ROOT file size 1GB
-  //GhostTree->SetMaxTreeSize(1000000000LL);
-
 }
 
 void DDDiagnostics::initHist(void) {
@@ -116,27 +98,11 @@ void DDDiagnostics::initHist(void) {
   hist_thm_t  = new TH1F( "hist_thm_t", "Cos theta distributions of true tracks", 21, -1., 1. ) ;
   hist_thm_f  = new TH1F( "hist_thm_f", "Cos theta distribution of found tracks", 21, -1., 1. ) ;
 
-  hist_pt_allMarTrk  = new TH1F( "hist_pt_allMarTrk", "Pt distributions of all MarlinTrktracks", nBins , bins ) ;
-  hist_pt_fakeMarTrk  = new TH1F( "hist_pt_fakeMarTrk", "Pt distribution of fake MarlinTrktracks", nBins , bins ) ;
-
-  hist_p_allMarTrk  = new TH1F( "hist_p_allMarTrk", "Momentum distributions of all MarlinTrktracks", 100 , 0.5, 100.5 ) ;
-  hist_p_fakeMarTrk  = new TH1F( "hist_p_fakeMarTrk", "Momentum distribution of fake MarlinTrktracks", 100 , 0.5, 100.5 ) ;
-
-  hist_th_allMarTrk  = new TH1F( "hist_th_allMarTrk", "Cos theta distributions of all MarlinTrktracks", 10, 0., 1. ) ;
-  hist_th_fakeMarTrk  = new TH1F( "hist_th_fakeMarTrk", "Cos theta distribution of fake MarlinTrktracks", 10, 0., 1. ) ;
-
-  hist_thm_allMarTrk  = new TH1F( "hist_thm_allMarTrk", "Cos theta distributions of all MarlinTrktracks", 21, -1., 1. ) ;
-  hist_thm_fakeMarTrk  = new TH1F( "hist_thm_fakeMarTrk", "Cos theta distribution of fake MarlinTrktracks", 21, -1., 1. ) ;
-
-
   pulls = new TCanvas("pulls","Track par. pulls",800,800);
   residuals =  new TCanvas("residuals","Track par. residuals",800,800);
 
   eff = new TCanvas("eff","Trk Eff",800,800);
   effPM = new TCanvas("effPM","Trk Eff",800,800);
-
-  Rfake = new TCanvas("Rfake","MarlinTrkTracks fake rate",800,800);
-  RfakePM = new TCanvas("RfakePM","MarlinTrkTracks fake rate",800,800);
 
   myfunc = new TF1("myfunc","gaus(0)");
 
@@ -145,17 +111,9 @@ void DDDiagnostics::initHist(void) {
   gth = new TGraphAsymmErrors() ;
   gthm = new TGraphAsymmErrors() ;
 
-  gptfake = new TGraphAsymmErrors() ;
-  gpfake = new TGraphAsymmErrors() ;
-  gthfake = new TGraphAsymmErrors() ;
-  gthmfake = new TGraphAsymmErrors() ;
-
 }
 
 void DDDiagnostics::fillCanvas(void) {
-
-  //TApplication theApp("tapp", 0, 0);
-  // Writing a canvas with the pulls of the track parameters
 
   pulls->Divide(3,2);
   pulls->cd(1);
@@ -248,66 +206,6 @@ void DDDiagnostics::fillCanvas(void) {
   gthm->Write("gthM");
   effPM->Write();
 
-
-  Rfake->Divide(1,2);
-
-  Rfake->cd(1);
-  gPad->SetLogx() ;
-  gptfake->Divide( hist_pt_fakeMarTrk , hist_pt_allMarTrk , "v" ) ;
-  gptfake->SetMarkerColor( kRed ) ;
-  gptfake->SetLineColor( kRed ) ;
-  gptfake->GetYaxis()->SetTitle( "Fraction of fake tracks" );
-  gptfake->GetXaxis()->SetTitle( "p_{t} [GeV]" );
-  gptfake->Draw("AP");
-
-  Rfake->cd(2);
-  gthfake->Divide( hist_th_fakeMarTrk , hist_th_allMarTrk , "v" ) ;
-  gthfake->SetMarkerColor( kRed ) ;
-  gthfake->SetLineColor( kRed ) ;
-  gthfake->GetYaxis()->SetTitle( "Fraction of fake tracks" );
-  gthfake->GetXaxis()->SetTitle( "cos(#theta)" );
-  gthfake->Draw("AP");
-
-
-  gptfake->Write("gptfake");
-  gthfake->Write("gthfake");
-  Rfake->Write();
-
-  RfakePM->Divide(1,2);
-
-  RfakePM->cd(1);
-  gPad->SetLogx() ;
-  gpfake->Divide( hist_p_fakeMarTrk , hist_p_allMarTrk , "v" ) ;
-  gpfake->SetMarkerColor( kRed ) ;
-  gpfake->SetLineColor( kRed ) ;
-  gpfake->GetYaxis()->SetTitle( "Fraction of fake tracks" );
-  gpfake->GetXaxis()->SetTitle( "Momentum [GeV]" );
-  gpfake->Draw("AP");
-
-  RfakePM->cd(2);
-  gthmfake->Divide( hist_thm_fakeMarTrk , hist_thm_allMarTrk , "v" ) ;
-  gthmfake->SetMarkerColor( kRed ) ;
-  gthmfake->SetLineColor( kRed ) ;
-  gthmfake->GetYaxis()->SetTitle( "Fraction of fake tracks" );
-  gthmfake->GetXaxis()->SetTitle( "cos(#theta)" );
-  gthmfake->Draw("AP");
-
-
-  gpfake->Write("gpfake");
-  gthmfake->Write("gthmfake");
-  RfakePM->Write();
-
-  streamlog_out(DEBUG4) << " Number of ghost being related to an MCParticle " << ghostCounter << std::endl ;
-  /*
-  TApplication theApp("tapp", 0, 0);
-
-  TControlBar bar2("vertical");
-  bar2.AddButton("Residuals","residuals->Draw()", "...  >>Residuals<<");
-  bar2.Show();
-  theApp.Run();
-  //theApp.SetReturnFromRun(true);
-  */
-
 }
 
 void DDDiagnostics::clearVec(void) {
@@ -316,11 +214,8 @@ void DDDiagnostics::clearVec(void) {
   trueD0.clear();    trueZ0.clear();  trueOmega.clear();   truePhi.clear();  trueTanLambda.clear();
   recoD0.clear();    recoZ0.clear();  recoOmega.clear();   recoPhi.clear();  recoTanLambda.clear();
   recoD0Error.clear();    recoZ0Error.clear();  recoOmegaError.clear();   recoPhiError.clear();  recoTanLambdaError.clear();
-  ghostPt.clear();  doubleCountingPt.clear();
-  foundTrkChi2OverNdof.clear();    ghostTrkChi2OverNdof.clear();  ghostCosTheta.clear(); doubleCountingCosTheta.clear();
+  foundTrkChi2OverNdof.clear();
   MarlinTrkHits.clear();   VXDHits.clear();  SITHits.clear();  FTDHits.clear();  TPCHits.clear();
-  BadTrksZ0.clear();  BadTrksD0.clear(); ghost_hits.clear();
-  ghostWgt.clear(); generatorStatus.clear(); DecayedInTracker.clear();
 
 }
 
@@ -466,8 +361,7 @@ void DDDiagnostics::initParameters(void) {
 
 DDDiagnostics::DDDiagnostics() : Processor("DDDiagnostics") {
 
-  // modify processor description
-  _description = "DDDiagnostics does whatever it does ..." ;
+  _description = "DDDiagnostics generates information for tracking performance monitor." ;
 
   initParameters() ;
 
@@ -478,16 +372,12 @@ void DDDiagnostics::init() {
 
   streamlog_out(DEBUG) << "   DDDiagnostics::init() called  "  << std::endl ;
 
-  // usually a good idea to
   printParameters() ;
   nEvt = 0;
 
   _bField = MarlinUtil::getBzAtOrigin();
 
-  ghostCounter = 0 ;
-
   gROOT->ProcessLine("#include <vector>");
-  //TApplication theApp("tapp", 0, 0);
 
   PI = (double)acos((double)(-1.0));
   TWOPI = (double)(2.0)*PI;
@@ -504,9 +394,9 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
   if( isFirstEvent() ) { 
     streamlog_out(DEBUG4) << " This is the first event " << std::endl;
 
-    if ( _fillBigTTree )  initTree() ;
-
     initHist() ;
+
+    if ( _fillBigTTree )  initTree() ;
   }
 
   clearVec() ;
@@ -514,7 +404,7 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
   typedef std::map< Track* , int> TrackMap;
   TrackMap MarlinTrkMap ;
 
-  int flagTrack = 0; int flagRecoToTrue = 0 ; int  flagTrueToReco = 0 ; //int flagSiRel = 0;
+  int flagTrack = 0; int flagRecoToTrue = 0 ; int  flagTrueToReco = 0 ;
   int  flagBCALPart = 0 ;     int  flagBCALCluster = 0 ;   int flagPFO = 0 ;
 
   const StringVec*  colNames = evt->getCollectionNames() ;
@@ -522,9 +412,6 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
 
     if  ( _trackColName == *it )
       flagTrack = 1 ;
-
-    //if  ( _vxdTrkHitRelations == *it )
-    //  flagSiRel = 1 ;
 
     if  ( _recoToTrue == *it )
       flagRecoToTrue = 1 ;
@@ -625,8 +512,6 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
 	    
 	    hitMapVXD[ mcp ] ++ ;
 	    
-	    //HitsInLayers[ layer ] ++ ;
-	    
 	    HitsInLayersPerMCP_VXD[mcp][layer] ++ ;
 	    
 	  }
@@ -723,9 +608,8 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
       
       if( cut ) {
 	mcpTracks.push_back( mcp ) ;
-      streamlog_out(DEBUG4) << " mcparticle that survives cuts " << mcp << std::endl;  
-      //streamlog_out(DEBUG4) << " mcparticle " << mcp << " VXD hits " << hitMapVXD[ mcp ] << " SIT hits " << hitMapSIT[ mcp ] << " TPC hits " << hitMapTPC[ mcp ] << std::endl ;
-      streamlog_out(DEBUG4) << " mcparticle " << mcp << " makes hits in " << noOfLayersPerMCP[ mcp ] << " VXD layers " << std::endl ;
+	streamlog_out(DEBUG4) << " mcparticle that survives cuts " << mcp << std::endl;
+	streamlog_out(DEBUG4) << " mcparticle " << mcp << " makes hits in " << noOfLayersPerMCP[ mcp ] << " VXD layers " << std::endl ;
       }
     }
     //_________________________________________________________________________________________________________________________________________________
@@ -862,7 +746,6 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
 	  double rec_z0_err = ((Track*)trkvec[jj])->getCovMatrix()[9] ;
 	  double rec_omega = ((Track*)trkvec[jj])->getOmega();
 	  double rec_omega_error = ((Track*)trkvec[jj])->getCovMatrix()[5];
-	  // double rec_phi = ((Track*)trkvec[jj])->getPhi();
 	  double rec_phi_error = ((Track*)trkvec[jj])->getCovMatrix()[2];
 	  double rec_tanlambda = ((Track*)trkvec[jj])->getTanLambda() ;
 	  double rec_tanlambda_err = ((Track*)trkvec[jj])->getCovMatrix()[14] ;
@@ -928,93 +811,12 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
       
       if (foundFlag==1) { streamlog_out(DEBUG4) << " Particle " << mcpTracks[ii] << " which makes " <<  hitMapVXD[ mcpTracks[ii] ] + hitMapSIT[ mcpTracks[ii] ] +  hitMapTPC[ mcpTracks[ii] ]<< " hits, found " << " and " <<  hitMapVXD[ mcpTracks[ii] ] << " VXD hits " << std::endl ; }
       if (foundFlag==0) { streamlog_out(DEBUG4) << " Particle " << mcpTracks[ii] << " which makes " <<  hitMapVXD[ mcpTracks[ii] ] + hitMapSIT[ mcpTracks[ii] ] +  hitMapTPC[ mcpTracks[ii] ]<< " hits " << " and " <<  hitMapVXD[ mcpTracks[ii] ] << " VXD hits and " <<  hitMapSIT[ mcpTracks[ii] ] << " SIT hits,  NOT found " << std::endl ; }
-      //if (foundFlag==0) { streamlog_out(DEBUG4) << " Particle " << mcpTracks[ii] << " which crosses " <<   noOfLayersPerMCP[ mcp ]  << " layers, NOT found " << std::endl ; }
       
     }  // end loop on tracks
-    
-    
-    for( TrackMap::iterator ii=MarlinTrkMap.begin(); ii!=MarlinTrkMap.end(); ++ii)
-      {
-	streamlog_out(DEBUG4) << " Found silicon tracks " << (*ii).first << ": " << (*ii).second << endl;
 
-	double ghost_Pt = fabs(((3.0/10000.0)*_bField) / ((*ii).first)->getOmega());
-	double ghost_phi = ((*ii).first)->getPhi() ;
-	double ghost_tanLam = ((*ii).first)->getTanLambda() ;
-	double px = ghost_Pt * cos( ghost_phi ) ;
-	double py = ghost_Pt * sin( ghost_phi ) ;
-	double pz = ghost_Pt * ghost_tanLam ;
-	double ghost_P = sqrt( px*px + py*py + pz*pz );
-	double ghost_Cos_Theta = cos ( atan ( (1.0 / ((*ii).first)->getTanLambda()))) ;
-	hist_pt_allMarTrk->Fill( ghost_Pt );
-	hist_p_allMarTrk->Fill( ghost_P );
-	hist_th_allMarTrk->Fill( fabs( ghost_Cos_Theta ) );
-	hist_thm_allMarTrk->Fill( ghost_Cos_Theta );
-
-	if ( (*ii).second == 1 ) {
-
-	  const EVENT::LCObjectVec& mcprelvec = nav.getRelatedFromObjects((*ii).first);
-	  //FloatVec ghWgt = navRtT.getRelatedToWeights( (*ii).first );
-	  //if(mcprelvec.size() != 1) continue;
-
-	  //double ghost_Cos_Theta = cos ( atan ( (1.0 / ((*ii).first)->getTanLambda()))) ;
-
-	  TrackerHitVec ghostTrkHits = ((*ii).first)->getTrackerHits();
-	  ghost_hits.push_back(ghostTrkHits.size());
-
-	  if (ghost_Cos_Theta <= _cosTheta ) {
-	    streamlog_out(DEBUG4) << " Adding to the ghost - bkg track list, track " <<  (*ii).first << " with momentum " << fabs(((3.0/10000.0)*_bField) / ((*ii).first)->getOmega()) << " & no of hits " <<  ghostTrkHits.size() << " being related to " << mcprelvec.size() << " MCParticles "  << std::endl ;
-	    
-	    ghostPt.push_back( ghost_Pt ) ;
-	    ghostCosTheta.push_back( ghost_Cos_Theta ) ;
-
-	    hist_pt_fakeMarTrk->Fill( ghost_Pt );
-	    hist_p_fakeMarTrk->Fill( ghost_P );
-	    hist_th_fakeMarTrk->Fill( fabs( ghost_Cos_Theta ) );
-	    hist_thm_fakeMarTrk->Fill( ghost_Cos_Theta );
-
-	    double ghostTrkChi2 = ((*ii).first)->getChi2();
-	    double ghostTrkNdf = ((*ii).first)->getNdf();
-	    BadTrksD0.push_back(((*ii).first)->getD0());
-	    BadTrksZ0.push_back(((*ii).first)->getZ0());
-
-	    for(unsigned int ghid=0; ghid < mcprelvec.size(); ghid++ ) {
-	      FloatVec ghWgt = nav.getRelatedToWeights( mcprelvec[ghid] );
-	      generatorStatus.push_back(  ((MCParticle*)mcprelvec[ghid])->getGeneratorStatus() );
-	      DecayedInTracker.push_back(  ((MCParticle*)mcprelvec[ghid])->isDecayedInTracker() );
-	      ghostWgt.push_back( ghWgt[ghid] );
-	    }
-	    
-	    /*
-	    for(int ghid=0; ghid <ghWgt.size(); ghid++ ) {
-	      ghostWgt.push_back( ghWgt[ghid] );
-	    }
-	    */
-	    if ( ghostTrkNdf != 0 ) { ghostTrkChi2OverNdof.push_back( ghostTrkChi2/ghostTrkNdf ) ; }
-	    
-	    ghostCounter++ ;
-	    
-	  }
-        }
-	else if( (*ii).second > 2 ) {
-
-	  //const EVENT::LCObjectVec& mcprelvec = nav.getRelatedFromObjects((*ii).first);
-
-	  double doubleCounting_Cos_Theta = cos ( atan ( (1.0 / ((*ii).first)->getTanLambda()))) ;
-	  if (doubleCounting_Cos_Theta <= _cosTheta ) {
-	    streamlog_out(DEBUG4) << " Adding to the doubleCounting track list, track " <<  (*ii).first << " with momentum " << fabs(((3.0/10000.0)*_bField) / ((*ii).first)->getOmega())  << std::endl ;
-
-	    doubleCountingPt.push_back( fabs(((3.0/10000.0)*_bField) / ((*ii).first)->getOmega())) ;
-	    doubleCountingCosTheta.push_back( doubleCounting_Cos_Theta ) ;
-	  }
-	}
-      }
-    
   }  // condition for the existence of the relation collections
   
-  if ( _fillBigTTree ) {
-    EvalTree->Fill();
-    GhostTree->Fill();
-  }
+  if ( _fillBigTTree )  EvalTree->Fill();
 
   nEvt++;
   
