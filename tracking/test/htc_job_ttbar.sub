@@ -38,7 +38,7 @@ InitialDir = $ENV(PWD)
 Notification = Always
 #
 # Defaults to 1 day:
-#+RequestRuntime = 3600 * 3
++RequestRuntime = 3600 * 12
 #
 # Defaults to 3G
 #RequestDisk = 2048 * 3

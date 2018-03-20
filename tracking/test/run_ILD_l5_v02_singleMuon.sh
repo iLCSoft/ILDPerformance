@@ -4,52 +4,6 @@
 # Running shell script in parallel over multiple cores
 #==============================================================
 
-echo "############################################################################"
-echo "                             System information"
-echo "                             =================="
-
-echo "Host:"
-hostname -f
-
-echo "CPU(s):"
-cat /proc/cpuinfo | grep "model name" | cut -b 14-
-
-echo "RAM:"
-cat /proc/meminfo | grep "MemTotal" | cut -b 10-
-
-echo "Swap:"
-cat /proc/meminfo | grep "SwapTotal" | cut -b 11-
-
-echo "############################################################################"
-echo "Group:      ${GROUP}"
-
-echo "Hosttype:   ${HOSTTYPE}"
-
-echo "JobID:      ${JOB_ID}"
-
-echo "JobName:    ${JOB_NAME}"
-
-echo "Job_Script: ${JOB_SCRIPT}"
-
-echo "User:       ${LOGNAME}"
-
-echo "Queue:      ${QUEUE}"
-
-echo "Shell:      ${SHELL}"
-
-echo "TMP:        ${TMP}"
-
-echo "TMPDIR:     ${TMPDIR}"
-
-echo "User:       ${USER}"
-
-echo "Working_DIR:${PWD}"
-
-echo "############################################################################"
-echo
-echo "############################################################################"
-echo
-
 ILDMODEL=ILD_l5_v02
 ILCSOFTVER=v01-19-05
 
@@ -90,8 +44,8 @@ ddsim \
     --inputFiles Results/GenFiles/mcparticles_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio  \
     --outputFile ${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
     --compactFile $lcgeo_DIR/ILD/compact/${ILDMODEL}/${ILDMODEL}.xml \
-    --steeringFile ddsim_steer.py \
-    --numberOfEvents 1000 &
+    --steeringFile ddsim_steer.py
+
 done
 wait
 done
@@ -146,6 +100,7 @@ INFILE=Results/RecoFiles/${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_
 
 Marlin DDDiagnostics.xml \
     --global.LCIOInputFiles=$INFILE \
+    --InitDD4hep.DD4hepXMLFile=$lcgeo_DIR/ILD/compact/ILD_l5_v02/ILD_l5_v02.xml \
     --MyAIDAProcessor.FileName=analysis_${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
     --MyDiagnostics.FillBigTTree=true \
     --MyDiagnostics.PhysSampleOn=false \
@@ -179,11 +134,12 @@ root -b -q PResolutionL5.C
 root -b -q meanL5.C
 root -b -q sigmaL5.C
 
-mkdir -p ~/www/ILDPerformance_${ILCSOFTVER}
+OUTPUTPATH=~/www/ILDPerformance_${ILCSOFTVER}
+mkdir -p ${OUTPUTPATH}
 
-cp IPResolution_${ILDMODEL}_${ILCSOFTVER}.png ~/www/ILDPerformance_${ILCSOFTVER}
-cp D0_fit_${ILDMODEL}_${ILCSOFTVER}.pdf ~/www/ILDPerformance_${ILCSOFTVER}
-cp PResolution_${ILDMODEL}_${ILCSOFTVER}.png ~/www/ILDPerformance_${ILCSOFTVER}
-cp PR_fit_${ILDMODEL}_${ILCSOFTVER}.pdf ~/www/ILDPerformance_${ILCSOFTVER}
-cp pull_mean_${ILDMODEL}_${ILCSOFTVER}.png ~/www/ILDPerformance_${ILCSOFTVER}
-cp pull_sigma_${ILDMODEL}_${ILCSOFTVER}.png ~/www/ILDPerformance_${ILCSOFTVER}
+cp IPResolution_${ILDMODEL}_${ILCSOFTVER}.png ${OUTPUTPATH}
+cp D0_fit_${ILDMODEL}_${ILCSOFTVER}.pdf ${OUTPUTPATH}
+cp PResolution_${ILDMODEL}_${ILCSOFTVER}.png ${OUTPUTPATH}
+cp PR_fit_${ILDMODEL}_${ILCSOFTVER}.pdf ${OUTPUTPATH}
+cp pull_mean_${ILDMODEL}_${ILCSOFTVER}.png ${OUTPUTPATH}
+cp pull_sigma_${ILDMODEL}_${ILCSOFTVER}.png ${OUTPUTPATH}
