@@ -265,8 +265,8 @@ void DDDiagnostics::initParameters(void) {
   registerInputCollection( LCIO::TRACKERHIT,
 			   "SpcPntsCollection" ,
 			   "Name of the SIT SpacePoints collection"  ,
-			   _sitSpacePoints ,
-			   std::string("SITSpacePoints")  ) ;
+			   _sitTrackerHits ,
+			   std::string("SITTrackerHits")  ) ;
 
   registerInputCollection( LCIO::TRACKERHIT,
 			   "VXDTrackerHits" ,
