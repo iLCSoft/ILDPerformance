@@ -32,12 +32,8 @@ void DDDiagnostics::initTree(void) {
 
   EvalTree = new TTree("EvalTree","EvalTree");
   EvalTree->Branch("foundTrk",&foundTrk) ;
-  EvalTree->Branch("BCalParts",&BCalParts,"BCalParts/I") ;
-  EvalTree->Branch("BCalCls",&BCalCls,"BCalCls/I") ;
-  EvalTree->Branch("pfos",&pfos,"pfos/I") ;
   EvalTree->Branch("PtReco",&PtReco) ;
   EvalTree->Branch("CosThetaReco",&CosThetaReco) ;
-  EvalTree->Branch("SiTrksPt",&SiTrksPt) ;
   EvalTree->Branch("foundTrkChi2OverNdof",&foundTrkChi2OverNdof);
   EvalTree->Branch("PtMCP",&PtMCP) ;
   EvalTree->Branch("CosThetaMCP",&CosThetaMCP) ;
@@ -48,13 +44,12 @@ void DDDiagnostics::initTree(void) {
   EvalTree->Branch("SITHits",&SITHits) ;
   EvalTree->Branch("FTDHits",&FTDHits) ;
   EvalTree->Branch("TPCHits",&TPCHits) ;
-  EvalTree->Branch("MarlinTracks",&MarlinTracks,"MarlinTracks/I") ;
   EvalTree->Branch("trueD0",&trueD0) ;
   EvalTree->Branch("trueZ0",&trueZ0) ;
   EvalTree->Branch("recoD0",&recoD0) ;
   EvalTree->Branch("recoZ0",&recoZ0) ;
-  EvalTree->Branch("recoD0error",&recoD0error) ;
-  EvalTree->Branch("recoZ0error",&recoZ0error) ;
+  EvalTree->Branch("recoD0Error",&recoD0Error) ;
+  EvalTree->Branch("recoZ0Error",&recoZ0Error) ;
   EvalTree->Branch("trueOmega",&trueOmega) ;
   EvalTree->Branch("truePhi",&truePhi) ;
   EvalTree->Branch("trueTanLambda",&trueTanLambda) ;
@@ -254,23 +249,6 @@ void DDDiagnostics::initParameters(void) {
 			   _mcParticleCollectionName ,
 			   std::string("MCParticle") ) ;
 
-  registerInputCollection( LCIO::RECONSTRUCTEDPARTICLE,
-			   "BCALParticles" , 
-			   "Name of the BCALParticles input collection"  ,
-			   _BCALParticleCollectionName ,
-			   std::string("BCALParticles") ) ;
-
-  registerInputCollection( LCIO::CLUSTER,
-			   "BCALCLusters" , 
-			   "Name of the BCAL clusters input collection"  ,
-			   _BCALClusterCollectionName ,
-			   std::string("BCALCLusters") ) ;
-
-  registerInputCollection( LCIO::RECONSTRUCTEDPARTICLE,
-                            "PFOs" , 
-                            "particle flow objects"  ,
-                            _pandoraPFOs ,
-                            std::string("PandoraPFOs") ) ;
 
   StringVec exampleSimHits ;
   exampleSimHits.push_back("VXDCollection") ;
@@ -405,7 +383,6 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
   TrackMap MarlinTrkMap ;
 
   int flagTrack = 0; int flagRecoToTrue = 0 ; int  flagTrueToReco = 0 ;
-  int  flagBCALPart = 0 ;     int  flagBCALCluster = 0 ;   int flagPFO = 0 ;
 
   const StringVec*  colNames = evt->getCollectionNames() ;
   for( StringVec::const_iterator it = colNames->begin() ; it != colNames->end() ; it++ ){
@@ -418,15 +395,6 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
 
     if  ( _trueToReco == *it )
       flagTrueToReco = 1 ;
-
-    if (  _BCALParticleCollectionName == *it )
-      flagBCALPart = 1 ;
-
-    if (  _BCALClusterCollectionName == *it )
-      flagBCALCluster = 1 ;
-
-    if ( _pandoraPFOs  == *it )
-      flagPFO = 1 ;
 
   }
 
@@ -447,21 +415,6 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
     }
   }
 
-
-  if (flagBCALPart == 1 ){
-    LCCollection* BCalParty = evt->getCollection( _BCALParticleCollectionName );
-    BCalParts = BCalParty->getNumberOfElements();
-  }
-
-  if (flagBCALCluster == 1 ){
-    LCCollection* BCalClassy = evt->getCollection( _BCALParticleCollectionName );
-    BCalCls = BCalClassy->getNumberOfElements();
-  }
-  
-  if (flagPFO == 1 ){
-    LCCollection* Particles = evt->getCollection( _pandoraPFOs );
-    pfos = Particles->getNumberOfElements();
-  }
   
 
   if ( flagRecoToTrue == 1 && flagTrueToReco == 1 ){   // condition for the existence of the relation collections
@@ -759,9 +712,9 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
 	  truePhi.push_back(phmcp);
 	  trueTanLambda.push_back(tLmcp);
 	  recoD0.push_back(((Track*)trkvec[jj])->getD0());
-	  recoD0error.push_back(((Track*)trkvec[jj])->getCovMatrix()[0]);
+	  recoD0Error.push_back(((Track*)trkvec[jj])->getCovMatrix()[0]);
 	  recoZ0.push_back(((Track*)trkvec[jj])->getZ0());
-	  recoZ0error.push_back(((Track*)trkvec[jj])->getCovMatrix()[9]);
+	  recoZ0Error.push_back(((Track*)trkvec[jj])->getCovMatrix()[9]);
 	  recoOmega.push_back(((Track*)trkvec[jj])->getOmega());
 	  recoOmegaError.push_back(((Track*)trkvec[jj])->getCovMatrix()[5]);
 
