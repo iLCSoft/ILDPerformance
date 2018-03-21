@@ -252,6 +252,7 @@ void DDDiagnostics::initParameters(void) {
 
   StringVec exampleSimHits ;
   exampleSimHits.push_back("VXDCollection") ;
+  exampleSimHits.push_back("FTDCollection") ;
   exampleSimHits.push_back("SITCollection") ;
   exampleSimHits.push_back("TPCCollection") ;
   
@@ -437,10 +438,12 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
     
     HITMAP hitMapVXD ;
     HITMAP hitMapSIT ;
+    HITMAP hitMapFTD ;
     HITMAP hitMapTPC ;
     HITMAP noOfLayersPerMCP ;
     
     HitsInLayersPerMCP HitsInLayersPerMCP_VXD ;
+    HitsInLayersPerMCP HitsInLayersPerMCP_FTD ;
   
     for( unsigned i=0,iN=_simTrkHitCollectionNames.size() ; i<iN ; ++i){
 
@@ -461,7 +464,7 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
 	    int layer = 0 ;  
 	    layer = encoder[lcio::LCTrackerCellID::layer()] ;
 	    
-	    streamlog_out(DEBUG2) << " MC particle " << mcp << " creates hit " << simHit << " in layer " << layer << std::endl ;
+	    streamlog_out(DEBUG2) << " MC particle " << mcp << " creates hit " << simHit << " in VXD layer " << layer << std::endl ;
 	    
 	    hitMapVXD[ mcp ] ++ ;
 	    
@@ -470,6 +473,27 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
 	  }
 	}
 	
+	if (_simTrkHitCollectionNames[i]=="FTDCollection"){
+	  for( int j = 0, jN = col->getNumberOfElements() ; j<jN ; ++j ) {
+	    SimTrackerHit* simHit = (SimTrackerHit*) col->getElementAt( j ) ;
+	    MCParticle* mcp = simHit->getMCParticle() ;
+
+	    UTIL::BitField64 encoder( lcio::LCTrackerCellID::encoding_string() ) ;
+	    encoder.reset();
+	    encoder.setValue(simHit->getCellID0()) ;
+
+	    int layer = 0 ;
+	    layer = encoder[lcio::LCTrackerCellID::layer()] ;
+
+	    streamlog_out(DEBUG2) << " MC particle " << mcp << " creates hit " << simHit << " in FTD layer " << layer << std::endl ;
+
+	    hitMapFTD[ mcp ] ++ ;
+
+	    HitsInLayersPerMCP_FTD[mcp][layer] ++ ;
+
+	  }
+	}
+
 
 	if (_simTrkHitCollectionNames[i]=="SITCollection"){
 	  for( int j = 0, jN = col->getNumberOfElements() ; j<jN ; ++j ) {
@@ -551,6 +575,11 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
 
 	APPLY_CUT( DEBUG, cut, !(mcp->isDecayedInTracker())) ;
 	
+	int SiHits_mcp = hitMapVXD[ mcp ] + hitMapSIT[ mcp ] + hitMapFTD[ mcp ];
+	if( _minSiHits > 0 ) APPLY_CUT( DEBUG, cut, SiHits_mcp >= _minSiHits ) ;
+
+	if( _siTrkEffOn &&  _reqInnVXDHit ) APPLY_CUT( DEBUG, cut, hitMapVXD[ mcp ] >= _minSiHits ) ;
+
 	//APPLY_CUT( DEBUG, cut, hitMapVXD[ mcp ]  > 5  && noOfLayersPerMCP[ mcp ] > 5  ) ; //  Accept as examined track subsample the MCParticles that creates certain number of hits to each subdetector
 	
 	//APPLY_CUT( DEBUG, cut, hitMapVXD[ mcp ]  > 5  && hitMapSIT[ mcp ] > 3  ) ; 
