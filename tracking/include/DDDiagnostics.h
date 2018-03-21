@@ -115,7 +115,7 @@ class DDDiagnostics : public Processor {
   std::string _mcParticleCollectionName = "";
   StringVec   _simTrkHitCollectionNames = {};
   std::string _trackColName = "";
-  std::string _sitSpacePoints = "";
+  std::string _sitTrackerHits = "";
   std::string _sitTrkHitRelations = "";
   std::string _vxdTrackerHits = "";
   std::string _vxdTrkHitRelations = "";
