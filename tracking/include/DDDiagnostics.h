@@ -119,9 +119,6 @@ class DDDiagnostics : public Processor {
   std::string _sitTrkHitRelations = "";
   std::string _vxdTrackerHits = "";
   std::string _vxdTrkHitRelations = "";
-  std::string _BCALParticleCollectionName = "";
-  std::string _BCALClusterCollectionName = "";
-  std::string _pandoraPFOs = "";
 
   int nEvt = 0;
   int OutSitBkgHit = 0;
@@ -149,18 +146,14 @@ class DDDiagnostics : public Processor {
   TTree *EvalTree = NULL;
   vector<int> foundTrk = {};
   vector<int> TrackSiHits = {};
-  vector<int> SiHitsSiTrk  = {};
   vector<int> MarlinTrkHits  = {};
   vector<int> VXDHits  = {};
   vector<int> SITHits  = {};
   vector<int> FTDHits  = {};
   vector<int> TPCHits  = {};
   vector<float> foundTrkChi2OverNdof  = {};
-  vector<float> CluChi2OverNdof  = {};
-  vector<float> SiTrkChi2OverNdof  = {};
   vector<float> PtReco = {};
   vector<float> CosThetaReco = {};
-  vector<float> SiTrksPt = {};
   vector<float> PtMCP = {};
   vector<float> CosThetaMCP = {};
   vector<float> Wgt = {};
@@ -177,17 +170,11 @@ class DDDiagnostics : public Processor {
   vector<float> recoOmega = {};
   vector<float> recoPhi = {};
   vector<float> recoTanLambda = {};
-  vector<float> recoD0error = {};
-  vector<float> recoZ0error = {};
   vector<float> recoOmegaError = {};
   vector<float> recoPhiError = {};
   vector<float> recoTanLambdaError = {};
-  vector<float> siTrksCosTheta = {};
 
   int MarlinTracks = 0;
-  int BCalParts = 0;
-  int BCalCls = 0;
-  int pfos  = 0;
 
   TH1F *OmegaPull = NULL;
   TH1F *PhiPull = NULL;
@@ -215,9 +202,7 @@ class DDDiagnostics : public Processor {
   TCanvas *pulls = NULL;
   TCanvas *residuals = NULL;
   TCanvas *eff = NULL;
-  TCanvas *Rfake = NULL;
   TCanvas *effPM = NULL;
-  TCanvas *RfakePM = NULL;
 
   TF1 *myfunc  = NULL;
 
