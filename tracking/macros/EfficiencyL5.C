@@ -1,15 +1,15 @@
 void EfficiencyL5(){
 
-  TFile* fttbar = new TFile("../Results/Analysis/analysis_ILD_l5_v02_v01-19-05_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05.root");
+  TFile* fttbar = new TFile("../Results/Analysis/analysis_ILD_l5_v02_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05.root");
 
   /*
   TCanvas *eff = (TCanvas*) f->Get("eff");
   eff->Draw();
-  eff->SaveAs("trkEff_ILD_l5_v02_v01-19-05.png");
+  eff->SaveAs("trkEff_ILD_l5_v02.png");
 
   TCanvas *effPM = (TCanvas*) f->Get("effPM");
   effPM->Draw();
-  effPM->SaveAs("trkEff_v02_ILD_l5_v02_v01-19-05.png");
+  effPM->SaveAs("trkEff_v02_ILD_l5_v02.png");
   */
 
 
@@ -65,11 +65,11 @@ void EfficiencyL5(){
   gPad->Update();
 
   auto legend0_pt = new TLegend(0.461153,0.242604,0.906015,0.363905);
-  legend0_pt->SetHeader("t#bar{t} @ 500GeV ILD_l5_v02 v01-19-05");
+  legend0_pt->SetHeader("t#bar{t} @ 500GeV ILD_l5_v02");
   legend0_pt->AddEntry(h_efficiency_pt_noOverlay,"No background","epl");
   legend0_pt->Draw();
 
-  c_pt->SaveAs("trkEff_pt_ttbar_ILD_l5_v02_v01-19-05.png");
+  c_pt->SaveAs("trkEff_pt_ttbar_ILD_l5_v02.png");
 
 
  // vs theta
@@ -91,10 +91,10 @@ void EfficiencyL5(){
   gPad->Update();
 
   auto legend0_theta = new TLegend(0.461153,0.242604,0.906015,0.363905);
-  legend0_theta->SetHeader("t#bar{t} @ 500GeV ILD_l5_v02 v01-19-05");
+  legend0_theta->SetHeader("t#bar{t} @ 500GeV ILD_l5_v02");
   legend0_theta->AddEntry(h_efficiency_theta_noOverlay,"No background","epl");
   legend0_theta->Draw();
 
-  c_theta->SaveAs("trkEff_theta_ttbar_ILD_l5_v02_v01-19-05.png");
+  c_theta->SaveAs("trkEff_theta_ttbar_ILD_l5_v02.png");
 
 }

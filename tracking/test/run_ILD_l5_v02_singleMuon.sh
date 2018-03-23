@@ -112,6 +112,17 @@ wait
 done
 wait
 
+# copy output by removing the "${ILCSOFTVER}"
+for i in {0..3}
+do
+
+for j in {0..7}
+do
+
+cp analysis_${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.root ../Results/Analysis/analysis_${ILDMODEL}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.root
+
+done
+done
 
 # move all to folder Analysis
 
@@ -138,9 +149,9 @@ root -b -q sigmaL5.C
 OUTPUTPATH=~/www/ILDPerformance_${ILCSOFTVER}
 mkdir -p ${OUTPUTPATH}
 
-cp IPResolution_${ILDMODEL}_${ILCSOFTVER}.png ${OUTPUTPATH}
-cp D0_fit_${ILDMODEL}_${ILCSOFTVER}.pdf ${OUTPUTPATH}
-cp PResolution_${ILDMODEL}_${ILCSOFTVER}.png ${OUTPUTPATH}
-cp PR_fit_${ILDMODEL}_${ILCSOFTVER}.pdf ${OUTPUTPATH}
-cp pull_mean_${ILDMODEL}_${ILCSOFTVER}.png ${OUTPUTPATH}
-cp pull_sigma_${ILDMODEL}_${ILCSOFTVER}.png ${OUTPUTPATH}
+cp IPResolution_${ILDMODEL}.png ${OUTPUTPATH}/IPResolution_${ILDMODEL}_${ILCSOFTVER}.png
+cp D0_fit_${ILDMODEL}.pdf ${OUTPUTPATH}/D0_fit_${ILDMODEL}_${ILCSOFTVER}.pdf
+cp PResolution_${ILDMODEL}.png ${OUTPUTPATH}/PResolution_${ILDMODEL}_${ILCSOFTVER}.png
+cp PR_fit_${ILDMODEL}.pdf ${OUTPUTPATH}/PR_fit_${ILDMODEL}_${ILCSOFTVER}.pdf
+cp pull_mean_${ILDMODEL}.png ${OUTPUTPATH}/pull_mean_${ILDMODEL}_${ILCSOFTVER}.png
+cp pull_sigma_${ILDMODEL}.png ${OUTPUTPATH}/pull_sigma_${ILDMODEL}_${ILCSOFTVER}.png

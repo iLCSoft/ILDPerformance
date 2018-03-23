@@ -15,14 +15,15 @@ root -b -q sigmaL5.C
 
 root -b -q EfficiencyL5.C
 
-mkdir -p ~/www/ILDPerformance_${ILCSOFTVER}
+OUTPUTPATH= ~/www/ILDPerformance_${ILCSOFTVER}
+mkdir -p ${OUTPUTPATH}
 
-cp IPResolution_${ILDMODEL}_${ILCSOFTVER}.png ~/www/ILDPerformance_${ILCSOFTVER}
-cp D0_fit_${ILDMODEL}_${ILCSOFTVER}.pdf ~/www/ILDPerformance_${ILCSOFTVER}
-cp PResolution_${ILDMODEL}_${ILCSOFTVER}.png ~/www/ILDPerformance_${ILCSOFTVER}
-cp PR_fit_${ILDMODEL}_${ILCSOFTVER}.pdf ~/www/ILDPerformance_${ILCSOFTVER}
-cp pull_mean_${ILDMODEL}_${ILCSOFTVER}.png ~/www/ILDPerformance_${ILCSOFTVER}
-cp pull_sigma_${ILDMODEL}_${ILCSOFTVER}.png ~/www/ILDPerformance_${ILCSOFTVER}
+cp IPResolution_${ILDMODEL}.png ${OUTPUTPATH}/IPResolution_${ILDMODEL}_${ILCSOFTVER}.png
+cp D0_fit_${ILDMODEL}.pdf ${OUTPUTPATH}/D0_fit_${ILDMODEL}_${ILCSOFTVER}.pdf
+cp PResolution_${ILDMODEL}.png ${OUTPUTPATH}/PResolution_${ILDMODEL}_${ILCSOFTVER}.png
+cp PR_fit_${ILDMODEL}.pdf ${OUTPUTPATH}/PR_fit_${ILDMODEL}_${ILCSOFTVER}.pdf
+cp pull_mean_${ILDMODEL}.png ${OUTPUTPATH}/pull_mean_${ILDMODEL}_${ILCSOFTVER}.png
+cp pull_sigma_${ILDMODEL}.png ${OUTPUTPATH}/pull_sigma_${ILDMODEL}_${ILCSOFTVER}.png
 
-cp trkEff_pt_ttbar_${ILDMODEL}_${ILCSOFTVER}.png ~/www/ILDPerformance_${ILCSOFTVER}
-cp trkEff_theta_ttbar_${ILDMODEL}_${ILCSOFTVER}.png ~/www/ILDPerformance_${ILCSOFTVER}
+cp trkEff_pt_ttbar_${ILDMODEL}.png ${OUTPUTPATH}/trkEff_pt_ttbar_${ILDMODEL}_${ILCSOFTVER}.png
+cp trkEff_theta_ttbar_${ILDMODEL}.png ${OUTPUTPATH}/trkEff_theta_ttbar_${ILDMODEL}_${ILCSOFTVER}.png
