@@ -63,6 +63,7 @@ rm ${ILDMODEL}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_
 
 Marlin Diagnostics_ILD_l5_v02_ttbar.xml \
     --constant.lcgeo_DIR=$lcgeo_DIR \
+    --constant.ILCSoftVersion=${ILCSOFTVER} \
     --MyAIDAProcessor.FileName=analysis_${ILDMODEL}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05 \
     --MyDiagnostics.PhysSampleOn=true \
 > DIAG_${ILDMODEL}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05.out
@@ -70,6 +71,7 @@ Marlin Diagnostics_ILD_l5_v02_ttbar.xml \
 
 # move all to folder Analysis
 
+cp  analysis_${ILDMODEL}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05.root ../Results/Analysis/analysis_${ILDMODEL}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05.root
 mv  analysis_${ILDMODEL}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05.root ../Results/Analysis
 
 
@@ -89,5 +91,5 @@ root -b -q EfficiencyL5.C
 OUTPUTPATH=~/www/ILDPerformance_${ILCSOFTVER}
 mkdir -p ${OUTPUTPATH}
 
-cp trkEff_pt_ttbar_${ILDMODEL}_${ILCSOFTVER}.png ${OUTPUTPATH}
-cp trkEff_theta_ttbar_${ILDMODEL}_${ILCSOFTVER}.png ${OUTPUTPATH}
+cp trkEff_pt_ttbar_${ILDMODEL}.png ${OUTPUTPATH}/trkEff_pt_ttbar_${ILDMODEL}_${ILCSOFTVER}.png
+cp trkEff_theta_ttbar_${ILDMODEL}.png ${OUTPUTPATH}/trkEff_theta_ttbar_${ILDMODEL}_${ILCSOFTVER}.png

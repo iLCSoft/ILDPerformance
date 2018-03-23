@@ -29,14 +29,14 @@ int color, marker;
 void PResolutionL5(){
 
   TCanvas *PR_fit = new TCanvas("PR fit","PR fit",800,800);
-  PR_fit->Print("PR_fit_ILD_l5_v02_v01-19-05.pdf[");
+  PR_fit->Print("PR_fit_ILD_l5_v02.pdf[");
 
   for (int ll = 0; ll < SIZE_M; ll++){  
     zeros[ll] = 0;
   }
   for(int ii = 0; ii < SIZE_PA; ii++){
     for (int i = 0; i < SIZE_M; i++){
-      TFile *f = new TFile(Form("../Results/Analysis/analysis_ILD_l5_v02_v01-19-05_MuonsAngle_%d_Mom_%d.root",PA[ii],Mom[i]), "read");
+      TFile *f = new TFile(Form("../Results/Analysis/analysis_ILD_l5_v02_MuonsAngle_%d_Mom_%d.root",PA[ii],Mom[i]), "read");
       //TTree *EvalTree = (TTree*)f->Get("EvalTree");
         TTree *EvalTree;
         f->GetObject("EvalTree", EvalTree);
@@ -105,12 +105,12 @@ void PResolutionL5(){
 
 	//std::cout << " sigma " << sigma[i][ii] <<std::endl ;
 
-	PR_fit->Print("PR_fit_ILD_l5_v02_v01-19-05.pdf",&dummy[0]);
+	PR_fit->Print("PR_fit_ILD_l5_v02.pdf",&dummy[0]);
 
     }//loop for each .root files, here I have collected sigma and its error
   }//polar angle loop
   
-  PR_fit->Print("PR_fit_ILD_l5_v02_v01-19-05.pdf]");
+  PR_fit->Print("PR_fit_ILD_l5_v02.pdf]");
 
  float sigma20[SIZE_M];
  float error20[SIZE_M];
@@ -221,6 +221,6 @@ void PResolutionL5(){
   fpr85->SetLineColor(1); 
   //fpr85->Draw("same");
 
-  c_two->SaveAs("PResolution_ILD_l5_v02_v01-19-05.png");
+  c_two->SaveAs("PResolution_ILD_l5_v02.png");
 
 }
