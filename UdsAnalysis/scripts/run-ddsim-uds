@@ -1,0 +1,150 @@
+#!/bin/bash
+#
+#(make sure the right shell will be used)
+#$ -S /bin/bash
+#
+#execute the job from the current directory and not relative to your home directory
+#$ -cwd
+
+# sld6 for bird on NAF2
+#$ -l arch=amd64
+#$ -l os=sld6
+
+#$ -l h_rt=23:59:00
+#$ -l h_vmem=4G
+
+#set the email address
+##$ -M <user>@desy.de
+#
+#send email when job aborts or when job ends
+##$ -m ae
+
+echo "############################################################################"
+echo "                             System information"
+echo "                             =================="
+
+echo "Host:"
+hostname -f
+
+echo "CPU(s):"
+cat /proc/cpuinfo | grep "model name" | cut -b 14-
+
+echo "RAM:"
+cat /proc/meminfo | grep "MemTotal" | cut -b 10-
+
+echo "Swap:"
+cat /proc/meminfo | grep "SwapTotal" | cut -b 11-
+
+echo "############################################################################"
+echo "Group:      ${GROUP}"
+
+echo "Hosttype:   ${HOSTTYPE}"
+
+echo "User:       ${LOGNAME}"
+
+echo "Queue:      ${QUEUE}"
+
+echo "Shell:      ${SHELL}"
+
+echo "TMP:        ${TMP}"
+
+echo "TMPDIR:     ${TMPDIR}"
+
+echo "User:       ${USER}"
+
+echo "Working_DIR:${PWD}"
+
+echo "############################################################################"
+echo
+echo "############################################################################"
+echo
+
+# global settings
+userSettings=$1
+source ${userSettings}
+
+if [ $? -ne 0 ]
+then
+  echo "Failed to source configuration file '${userSettings}'"
+  exit 1
+fi
+
+# job specific settings
+energy=$2
+run=$3
+skipNEvents=$4
+
+echo "############################################################################"
+echo "                              Job information"
+echo "                             =================="
+
+echo "ILCSoft path:      ${ilcsoftPath}"
+
+echo "ILCSoft version:   ${ilcsoftVersion}"
+
+echo "ILDConfig:         ${ildconfig}"
+
+echo "Detector:          ${detectorSim}"
+
+echo "CMS energy:        ${energy}"
+
+echo "Output directory:  ${outputDirectory}"
+
+echo "Run:               ${run}"
+
+echo "Skip/split:        ${skipNEvents}"
+
+echo "Grid mount:        ${gridMount}"
+
+# Initialize ILCSoft
+source ${ilcsoftPath}/${ilcsoftVersion}/init_ilcsoft.sh
+
+stdhepInputFile="${gridMount}/ilc/user/s/sgreen/StdHepFiles/Z_uds/${energy}GeV/Zuds${energy}_0${run}.stdhep"
+compactFile="$lcgeo_DIR/ILD/compact/${detectorSim}/${detectorSim}.xml"
+outputFile="${outputDirectory}/SIM/ddsim-s${ilcsoftVersion}-G${detectorSim}-Zuds${energy}_0${run}_${skipNEvents}00.slcio"
+steerDownloadUrl="https://raw.githubusercontent.com/iLCSoft/ILDConfig/${ildconfig}/StandardConfig/production/ddsim_steer.py"
+
+
+echo "Stdhep file:       ${stdhepInputFile}"
+
+echo "Compact file:      ${compactFile}"
+
+echo "Output file:       ${outputFile}"
+
+echo "Steering file url: ${steerDownloadUrl}"
+
+# Create output directory if doesn't exists
+mkdir -p ${outputDirectory}/SIM
+
+if [ $? != 0 ]
+then
+  echo "Couldn't create output directory '${outputDirectory}/SIM' !"
+  exit 1
+fi
+
+steeringFile=`mkstmp -p . ddsim_steer_XXXXXX.py`
+
+# Get the ddsim steering file from github
+wget -O ${steeringFile} ${steerDownloadUrl}
+
+if [ $? != 0 ]
+then
+  echo "Couldn't get the ddsim steering file from github url: '${steerDownloadUrl}' !"
+  exit 1
+fi
+
+echo "Steering file    : ${steeringFile}"
+
+echo "############################################################################"
+echo "                                Running ddsim"
+echo "                             =================="
+
+# Run ddsim
+ddsim --compactFile ${compactFile} --inputFiles ${stdhepInputFile} --outputFile ${outputFile} --steeringFile ${steeringFile} --skipNEvents ${skipNEvents}00 --numberOfEvents 100
+ddsimStatus=$?
+
+echo "############################################################################"
+echo "                   Job finished with status ${ddsimStatus}"
+echo "                             =================="
+
+ls -lthr

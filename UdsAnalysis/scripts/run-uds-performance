@@ -1,0 +1,141 @@
+#!/bin/bash
+#
+#(make sure the right shell will be used)
+#$ -S /bin/bash
+#
+#execute the job from the current directory and not relative to your home directory
+#$ -cwd
+
+# sld6 for bird on NAF2
+#$ -l arch=amd64
+#$ -l os=sld6
+
+#$ -l h_rt=23:59:00
+#$ -l h_vmem=4G
+
+#set the email address
+##$ -M <user>@desy.de
+#
+#send email when job aborts or when job ends
+##$ -m ae
+
+echo "############################################################################"
+echo "                             System information"
+echo "                             =================="
+
+echo "Host:"
+hostname -f
+
+echo "CPU(s):"
+cat /proc/cpuinfo | grep "model name" | cut -b 14-
+
+echo "RAM:"
+cat /proc/meminfo | grep "MemTotal" | cut -b 10-
+
+echo "Swap:"
+cat /proc/meminfo | grep "SwapTotal" | cut -b 11-
+
+echo "############################################################################"
+echo "Group:      ${GROUP}"
+
+echo "Hosttype:   ${HOSTTYPE}"
+
+echo "User:       ${LOGNAME}"
+
+echo "Queue:      ${QUEUE}"
+
+echo "Shell:      ${SHELL}"
+
+echo "TMP:        ${TMP}"
+
+echo "TMPDIR:     ${TMPDIR}"
+
+echo "User:       ${USER}"
+
+echo "Working_DIR:${PWD}"
+
+echo "############################################################################"
+echo
+echo "############################################################################"
+echo
+
+# global settings
+userSettings=$1
+source ${userSettings}
+
+if [ $? -ne 0 ]
+then
+  echo "Failed to source configuration file '${userSettings}'"
+  exit 1
+fi
+
+outputFile="${outputDirectory}/PERFORMANCE/ddsim-s${ilcsoft}-G${detectorRec}-ILDConfig${ildconfig}-Zuds-ILDPerformanceUdsAnalysis.root"
+filePattern="${outputDirectory}/PFO/ddsim-s${ilcsoft}-G${detectorRec}-ILDConfig${ildconfig}-Zuds%{energy}_PfoAnalysis_combined.root"
+ildperformance=`find ${ilcsoftPath}/${ilcsoftVersion}/ILDPerformance  -type d -maxdepth 1 -mindepth 1`
+udsAnalysisBinary=${ildperformance}/bin/ILDPerformance_AnalyseUds
+
+echo "############################################################################"
+echo "                              Job information"
+echo "                             =================="
+
+echo "ILCSoft path:      ${ilcsoftPath}"
+
+echo "ILCSoft version:   ${ilcsoftVersion}"
+
+echo "ILDConfig:         ${ildconfig}"
+
+echo "Detector:          ${detectorRec}"
+
+echo "CMS energies:      ${energies}"
+
+echo "Output directory:  ${outputDirectory}"
+
+echo "Output file:       ${outputFile}"
+
+echo "File pattern:      ${filePattern}"
+
+echo "Uds analysis:      ${udsAnalysisBinary}"
+
+# Initialize ILCSoft
+source ${ilcsoftPath}/${ilcsoftVersion}/init_ilcsoft.sh
+
+# Combine all PFO analysis root files for each energies
+cd ${outputDirectory}/PFO
+energyListArgument=""
+
+for energy in ${energies}
+do
+  combinedFile="ddsim-s${ilcsoftVersion}-G${detectorRec}-ILDConfig${ildconfig}-Zuds${energy}_PfoAnalysis_combined.root"
+  fileList=`ls ddsim-s${ilcsoftVersion}-G${detectorRec}-ILDConfig${ildconfig}-Zuds${energy}_*_PfoAnalysis.root`
+  
+  # Remove the combined file (if any) to avoid error from root
+  if [ -f ${combinedFile} ]
+  then
+    rm ${combinedFile}
+  fi
+
+  # Combined PFO analysis files
+  hadd ${combinedFile} ${fileList}
+  
+  if [ "${energyListArgument}" = "" ]
+  then
+    energyListArgument="${energyListArgument}"
+  else
+    energyListArgument="${energyListArgument}:${energyListArgument}"
+  fi
+done
+
+mkdir -p ${outputDirectory}/PERFORMANCE
+
+echo "############################################################################"
+echo "                            Running uds analysis"
+echo "                             =================="
+
+${udsAnalysisBinary} -o ${outputFile} -e ${energyListArgument} -f ${filePattern}
+udsAnalysisStatus=$?
+
+echo "############################################################################"
+echo "                   Job finished with status ${udsAnalysisStatus}"
+echo "                             =================="
+
+ls -lthr

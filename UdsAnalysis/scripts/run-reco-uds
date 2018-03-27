@@ -1,0 +1,170 @@
+#!/bin/bash
+#
+#(make sure the right shell will be used)
+#$ -S /bin/bash
+#
+#execute the job from the current directory and not relative to your home directory
+#$ -cwd
+
+# sld6 for bird on NAF2
+#$ -l arch=amd64
+#$ -l os=sld6
+
+#$ -l h_rt=23:59:00
+#$ -l h_vmem=4G
+
+#set the email address
+##$ -M <user>@desy.de
+#
+#send email when job aborts or when job ends
+##$ -m ae
+
+echo "############################################################################"
+echo "                             System information"
+echo "                             =================="
+
+echo "Host:"
+hostname -f
+
+echo "CPU(s):"
+cat /proc/cpuinfo | grep "model name" | cut -b 14-
+
+echo "RAM:"
+cat /proc/meminfo | grep "MemTotal" | cut -b 10-
+
+echo "Swap:"
+cat /proc/meminfo | grep "SwapTotal" | cut -b 11-
+
+echo "############################################################################"
+echo "Group:      ${GROUP}"
+
+echo "Hosttype:   ${HOSTTYPE}"
+
+echo "User:       ${LOGNAME}"
+
+echo "Queue:      ${QUEUE}"
+
+echo "Shell:      ${SHELL}"
+
+echo "TMP:        ${TMP}"
+
+echo "TMPDIR:     ${TMPDIR}"
+
+echo "User:       ${USER}"
+
+echo "Working_DIR:${PWD}"
+
+echo "############################################################################"
+echo
+echo "############################################################################"
+echo
+
+# global settings
+userSettings=$1
+source ${userSettings}
+
+if [ $? -ne 0 ]
+then
+  echo "Failed to source configuration file '${userSettings}'"
+  exit 1
+fi
+
+energy=$2
+run=$3
+skipNEvents=$4
+
+
+echo "############################################################################"
+echo "                              Job information"
+echo "                             =================="
+
+echo "ILCSoft path:      ${ilcsoftPath}"
+
+echo "ILCSoft version:   ${ilcsoftVersion}"
+
+echo "ILDConfig:         ${ildconfig}"
+
+echo "Sim detector:      ${detectorSim}"
+
+echo "Rec detector:      ${detectorRec}"
+
+echo "CMS energy:        ${energy}"
+
+echo "Output directory:  ${outputDirectory}"
+
+echo "Run:               ${run}"
+
+echo "Skip/split:        ${skipNEvents}"
+
+source ${ilcsoftPath}/${ilcsoftVersion}/init_ilcsoft.sh
+
+compactFile="$lcgeo_DIR/ILD/compact/${detectorRec}/${detectorRec}.xml"
+inputFile="${outputDirectory}/SIM/ddsim-s${ilcsoftVersion}-G${detectorSim}-Zuds${energy}_0${run}_${skipNEvents}00.slcio"
+pfoAnalysisFile="${outputDirectory}/PFO/ddsim-s${ilcsoftVersion}-G${detectorRec}-ILDConfig${ildconfig}-Zuds${energy}_0${run}_${skipNEvents}00_PfoAnalysis.root"
+recOutputFile="${outputDirectory}/REC/ddsim-s${ilcsoftVersion}-G${detectorRec}-ILDConfig${ildconfig}-Zuds${energy}_0${run}_${skipNEvents}00_REC.slcio"
+dstOutputFile="${outputDirectory}/DST/ddsim-s${ilcsoftVersion}-G${detectorRec}-ILDConfig${ildconfig}-Zuds${energy}_0${run}_${skipNEvents}00_DST.slcio"
+
+echo "Input file:        ${inputFile}"
+
+echo "Compact file:      ${compactFile}"
+
+echo "PFO output file:   ${pfoAnalysisFile}"
+
+echo "REC output file:   ${recOutputFile}"
+
+echo "DST output file:   ${dstOutputFile}"
+
+# Create output directories if doesn't exists
+mkdir -p ${outputDirectory}/REC && mkdir -p ${outputDirectory}/PFO && mkdir -p ${outputDirectory}/DST
+
+if [ $? != 0 ]
+then
+  echo "Couldn't create output directories '${outputDirectory}/REC', '${outputDirectory}/PFO' and '${outputDirectory}/DST' !"
+  exit 1
+fi
+
+jobDirectory=`mktemp -d -p . ILDPerformance_JER_reco_XXXXXX`
+cd ${jobDirectory}
+pwd
+
+# prepare ILDConfig : clone and checkout on branch/tag/commit
+git clone https://github.com/iLCSoft/ILDConfig.git
+cd ILDConfig
+git checkout ${ildconfig}
+
+if [ $? != 0 ]
+then
+  echo "Couldn't checkout tag, branch or commit ${ildconfig} in ildconfig!"
+  exit 1
+fi
+
+cd StandardConfig/production
+ls -lthr
+
+echo "############################################################################"
+echo "                               Running Marlin"
+echo "                             =================="
+
+# Run Marlin
+Marlin MarlinStdReco.xml --constant.lcgeo_DIR=$lcgeo_DIR --constant.DetectorModel=${detectorRec} --global.LCIOInputFiles=${inputFile} --MyLCIOOutputProcessor.LCIOOutputFile=${recOutputFile} --DSTOutput.LCIOOutputFile=${dstOutputFile} --MyPfoAnalysis.RootFile=${pfoAnalysisFile}
+marlinStatus=$?
+
+echo "############################################################################"
+echo "                   Job finished with status ${marlinStatus}"
+echo "                             =================="
+
+ls -lthr
+
+# Remove DST file if user asked for, to save disk space
+if [ "${keepRECFiles}" -neq "0" ]
+then
+  echo "Removing REC file: ${recOutputFile}"
+  rm ${recOutputFile}
+fi
+
+# Remove DST file if user asked for, to save disk space
+if [ "${keepDSTFiles}" -neq "0" ]
+then
+  echo "Removing DST file: ${dstOutputFile}"
+  rm ${dstOutputFile}
+fi

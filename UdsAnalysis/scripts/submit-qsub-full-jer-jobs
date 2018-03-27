@@ -1,0 +1,61 @@
+#!/bin/bash
+
+jobIDFromPrint () {
+  qsubPrint="$1"
+  jid=`echo "$qsubPrint" | awk 'match($0,/[0-9]+/){print substr($0, RSTART, RLENGTH)}'`
+  echo "${jid}"
+}
+
+if [ $# -ne 1 ]
+then
+  echo "usage: $0 settings.conf"
+  exit 1
+fi
+
+userSettings=$1
+source ${userSettings}
+
+if [ $? -ne 0 ]
+then
+  echo "Failed to source configuration file '${userSettings}'"
+  exit 1
+fi
+
+scriptDirectory="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+recJidHold=""
+
+# Send the jobs with qsub
+for run in ${runs}
+do
+  for energy in ${energies}
+  do
+    for skip in 0 1 2 3 4 5 6 7 8 9
+    do
+      qsubSimPrint=`qsub -N simuds${energy}_${run}_${skip} ${scriptDirectory}/run-ddsim-uds ${userSettings} ${energy} ${run} ${skip}`
+      simJobId=`jobIDFromPrint "${qsubSimPrint}"`
+      
+      echo "Job ${simJobId} sent with name simuds${energy}_${run}_${skip}"
+
+      qsubRecoPrint=`qsub -hold_jid ${simJobId} -N recuds${energy}_${run}_${skip} ${scriptDirectory}/run-reco-uds ${userSettings} ${energy} ${run} ${skip}`
+      recoJobId=`jobIDFromPrint "${qsubRecoPrint}"`
+      
+      echo "Job ${recoJobId} sent with name recuds${energy}_${run}_${skip}, will wait for job ${simJobId} to be finished ..."
+      echo ""
+      
+      if [ "${recJidHold}" = "" ]
+      then
+        recJidHold="${recoJobId}"
+      else
+        recJidHold="${recJidHold},${recoJobId}"
+      fi
+    done
+  done
+done
+
+
+echo "jid list to hold on: ${recJidHold}"
+qsubPerfPrint=`qsub -hold_jid ${recJidHold} -N uds-ana ${scriptDirectory}/run-uds-performance ${userSettings}`
+perfJobId=`jobIDFromPrint "${qsubPerfPrint}"`
+
+echo "Job ${perfJobId} sent with name uds-ana, will wait for all reco jobs to be finished ..."
+echo ""
