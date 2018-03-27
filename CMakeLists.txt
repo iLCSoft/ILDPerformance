@@ -96,7 +96,7 @@ ADD_SHARED_LIBRARY( ${PROJECT_NAME} ${library_sources} )
 INSTALL_SHARED_LIBRARY( ${PROJECT_NAME} DESTINATION lib )
 
 # add binaries
-ADD_EXECUTABLE( ILDPerformance_UdsAnalysis JER/src/ILDPerformance_AnalyseUds.cc )
+ADD_EXECUTABLE( ILDPerformance_UdsAnalysis UdsAnalysis/src/ILDPerformance_AnalyseUds.cc )
 INSTALL( TARGETS ILDPerformance_UdsAnalysis RUNTIME DESTINATION bin )
 
 # display some variables and write them to cache
