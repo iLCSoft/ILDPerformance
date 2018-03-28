@@ -5,7 +5,7 @@
 #==============================================================
 
 ILDMODEL=ILD_l5_v02
-ILCSOFTVER=v01-19-05
+ILCSOFTVER=v01-19-06
 
 . /afs/desy.de/project/ilcsoft/sw/x86_64_gcc49_sl6/${ILCSOFTVER}/init_ilcsoft.sh
 
@@ -41,6 +41,7 @@ do
 Marlin MarlinStdReco.xml \
     --constant..DetectorModel=ILD_l5_o1_v02 \
     --global.LCIOInputFiles=Results/SimFiles/${ILDMODEL}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_${i}_SIM.slcio \
+    --constant.RunBeamCalReco=false \
     --constant.lcgeo_DIR=$lcgeo_DIR \
     --constant.OutputBaseName=${ILDMODEL}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_${i} \
     --MyRecoMCTruthLinker.UsingParticleGun=false \
