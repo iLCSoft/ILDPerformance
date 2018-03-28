@@ -84,11 +84,11 @@ void DDDiagnostics::initHist(void) {
   hist_pt_t  = new TH1F( "hist_pt_t", "Pt distributions of true tracks", nBins , bins ) ;
   hist_pt_f  = new TH1F( "hist_pt_f", "Pt distribution of found tracks", nBins , bins ) ;
 
-  hist_p_t  = new TH1F( "hist_p_t", "Momentum distributions of true tracks", 100 , 0.5, 100.5 ) ;
-  hist_p_f  = new TH1F( "hist_p_f", "Momentum distribution of found tracks", 100 , 0.5, 100.5 ) ;
+  hist_p_t  = new TH1F( "hist_p_t", "Momentum distributions of true tracks",  nBins , bins ) ;
+  hist_p_f  = new TH1F( "hist_p_f", "Momentum distribution of found tracks",  nBins , bins ) ;
 
-  hist_th_t  = new TH1F( "hist_th_t", "Cos theta distributions of true tracks", 10, 0., 1. ) ;
-  hist_th_f  = new TH1F( "hist_th_f", "Cos theta distribution of found tracks", 10, 0., 1. ) ;
+  hist_th_t  = new TH1F( "hist_th_t", "Cos theta distributions of true tracks", 20, 0., 1. ) ;
+  hist_th_f  = new TH1F( "hist_th_f", "Cos theta distribution of found tracks", 20, 0., 1. ) ;
 
   hist_thm_t  = new TH1F( "hist_thm_t", "Cos theta distributions of true tracks", 21, -1., 1. ) ;
   hist_thm_f  = new TH1F( "hist_thm_f", "Cos theta distribution of found tracks", 21, -1., 1. ) ;
