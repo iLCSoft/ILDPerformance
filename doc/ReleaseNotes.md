@@ -1,3 +1,79 @@
+# v01-05
+
+* 2018-01-31 StrahinjaLukic ([PR#13](https://github.com/iLCSoft/ILDPerformance/pull/13))
+  - Added TrackerHitCounter Marlin processor. This is a simple tool to count hits in the tracker elements. It reports the number of hits per run, per event and, where available, per unit area.
+
+* 2017-12-20 Daniel Jeans ([PR#12](https://github.com/iLCSoft/ILDPerformance/pull/12))
+  - simple processor to make some single photon validation plots at PFO level
+  - number of PFOs, energy, energy resolution
+
+* 2017-11-17 Shaojun Lu ([PR#7](https://github.com/iLCSoft/ILDPerformance/pull/7))
+  - Tracking performance scripts for ILCSoft v01-19-05 and detector model ILD_l5_v02.
+      - adapt to ILCSoft v01-19-05 and ILDConfig production.
+      - in general, user could run "run_ILD_l5_v02_singleMuon.sh" for monitor track fitting.
+      - in general, user could run "run_ILD_l5_v02_ttbar.sh" for the pattern recognition efficiency.
+      - "README_Tracking.md" for a quick documentation.
+
+* 2018-03-14 Jakob Beyer ([PR#15](https://github.com/iLCSoft/ILDPerformance/pull/15))
+  - Adding WW/ZZ separation plots to ILDPerformance.
+
+* 2017-12-12 Frank Gaede ([PR#9](https://github.com/iLCSoft/ILDPerformance/pull/9))
+  - updated general documentation (added Usage and Sup-Packages sections)
+  - updated PID package
+       - updated documentation (now in README.md)
+       - make all macros compatible w/ ROOT6
+       - improve performance plots for PID efficiency (now all in one pdf file)
+       - reduce verbosity in PIDTree.cc
+       - remove all compiler warnings  for PIDTree
+
+* 2017-12-12 Shaojun Lu ([PR#8](https://github.com/iLCSoft/ILDPerformance/pull/8))
+  - Update ILD Tracking performance scripts
+      - adapt to DD4hep and  use "MarlinUtil::getBzAtOrigin()" to access BField.
+      - clean up all the warning for code DDDiagnostics.cc
+      - improve the tracking performance scripts, to make them more user friendly.
+      - remove the out-of-dated scripts for the old Mokka/Marlin
+      - adapt to ILCSoft v01-19-05 and ILDConfig v01-19-05-p01 production
+
+* 2017-12-13 Frank Gaede ([PR#10](https://github.com/iLCSoft/ILDPerformance/pull/10))
+  - improve PID plots
+      - create PID plots in directory of the root tree file 
+         allows to create PID plots for different samples in parallel directories
+      - add script `run_all.sh` to do just this
+
+* 2018-03-28 Shaojun Lu ([PR#20](https://github.com/iLCSoft/ILDPerformance/pull/20))
+  - update to the same bins as DBD for tracking efficiency plots.
+  - set RunBeamCalReco=false.
+  - update to next release ILCsoft v01-19-06.
+
+* 2018-03-28 Ete Remi ([PR#19](https://github.com/iLCSoft/ILDPerformance/pull/19))
+  - Added `UdsAnalysis` directory
+     - Replace the old out-dated `JER` directory
+     - New binary `ILDPerformance_UdsAnalysis` making plots from PfoAnalysis root files
+     - Added NAF2 scripts to get JER/JES plots in a single shot
+
+* 2018-03-26 Shaojun Lu ([PR#18](https://github.com/iLCSoft/ILDPerformance/pull/18))
+  - make the scripts more generic to run for ilcsoft HEAD and release installation.
+      - remove the release version "v01-19-05" information within the scripts.
+
+* 2017-12-15 Frank Gaede ([PR#11](https://github.com/iLCSoft/ILDPerformance/pull/11))
+  - fix **all compiler warnings** in ILDPerformance 
+         - gcc 4.9, SL6
+         - gcc 6.2, SL6
+         - clang 3.9, SL6
+
+* 2018-03-22 Shaojun Lu ([PR#16](https://github.com/iLCSoft/ILDPerformance/pull/16))
+  - cleanup the massive monitoring information of tracking. 
+  - cleanup the job scripts which are used on DESY NAF2 working nodes.
+  - increase the statistic to 5000 single muons for each check point.
+  - added RequestRuntime for expected longer runtime on DESY NAF2 working nodes
+  - added FTDCollection, and count the true hits number in FTD simulation too.
+  - adapt to pixel SIT, and change the name from SITSpacePoints to SITTrackerHits.
+  - active minimum silicon hits number cut for MCParticles nominators.
+      - count the silicon hits number from all VXD, SIT and FTD for each mcp track.
+
+* 2018-03-23 Shaojun Lu ([PR#17](https://github.com/iLCSoft/ILDPerformance/pull/17))
+  - added numberOfEvents 5000 for single Muon to fix simulation 3 events only.
+
 # v01-04
 
 * 2017-11-08 Shaojun Lu ([PR#5](https://github.com/ilcsoft/ILDPerformance/pull/5))
