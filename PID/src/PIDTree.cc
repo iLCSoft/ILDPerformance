@@ -332,7 +332,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
         maxbackweight = mcpcaloweight;
         streamlog_out(DEBUG3) << " found reco particle for mcp with bi-directional calo link at imaxweight = " << imaxweight << " with weight = " << maxweight << std::endl ;
       }
-      else {
+      else if( !recovec.empty() ) { // don't warn about particles that are not reconstructed
         streamlog_out(WARNING) << " neither track nor cluster link have a weight larger than " << weightcut << " in _both_ directions: " << std::endl ;
         streamlog_out(WARNING) << " maxtrckweight =  " << maxtrckweight << ", mcptrckweight = " << mcptrckweight << std::endl ;
         streamlog_out(WARNING) << " maxcaloweight =  " << maxcaloweight << ", mcpcaloweight = " << mcpcaloweight << std::endl ;
@@ -502,7 +502,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
       } // if reco part
       // IMPROVE HERE: CHECK if track or cluster exists!
       else {
-        streamlog_out(WARNING) << "no ReconstructedParticle found for this mcp with PDG = " << mcp->getPDG() << " ! " << std::endl ;
+        streamlog_out(DEBUG4) << "no ReconstructedParticle found for this mcp with PDG = " << mcp->getPDG() << " ! " << std::endl ;
         
         seenP.push_back(0);
         seenPt.push_back(0);
