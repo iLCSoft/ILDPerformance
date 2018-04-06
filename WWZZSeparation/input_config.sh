@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #------------------------------------------------------------------------#
-#Set paths for stdhep files:
+#Set paths for stdhep files (should start with /pnfs/desy.de/...):
 vvXYYX=/pnfs/desy.de/ilc/prod/ilc/mc-dbd/generated/1000-B1b_ws/6f/E1000-B1b_ws.Pvvxyyx.Gwhizard-1.95.eL.pR.I35867.001.stdhep
 vvXXXX=/pnfs/desy.de/ilc/prod/ilc/mc-dbd/generated/1000-B1b_ws/6f/E1000-B1b_ws.Pxxxxvv.Gwhizard-1.95.eL.pR.I35911.001.stdhep
 vvYYYY=/pnfs/desy.de/ilc/prod/ilc/mc-dbd/generated/1000-B1b_ws/6f/E1000-B1b_ws.Pyyyyvv.Gwhizard-1.95.eL.pR.I35935.001.stdhep
@@ -30,7 +30,7 @@ elif [[ $1 == "luminosity" ]]; then
 	echo $LUMINOSITY
 elif [[ $1 == "polarisations" ]]; then
 	echo ${E_BEAM_POL} ${P_BEAM_POL}
-else 
+else
 	echo "ERROR in input_config.sh: No valid input argument supplied."
 	echo "Exiting."
 	exit
