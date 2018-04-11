@@ -12,6 +12,9 @@ RUN_PLOTTING=true
 N_EVENTS=10
 DETECTOR_MODEL=ILD_l5_o1_v02
 
+ILCSOFT_VERSION="local"
+ILDCONFIG_VERSION="local"
+
 for i in "$@"
 do
 case $i in
@@ -77,22 +80,24 @@ done
 WORKING_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 STEERING_DIRECTORY=${WORKING_DIR}/../processor/steering_files
-OUTPUT_DIRECTORY=${WORKING_DIR}/../output
-# If not already here create detector model specific output directory
-if [[ ! -d ${OUTPUT_DIRECTORY} ]] ; then
-	mkdir ${OUTPUT_DIRECTORY}
-fi
+TEMPLATE=${STEERING_DIRECTORY}/template.xml
 
 LOG_DIRECTORY=${WORKING_DIR}/../log
+OUTPUT_DIRECTORY=${WORKING_DIR}/../output
 
-TEMPLATE=${STEERING_DIRECTORY}/template.xml
+source ${WORKING_DIR}/get_output_subdir.sh
+SUBDIR=$( echo_subdir_base ${DETECTOR_MODEL} ${ILCSOFT_VERSION} ${ILDCONFIG_VERSION} )
+OUTPUT_BASE=${OUTPUT_DIRECTORY}/${SUBDIR}
+# If not already here create detector model specific output directory
+if [[ ! -d ${OUTPUT_BASE} ]] ; then
+	mkdir ${OUTPUT_BASE}
+fi
 
 N_STATES=3
 FINAL_STATES=("vvxyyx" "vvxxxx" "vvyyyy")
 FILES=($(./../input_config.sh filepaths))
 CROSS_SECTIONS=($(./../input_config.sh cross-sections))
 
-PIDs=() #Process IDs keep track of my background processes
 # If needed and not already here load ILDConfig from GitHub
 if ! $RUN_ON_ILCDIRAC && ($RUN_DDSIM || $RUN_PANDORA); then
 	if [[ ! -d ${WORKING_DIR}/ILDConfig ]] ; then
@@ -101,6 +106,8 @@ if ! $RUN_ON_ILCDIRAC && ($RUN_DDSIM || $RUN_PANDORA); then
 		echo ""
 	fi
 fi
+
+PIDs=() #Process IDs keep track of my background processes
 
 for (( i=0; i<$(( $N_STATES )); i++ )) do
 	final_state=${FINAL_STATES[$i]}
@@ -116,21 +123,24 @@ for (( i=0; i<$(( $N_STATES )); i++ )) do
   dst_output_file=''
 
   #--------------------- RUN SIM AND RECO ------------------------#
+  output_subdir=${OUTPUT_BASE}/${final_state}
+  if [[ ! -d ${output_subdir} ]] ; then
+    mkdir ${output_subdir}
+  fi
+
   if $RUN_ON_ILCDIRAC; then
+    cd ${output_subdir}
     if $RUN_DDSIM && $RUN_PANDORA; then
       # Run
-      cd ${WORKING_DIR}/ilcdirac_user_jobs
-      python submit_jobs.py -N ${N_EVENTS} --DetectorModel ${DETECTOR_MODEL} --stdhepInput ${file} --processName ${final_state} --ILCSoftVer ${ILCSOFT_VERSION} --ILDConfigVer ${ILDCONFIG_VERSION}
-      cd ${OUTPUT_DIRECTORY}
+      python ${WORKING_DIR}/ilcdirac_user_jobs/submit_jobs.py -N ${N_EVENTS} --DetectorModel ${DETECTOR_MODEL} --stdhepInput ${file} --processName ${final_state} --ILCSoftVer ${ILCSOFT_VERSION} --ILDConfigVer ${ILDCONFIG_VERSION}
     fi
     # Retrieve output
-    output_subdir=${ILCSOFT_VERSION}_ILDConfig_${ILDCONFIG_VERSION}_${final_state}
-    if [[ ! -d ${output_subdir} ]] ; then
-      mkdir ${output_subdir}
-    fi
-    cd ${output_subdir}
-    dirac-repo-retrieve-jobs-output-data -r ${WORKING_DIR}/ilcdirac_user_jobs/${ILCSOFT_VERSION}_${ILDCONFIG_VERSION}_${final_state}_${DETECTOR_MODEL}.rep
-    dst_output_file=( $( find $(pwd) -type f -name "*DST.slcio" ) ) # List of absolute paths
+    dirac-repo-retrieve-jobs-output-data -r ${ILCSOFT_VERSION}_${ILDCONFIG_VERSION}_${final_state}_${DETECTOR_MODEL}.rep
+    dst_output_file="$( find $(pwd) -type f -name "*DST.slcio" | tr "\n" " " )" # List of absolute paths, line breaks replaced by spaces
+    cd ${WORKING_DIR}
+
+  ###############################################################################
+  #TODO ALSO CHANGE OUTPUT IN NON-DIRAC MODE
   else
     if $RUN_DDSIM && $RUN_PANDORA; then
       ./run_sim_and_rec.sh -N=${N_EVENTS} --DetectorModel=${DETECTOR_MODEL} --stdhepInput=${file} --processName=${final_state}
@@ -145,12 +155,13 @@ for (( i=0; i<$(( $N_STATES )); i++ )) do
 
     dst_output_file=${OUTPUT_DIRECTORY}/${final_state}_DST.slcio
   fi
+  ###############################################################################
 
 	#--------------------- RUN ANALYSIS ----------------------------#
 	tmp_steering_dir=${STEERING_DIRECTORY}/tmp_${final_state}
 	steering_file=${tmp_steering_dir}/My_${final_state}.xml
 
-	output_root_name=${OUTPUT_DIRECTORY}/${final_state}.root
+	output_root_name=${output_subdir}/${final_state}.root
 
 	if $RUN_ANALYSIS; then
 		echo "Starting analysis."
@@ -176,13 +187,13 @@ for (( i=0; i<$(( $N_STATES )); i++ )) do
 		rm -r ${tmp_steering_dir}
 	fi
 
-	#rm ${OUTPUT_DIRECTORY}/${final_state}*.slcio
-
 	#Do logging for each final state
 	} > ${LOG_DIRECTORY}/${final_state}.log 2>${LOG_DIRECTORY}/${final_state}.err
 	} & PIDs+=($!) # Add backround process ID to ID list so I can check if it's still running
-
 done
+
+echo "Waiting for sim+reco+analysis chain to finish."
+echo ""
 
 # Go through list of background process IDs and if one is still running wait
 for pid in "${PIDs[@]}"
@@ -190,12 +201,10 @@ do
 	wait $pid
 done
 
-
 echo "Simulation, reconstruction and Marlin processors finished."
 echo ""
 
 if $RUN_PLOTTING; then
 	echo "Start plotting."
-
-	./run_plotting.sh
+	./run_plotting.sh --InputBase=${OUTPUT_BASE}
 fi
