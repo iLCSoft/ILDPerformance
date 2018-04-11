@@ -35,11 +35,11 @@ case $i in
     shift # past argument=value
     ;;
     --no-ddsim)
-	RUN_DDSIM=false
+    RUN_DDSIM=false
     shift # past argument=value
     ;;
     --no-pandora)
-	RUN_PANDORA=false
+    RUN_PANDORA=false
     shift # past argument=value
     ;;
     *)
@@ -48,9 +48,9 @@ case $i in
 esac
 done
 
-OUTPUT_DIR=${WORKING_DIR}/../output/${DETECTOR_MODEL}
+OUTPUT_DIR=${WORKING_DIR}/../output/local_ILDConfig_local_${DETECTOR_MODEL}
 
-CONFIG_DIR=${WORKING_DIR}/ILDConfig/StandardConfig/production 
+CONFIG_DIR=${WORKING_DIR}/ILDConfig/StandardConfig/production
 
 SIM_OUTPUT_FILE=${OUTPUT_DIR}/${PROCESS_NAME}.slcio
 SIM_STEERING=ddsim_steer.py

@@ -112,10 +112,7 @@ def main(argv):
             print mares['Not ok appending Marlin to job']
             quit()
 
-    # TODO Change this!!!
-    ######################################################
-    job.setOutputData(RECoutput,"test/6_WWZZSeparation/{}_ILDConfig_{}_{}".format(ilcsoft_version,ildconfig_version,detector_model),"DESY-SRM")
-    ######################################################
+    job.setOutputData(RECoutput,"ILDPerformance/WWZZSeparation/{}_ILDConfig_{}_{}".format(ilcsoft_version,ildconfig_version,detector_model),"DESY-SRM")
     print RECoutput
 
     submit_output = job.submit(dirac)

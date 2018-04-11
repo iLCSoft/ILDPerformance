@@ -139,8 +139,6 @@ for (( i=0; i<$(( $N_STATES )); i++ )) do
     dst_output_file="$( find $(pwd) -type f -name "*DST.slcio" | tr "\n" " " )" # List of absolute paths, line breaks replaced by spaces
     cd ${WORKING_DIR}
 
-  ###############################################################################
-  #TODO ALSO CHANGE OUTPUT IN NON-DIRAC MODE
   else
     if $RUN_DDSIM && $RUN_PANDORA; then
       ./run_sim_and_rec.sh -N=${N_EVENTS} --DetectorModel=${DETECTOR_MODEL} --stdhepInput=${file} --processName=${final_state}
@@ -151,11 +149,10 @@ for (( i=0; i<$(( $N_STATES )); i++ )) do
     fi
 
     # Clean up unneeded files
-    rm ${OUTPUT_DIRECTORY}/${final_state}*.root
+    rm ${output_subdir}/${final_state}*.root
 
-    dst_output_file=${OUTPUT_DIRECTORY}/${final_state}_DST.slcio
+    dst_output_file=${output_subdir}/${final_state}_DST.slcio
   fi
-  ###############################################################################
 
 	#--------------------- RUN ANALYSIS ----------------------------#
 	tmp_steering_dir=${STEERING_DIRECTORY}/tmp_${final_state}
