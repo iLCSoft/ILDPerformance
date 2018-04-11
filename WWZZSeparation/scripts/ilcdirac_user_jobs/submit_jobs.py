@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
-import sys, os, subprocess, getopt
+import sys, os, getopt, inspect
 from string import Template
 import math
+import ast
 
 def print_usage():
     print "In submit_jobs.py:"
@@ -51,8 +52,11 @@ def main(argv):
         elif opt in ("--ILDConfigVer"):
             ildconfig_version = arg
 
+    # Get directory of this script
+    this_script_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+
     # Open Template file and read in lines
-    fR = file("sim_reco_template.py","r")
+    fR = file(this_script_path + "/sim_reco_template.py","r")
     lines = fR.read()
     fR.close()
 
@@ -69,9 +73,6 @@ def main(argv):
     # Replace lines in template with arguments, use safe_substitute because not all values are replaced
     lines_w_args = (Template(lines)).safe_substitute(ILDCONFIGVER=ildconfig_version,ILCSOFTVER=ilcsoft_version,EVTSPERRUN=evts_per_run,DETECTOR=detector_model,SIMINPUT=sim_input,PROCESS=process_name)
 
-    # List for subprocess objects to track whether they are done
-    subprocesses = []
-
     tmp_file_name = process_name + "_sim_reco_job_tmp.py"
 
     for ind in range(1, n_jobs+1): #1 to n_jobs
@@ -82,11 +83,30 @@ def main(argv):
         fT = file(tmp_file_name,"w")
         fT.write(t.safe_substitute(IND=stren))
         fT.close()
-        subprocesses.append( subprocess.Popen("python {}".format(tmp_file_name), shell=True) )
+        os.system("python {}".format(tmp_file_name))
 
-    # This returns as soon as all subprocesses are finished
-    # -> Counting on subprocesses to finish only when sim+reco concluded
-    exit_codes = [ p.wait() for p in subprocesses ]
+    # Look into status of jobs logged in the repository file.
+    # When all either Done or Killed proceed. Warn if any fail.
+    rep_file = ilcsoft_version + "_" + ildconfig_version + "_" + process_name + "_" + detector_model + ".rep"
+
+    warned_about_failure = False
+    finished = False
+    while ( not finished ):
+        # Get status of jobs in repository, remove line break at the end
+        rep_status = os.popen( "dirac-repo-monitor {}".format(rep_file) ).read()[:-1]
+        status_dict = ast.literal_eval( rep_status ) # Interpret output as python dict
+        print rep_status
+        print status_dict
+        # Check if all jobs are done (or killed) before proceeding
+        if 'Done' in status_dict:
+            if status_dict['Done'] == n_jobs:
+                finished=True
+            elif 'Killed' in status_dict:
+                if status_dict['Done'] + status_dict['Killed'] == n_jobs:
+                    finished=True
+        elif 'Failed' in status_dict and not warned_about_failure:
+            print "WARNING: some jobs failed!"
+            warned_about_failure = True
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
