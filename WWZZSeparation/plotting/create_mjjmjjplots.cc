@@ -130,5 +130,7 @@ void create_mjjmjjplots(
 	delete h2_WW;
 	delete h1_ZZ;
 	delete h2_ZZ;
+	delete canvas_h1;
+	delete canvas_h2;
 
 }
