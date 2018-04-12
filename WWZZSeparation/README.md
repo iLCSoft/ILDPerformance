@@ -48,11 +48,12 @@ While possible it is not recommended to run this script on the local machine (si
 - The detector model name should be like *ILD_l5_o2_v02* , the *o2* part will be automatically removed for the detector simulation.
 - The *.stdhep* file paths should begin with */pnfs/desy.de* , they are automatically adjusted to useful to *ILCDirac*.
 - The user running the script must have a *ILCDirac* grid certificate, know their password and ideally run from the DESY-NAF.
-- **The script can only be run ONCE!** per detector model - ilcsoft version - ILDConfig version - combination. To run it again (if absolutely necessary, creates new DSTs) change the output path for the slcio files (see below). 
+- **The script can only be run ONCE!** per detector model - ilcsoft version - ILDConfig version - combination. To run it again (if absolutely necessary, creates new DSTs) change the output path for the slcio files (see below).
+- All *ILCDirac* jobs must end up with the status **DONE** or **KILLED**.
 
 **slcio output path:** The output path in your *pnfs/desy.de/...* directory is set in the *scripts/ilcdirac_user_jobs/sim_reco_template.py* script (almost at the end of the script).
 
-**Note:** Even though a version of *ilcsoft* is given as input the analysis of the *DST* files happens within the locally installed version!
+**Note to input versions:** Even though a version of *ilcsoft* is given as input the analysis of the *DST* files happens within the locally installed version!
 
 #### 3.3 Note to old ilcsoft versions
 
