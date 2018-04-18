@@ -1,3 +1,18 @@
+# v01-06
+
+* 2018-04-12 Jakob Beyer ([PR#22](https://github.com/ilcsoft/ILDPerformance/pull/22))
+  - WWZZSeparation
+     - The script can now be executed with the option to run on ILCDirac (assuming the user has a certificate). Now high statistics DSTs can be produced and analyzed. (Has been tested with a total of 15k events.)
+     - The output structure was changed and the README was updated.
+     - Due to a new naming convention in DSTs the analysis no longer works for ilcsoft older than 01-19-06.
+
+* 2018-04-18 Ete Remi ([PR#23](https://github.com/ilcsoft/ILDPerformance/pull/23))
+  - UdsAnalysis:
+     - Fixed job script to run on the NAF
+
+* 2018-04-05 Frank Gaede ([PR#21](https://github.com/ilcsoft/ILDPerformance/pull/21))
+  - in PIDTree: don't print warnings for particles that are not reconstructed
+
 # v01-05
 
 * 2018-01-31 StrahinjaLukic ([PR#13](https://github.com/iLCSoft/ILDPerformance/pull/13))
