@@ -122,7 +122,7 @@ then
   exit 1
 fi
 
-steeringFile=`mkstmp -p . ddsim_steer_XXXXXX.py`
+steeringFile=`mktemp -p . ddsim_steer_XXXXXX.py`
 
 # Get the ddsim steering file from github
 wget -O ${steeringFile} ${steerDownloadUrl}
