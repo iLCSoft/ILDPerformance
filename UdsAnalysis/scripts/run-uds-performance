@@ -69,10 +69,10 @@ then
   exit 1
 fi
 
-outputFile="${outputDirectory}/PERFORMANCE/ddsim-s${ilcsoft}-G${detectorRec}-ILDConfig${ildconfig}-Zuds-ILDPerformanceUdsAnalysis.root"
-filePattern="${outputDirectory}/PFO/ddsim-s${ilcsoft}-G${detectorRec}-ILDConfig${ildconfig}-Zuds%{energy}_PfoAnalysis_combined.root"
+outputFile="${outputDirectory}/PERFORMANCE/ddsim-s${ilcsoftVersion}-G${detectorRec}-ILDConfig${ildconfig}-Zuds-ILDPerformanceUdsAnalysis.root"
+filePattern="${outputDirectory}/PFO/ddsim-s${ilcsoftVersion}-G${detectorRec}-ILDConfig${ildconfig}-Zuds%{energy}_PfoAnalysis_combined.root"
 ildperformance=`find ${ilcsoftPath}/${ilcsoftVersion}/ILDPerformance  -type d -maxdepth 1 -mindepth 1`
-udsAnalysisBinary=${ildperformance}/bin/ILDPerformance_AnalyseUds
+udsAnalysisBinary=${ildperformance}/bin/ILDPerformance_UdsAnalysis
 
 echo "############################################################################"
 echo "                              Job information"
@@ -119,9 +119,9 @@ do
   
   if [ "${energyListArgument}" = "" ]
   then
-    energyListArgument="${energyListArgument}"
+    energyListArgument="${energy}"
   else
-    energyListArgument="${energyListArgument}:${energyListArgument}"
+    energyListArgument="${energyListArgument}:${energy}"
   fi
 done
 
@@ -131,7 +131,8 @@ echo "##########################################################################
 echo "                            Running uds analysis"
 echo "                             =================="
 
-${udsAnalysisBinary} -o ${outputFile} -e ${energyListArgument} -f ${filePattern}
+echo "Running: ${udsAnalysisBinary} -o ${outputFile} -e ${energyListArgument} -f ${filePattern} -t PfoAnalysisTree"
+${udsAnalysisBinary} -o ${outputFile} -e ${energyListArgument} -f ${filePattern} -t PfoAnalysisTree
 udsAnalysisStatus=$?
 
 echo "############################################################################"
