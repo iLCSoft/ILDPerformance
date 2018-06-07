@@ -9,8 +9,7 @@
     <constant name="DetectorModel" value="" />
     <!-- The full compact file name -->
     <constant name="CompactFile" value="${lcgeo_DIR}/ILD/compact/${DetectorModel}/${DetectorModel}.xml" />
-  </constants>
-
+  </constants> 
 
   <execute>
     <processor name="MyAIDAProcessor"/>
@@ -19,7 +18,18 @@
   </execute>
 
   <global>
-    <parameter name="LCIOInputFiles"></parameter>
+    <parameter name="LCIOInputFiles">
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_0_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_1_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_2_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_3_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_4_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_5_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_6_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_7_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_8_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_9_REC.slcio
+    </parameter>
     <parameter name="MaxRecordNumber" value="0"/>
     <parameter name="SkipNEvents" value="0"/>
     <parameter name="SupressCheck" value="false"/>
@@ -30,7 +40,7 @@
 
   <processor name="MyAIDAProcessor" type="AIDAProcessor">
     <parameter name="Compress" type="int" value="1"/>
-    <parameter name="FileName" type="string" value="analysis_output"/>
+    <parameter name="FileName" type="string" value="analysis_${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05"/>
     <parameter name="FileType" type="string" value="root "/>
   </processor>
 
@@ -39,8 +49,6 @@
   </processor>
 
   <processor name="MyDiagnostics" type="DDDiagnostics">
-    <!--Fill the more detail information into TTree for DEBUG.-->
-    <parameter name="FillBigTTree" type="bool">false </parameter>
     <!--Name of the studied track collection-->
     <parameter name="StudiedTracks" type="string" lcioInType="Track"> MarlinTrkTracks </parameter>
     <!--true - reco relation collection-->

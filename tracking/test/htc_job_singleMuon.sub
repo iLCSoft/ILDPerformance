@@ -4,7 +4,7 @@
  ######################################################
 
 # Run your script:
-Executable = $ENV(PWD)/run_ILD_l5_v02_singleMuon.sh
+Executable = $ENV(PWD)/run_singleMuon.sh
 #
 # Infos from your job:
 Output = $(Cluster).$(Process).out
@@ -37,8 +37,8 @@ InitialDir = $ENV(PWD)
 # As you need (see notify...)
 Notification = Always
 #
-# Defaults to 1 day:
-+RequestRuntime = 3600 * 12
+# Defaults to 3 hours:
+#+RequestRuntime = 3600 * 12
 #
 # Defaults to 3G
 #RequestDisk = 2048 * 3
