@@ -4,10 +4,10 @@
 # Running shell script in parallel over multiple cores
 #==============================================================
 #YES NO
-RUNGEN="NO" 
-RUNSIM="NO" 
+RUNGEN="YES"
+RUNSIM="YES"
 RUNREC="NO"
-RUNANA="YES"
+RUNANA="NO"
 
 ILDMODEL_SIM=ILD_l5_v02
 ILDMODEL_REC=ILD_l5_o1_v02
