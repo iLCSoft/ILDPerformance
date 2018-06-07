@@ -30,6 +30,7 @@
 #include <TVector3.h>
 #include <TMath.h>
 #include <TH1F.h>
+#include <TH2F.h>
 #include <TF1.h>
 #include <TGraphAsymmErrors.h>
 #include <TStyle.h>
@@ -198,6 +199,9 @@ class DDDiagnostics : public Processor {
   TH1F *hist_th_f  = NULL;
   TH1F *hist_thm_t  = NULL;
   TH1F *hist_thm_f  = NULL;
+
+  TH2F *h2_thm_pt_t = NULL;
+  TH2F *h2_thm_pt_f = NULL;
 
   TCanvas *pulls = NULL;
   TCanvas *residuals = NULL;
