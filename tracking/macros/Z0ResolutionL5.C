@@ -31,10 +31,10 @@ int PA[SIZE_PA] = {10, 20, 40, 85};
 float LimAxis;
 int color, marker;
 
-void D0ResolutionL5(){
+void Z0ResolutionL5(){
 
-  TCanvas *D0_fit = new TCanvas("D0 fit","D0 fit",800,800);
-  D0_fit->Print("D0_fit.pdf[");
+  TCanvas *Z0_fit = new TCanvas("Z0 fit","Z0 fit",800,800);
+  Z0_fit->Print("Z0_fit.pdf[");
 
   for (int ll = 0; ll < SIZE_M; ll++){  
     zeros[ll] = 0;
@@ -49,16 +49,16 @@ void D0ResolutionL5(){
 
       printf( " I am studying file analysis_MuonsAngle_%d_Mom_%d.root ",PA[ii],Mom[i]);    
 
-      vector<float> *recoD0 = 0;
-      vector<float> *trueD0 = 0; 
+      vector<float> *recoZ0 = 0;
+      vector<float> *trueZ0 = 0; 
 	
       //Loading the branches in EvalTree
-      EvalTree->SetBranchAddress("recoD0", &recoD0);
-      EvalTree->SetBranchAddress("trueD0", &trueD0);
+      EvalTree->SetBranchAddress("recoZ0", &recoZ0);
+      EvalTree->SetBranchAddress("trueZ0", &trueZ0);
 
       EvalTree->SetBranchStatus("*",0); //disable all branches
-      EvalTree->SetBranchStatus("recoD0",1);
-      EvalTree->SetBranchStatus("trueD0",1);
+      EvalTree->SetBranchStatus("recoZ0",1);
+      EvalTree->SetBranchStatus("trueZ0",1);
       
       //getting the correct size of the axis for a good fitting
       /*
@@ -76,22 +76,22 @@ void D0ResolutionL5(){
       }
       */
       if (PA[ii] < 11 ){
-	   LimAxis =  10.0/Mom[i];
+	   LimAxis =  30.0/Mom[i];
       }
       else if (PA[ii] < 20 ){
-	   LimAxis =  5.0/Mom[i];
+	   LimAxis =  10.0/Mom[i];
       }
-      else if (PA[ii] >= 20 && PA[ii] < 90){
+      else if (PA[ii] >= 20 && PA[ii] < 85){
 	if( Mom[i] > 10 ){
+	  LimAxis =  0.8/Mom[i];
+	}else {
 	  LimAxis =  0.5/Mom[i];
-	}else {
-	  LimAxis =  0.2/Mom[i];
 	}
-      }else if (PA[ii] == 90 ){
+      }else if (PA[ii] == 85 ){
 	if( Mom[i] > 9 ){
-	  LimAxis =  2.0/Mom[i];
+	  LimAxis =  1.0/Mom[i];
 	}else {
-	  LimAxis =  0.2/Mom[i];
+	  LimAxis =  0.15/Mom[i];
 	}
       }
 
@@ -103,8 +103,8 @@ void D0ResolutionL5(){
       Long64_t nentries = EvalTree->GetEntriesFast(); 
       for (Long64_t jentry=0; jentry<nentries;jentry++) {
 	EvalTree->GetEntry(jentry);
-	for (int unsigned k = 0; k < recoD0->size(); k++){
-	  float DistanceResolution = (recoD0->at(k) - trueD0->at(k));
+	for (int unsigned k = 0; k < recoZ0->size(); k++){
+	  float DistanceResolution = (recoZ0->at(k) - trueZ0->at(k));
 	  h1->Fill( DistanceResolution );
 	}
       }
@@ -116,12 +116,12 @@ void D0ResolutionL5(){
 
       //std::cout << " angle " << PA[ii] << " momentum " << Mom[i] << " sigma " << sigma[i][ii] << std::endl ;
       
-      D0_fit->Print("D0_fit.pdf",&dummy[0]);
+      Z0_fit->Print("Z0_fit.pdf",&dummy[0]);
 
     }//loop for each .root files, here I have collected sigma and its error
   }//polar angle loop
 
-  D0_fit->Print("D0_fit.pdf]");
+  Z0_fit->Print("Z0_fit.pdf]");
  
   float sigma20[SIZE_M];
   float error20[SIZE_M];
@@ -159,48 +159,48 @@ void D0ResolutionL5(){
 
 
 
-  TCanvas *c_two = new TCanvas("D0Resolution","D0 Resolution",200,10,700,700);
+  TCanvas *c_two = new TCanvas("Z0Resolution","Z0 Resolution",200,10,700,700);
   //c_two -> Divide(1,2);
 
   //c_two->cd(1);
   TGraphErrors *Muon_plot40 = new TGraphErrors(SIZE_M, Momentum, sigma40, zeros, error40);
-  Muon_plot40 -> SetTitle("Impact Parameter Resolution");
+  Muon_plot40 -> SetTitle("Z0 Resolution");
   Muon_plot40 -> SetMarkerColor(2);
   Muon_plot40 -> SetMarkerStyle(21);
   Muon_plot40 -> SetMarkerSize(1);
   Muon_plot40 -> GetXaxis() -> SetTitle("Momentum (GeV)");
-  Muon_plot40 -> GetYaxis() -> SetTitle("#sigma_{d0}(mm)");
+  Muon_plot40 -> GetYaxis() -> SetTitle("#sigma_{Z0}(mm)");
   Muon_plot40 -> SetMinimum( pow(10,-3) );
-  Muon_plot40 -> SetMaximum( 0.8 );
+  Muon_plot40 -> SetMaximum( 10.8 );
   Muon_plot40 -> Draw("AP");
     
   //c_two->cd(1);
   TGraphErrors *Muon_plot20 = new TGraphErrors(SIZE_M, Momentum, sigma20, zeros, error20);
-  Muon_plot20 -> SetTitle("Distance Resolution");
+  Muon_plot20 -> SetTitle("Z0 Resolution");
   Muon_plot20 -> SetMarkerColor(4);
   Muon_plot20 -> SetMarkerStyle(22);
   Muon_plot20 -> SetMarkerSize(1);
   Muon_plot20 -> GetXaxis() -> SetTitle("Momentum (GeV)");
-  Muon_plot20 -> GetYaxis() -> SetTitle("#sigma_{d0}(mm)");
+  Muon_plot20 -> GetYaxis() -> SetTitle("#sigma_{Z0}(mm)");
   Muon_plot20 -> Draw("P");
 
   TGraphErrors *Muon_plot10 = new TGraphErrors(SIZE_M, Momentum, sigma10, zeros, error10);
-  Muon_plot10 -> SetTitle("Distance Resolution");
+  Muon_plot10 -> SetTitle("Z0 Resolution");
   Muon_plot10 -> SetMarkerColor(6);
   Muon_plot10 -> SetMarkerStyle(22);
   Muon_plot10 -> SetMarkerSize(1);
   Muon_plot10 -> GetXaxis() -> SetTitle("Momentum (GeV)");
-  Muon_plot10 -> GetYaxis() -> SetTitle("#sigma_{d0}(mm)");
+  Muon_plot10 -> GetYaxis() -> SetTitle("#sigma_{Z0}(mm)");
   Muon_plot10 -> Draw("P");
   
   //c_two->cd(1);
   TGraphErrors *Muon_plot85 = new TGraphErrors(SIZE_M, Momentum, sigma85, zeros, error85 );
-  Muon_plot85 -> SetTitle("Impact Parameter Resolution");
+  Muon_plot85 -> SetTitle("Z0 Resolution");
   Muon_plot85 -> SetMarkerColor(1);
   Muon_plot85 -> SetMarkerStyle(20);
   Muon_plot85 -> SetMarkerSize(1);
   Muon_plot85 -> GetXaxis() -> SetTitle("Momentum (GeV)");
-  Muon_plot85 -> GetYaxis() -> SetTitle("#sigma_{d0}(mm)");
+  Muon_plot85 -> GetYaxis() -> SetTitle("#sigma_{Z0}(mm)");
   Muon_plot85 -> Draw("P");
   c_two->SetLogx();
   c_two->SetLogy();
@@ -231,6 +231,6 @@ void D0ResolutionL5(){
   fpr85->SetLineColor(1); 
   //fpr85->Draw("same");
 
-  c_two->SaveAs("D0Resolution.png");
+  c_two->SaveAs("Z0Resolution.png");
 
 }

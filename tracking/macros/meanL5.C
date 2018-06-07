@@ -78,7 +78,7 @@ void meanL5(){
 
   for(int ii = 0; ii < SIZE_PA; ii++){
     for (int i = 0; i < SIZE_M; i++){
-      TFile *f1 = new TFile(Form("../Results/Analysis/analysis_ILD_l5_v02_MuonsAngle_%d_Mom_%d.root",PA[ii],Mom[i]), "read");
+      TFile *f1 = new TFile(Form("../Results/Analysis/analysis_MuonsAngle_%d_Mom_%d.root",PA[ii],Mom[i]), "read");
       //TDirectory *d1 = (TDirectory*) f1->Get("MyRecoMCTruthLinker");
       
       TH1F* hOmega = (TH1F*) f1->Get("OmegaPull");
@@ -424,6 +424,6 @@ void meanL5(){
     leg->AddEntry(Muon_plot_omega85,"#theta = 85^{o}","p");
     leg->Draw();
 
-    c_two->SaveAs("pull_mean_ILD_l5_v02.png");
+    c_two->SaveAs("pull_mean.png");
  
 }
