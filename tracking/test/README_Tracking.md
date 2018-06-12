@@ -1,5 +1,5 @@
 ##########################################
-# Ready for ILCSoft v01-19-05 and ILD_l5_v02
+# Ready for ILCSoft v02-00-01 and ILD_l5_v02
 #
 You may modify them for others.
 
@@ -22,8 +22,8 @@ cp -fr ILDConfig/StandardConfig/production/* .
 # user may generate monitor plots
 #
 ```shell
-./run_ILD_l5_v02_singleMuon.sh
-./run_ILD_l5_v02_ttbar.sh
+./run_singleMuon.sh
+./run_ttbar.sh
 ```
 
 

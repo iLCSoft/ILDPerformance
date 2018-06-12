@@ -1,14 +1,16 @@
-<!--
-      Example steering file to run a standard reconstruction on the ttbar events
-      simulated with ddsim in this example dierectory.
-
-      Works with ilcsoft v01-19_xx
-
-      Defines the standard reconstruction for ILD.
--->
-
-
 <marlin>
+  <constants>
+    <!-- ***** Global constant for reconstruction ***** -->
+    <!-- The lcgeo directory where to look for the ILD model -->
+    <constant name="lcgeo_DIR" value="" />
+    <!-- ILC software version -->
+    <constant name="ILCSoftVersion" value="" />
+    <!-- ILD detector model -->
+    <constant name="DetectorModel" value="" />
+    <!-- The full compact file name -->
+    <constant name="CompactFile" value="${lcgeo_DIR}/ILD/compact/${DetectorModel}/${DetectorModel}.xml" />
+  </constants>
+
 
   <execute>
     <processor name="MyAIDAProcessor"/>
@@ -17,9 +19,7 @@
   </execute>
 
   <global>
-    <parameter name="LCIOInputFiles">
-      ../RecoFiles/reco_sim_0_ILD_l5_v02.slcio
-    </parameter>
+    <parameter name="LCIOInputFiles"></parameter>
     <parameter name="MaxRecordNumber" value="0"/>
     <parameter name="SkipNEvents" value="0"/>
     <parameter name="SupressCheck" value="false"/>
@@ -29,19 +29,13 @@
 
 
   <processor name="MyAIDAProcessor" type="AIDAProcessor">
-    <!--Processor that handles AIDA files. Creates on directory per processor.  Processors only need to create and fill the histograms, clouds and tuples. Needs to be the first ActiveProcessor-->
-    <!-- compression of output file 0: false >0: true (default) -->
     <parameter name="Compress" type="int" value="1"/>
-    <!-- filename without extension-->
     <parameter name="FileName" type="string" value="analysis_output"/>
-    <!-- type of output file xml (default) or root ( only OpenScientist)-->
     <parameter name="FileType" type="string" value="root "/>
   </processor>
 
   <processor name="InitDD4hep" type="InitializeDD4hep">
-    <!--InitializeDD4hep reads a compact xml file and initializes the DD4hep::LCDD object-->
-    <!--Name of the DD4hep compact xml file to load-->
-    <parameter name="DD4hepXMLFile" type="string"> $lcgeo_DIR/ILD/compact/ILD_l5_v02/ILD_l5_v02.xml </parameter>
+    <parameter name="DD4hepXMLFile" type="string"> ${CompactFile} </parameter>
   </processor>
 
   <processor name="MyDiagnostics" type="DDDiagnostics">

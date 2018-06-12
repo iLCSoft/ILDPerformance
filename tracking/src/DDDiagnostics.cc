@@ -93,6 +93,9 @@ void DDDiagnostics::initHist(void) {
   hist_thm_t  = new TH1F( "hist_thm_t", "Cos theta distributions of true tracks", 21, -1., 1. ) ;
   hist_thm_f  = new TH1F( "hist_thm_f", "Cos theta distribution of found tracks", 21, -1., 1. ) ;
 
+  h2_thm_pt_t = new TH2F("h2_thm_pt_t","",41,-1.,1.,nBins,bins);
+  h2_thm_pt_f = new TH2F("h2_thm_pt_f","",41,-1.,1.,nBins,bins);
+
   pulls = new TCanvas("pulls","Track par. pulls",800,800);
   residuals =  new TCanvas("residuals","Track par. residuals",800,800);
 
@@ -626,6 +629,8 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
       if (fabs(mcpTracks[ii]->getCharge())<10.){
 	hist_th_t->Fill(costhmcp);
 	hist_thm_t->Fill(costhmcpm);
+
+	h2_thm_pt_t->Fill(costhmcpm,ptmcp); //2D histogram MCTruth
       }
 
       
@@ -774,6 +779,8 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
 
 	  hist_th_f->Fill(costhmcp2);
 	  hist_thm_f->Fill(costhmcp2m);
+
+	  h2_thm_pt_f->Fill(costhmcp2m,ptmcp);//2D histogram
 
 	  double foundTrkChi2 = ((Track*)trkvec[jj])->getChi2();
 	  double foundTrkNdf = ((Track*)trkvec[jj])->getNdf();
