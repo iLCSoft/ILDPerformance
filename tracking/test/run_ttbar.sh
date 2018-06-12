@@ -55,7 +55,7 @@ for i in {0..9}
 do
 
 Marlin MarlinStdReco.xml \
-    --constant..DetectorModel=${ILDMODEL_REC} \
+    --constant.DetectorModel=${ILDMODEL_REC} \
     --global.LCIOInputFiles=Results/SimFiles/${ILDMODEL_SIM}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_${i}_SIM.slcio \
     --constant.RunBeamCalReco=false \
     --constant.lcgeo_DIR=$lcgeo_DIR \
@@ -82,11 +82,17 @@ if [ $RUNANA == "YES" ]
 then
   echo "running ana"
 
-Marlin Diagnostics_ttbar.xml \
+INPUTS=$(ls  ./Results/RecoFiles/${ILDMODEL_REC}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_*_REC.slcio | tr "\n" " ")
+
+#echo "All inputs: ${INPUTS}"
+
+Marlin DDDiagnostics.xml \
+    --global.LCIOInputFiles="${INPUTS}" \
     --constant.lcgeo_DIR=$lcgeo_DIR \
     --constant.DetectorModel=${ILDMODEL_REC} \
     --constant.ILCSoftVersion=${ILCSOFTVER} \
     --MyAIDAProcessor.FileName=analysis_${ILDMODEL_REC}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05 \
+    --MyDiagnostics.FillBigTTree=false \
     --MyDiagnostics.PhysSampleOn=true \
     --MyDiagnostics.CosThetaCut=0.99 \
     --MyDiagnostics.PCut=0.0 \

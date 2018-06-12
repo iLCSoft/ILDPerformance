@@ -82,7 +82,7 @@ for j in {0..7}
 do
 
 Marlin MarlinStdReco.xml \
-    --constant..DetectorModel=${ILDMODEL_REC} \
+    --constant.DetectorModel=${ILDMODEL_REC} \
     --global.LCIOInputFiles=Results/SimFiles/${ILDMODEL_SIM}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
     --constant.RunBeamCalReco=false \
     --constant.lcgeo_DIR=$lcgeo_DIR \
