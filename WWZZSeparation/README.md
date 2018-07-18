@@ -55,7 +55,17 @@ While possible it is not recommended to run this script on the local machine (si
 
 **Note to input versions:** Even though a version of *ilcsoft* is given as input the analysis of the *DST* files happens within the locally installed version!
 
-#### 3.3 Note to old ilcsoft versions
+#### 3.3 Running on already reconstructed files
+Alternatively the analysis and plotting can be run on files which were already reconstructed (e.g. DST files from central ILD production).
+
+```shell
+./run_complete_analysis.sh --DetectorModel=detector_model --useReconstructedFilesAt=superdirectory_containing_all_dsts 
+```
+
+The script will then search in the given directory and its subdirectories for vvqqqq DST files following the ILD naming convention: 
+\*rv${RECONSTRUCTION_SOFTWARE_VERSION}\*sv${SIMULATION_SOFTWARE_VERSION}\*m${detector_model}\*E1000\*P${final_state}\*eL.pR\*DST\*.slcio
+
+#### 3.4 Note to old ilcsoft versions
 
 *ilcsoft* versions older than 01-19-06 will not work with the analysis of the output DST files. The reason is a changed naming convention in the MCParticles collection (changed from *MCParticleSkimmed* to *MCParticle*).
 
@@ -95,6 +105,7 @@ The analysis is largely similar to the one in the [ILD Letter of Intent](https:/
 
 Differences are:
 
+- An additional FastJet clustering processor is run to remove overlay.
 - The event selection includes a cut on isolated leptons.
 - The pairing of the 4 jets to two boson candidates uses a different criterium.
 

@@ -59,11 +59,12 @@ WWZZProcessor::WWZZProcessor() : Processor("WWZZProcessor") {
 
 
 void WWZZProcessor::init() { 
-    streamlog_out(DEBUG) << "   init called  " << std::endl ;
+  streamlog_out(DEBUG) << "Initializing." << std::endl ;
 
-    _otfile = new TFile( _rootfilename.c_str() , "RECREATE" );   
-
+  _otfile = new TFile( _rootfilename.c_str() , "RECREATE" );   
 	_tree = new TTree( "eventinfo" , "events" );
+  
+  streamlog_out(DEBUG) << "Created file and tree." << std::endl ;
 
 	// Create tree branches and link them to the variables in the info classes
 	//
@@ -79,6 +80,7 @@ void WWZZProcessor::init() {
 	_tree->Branch("pair1_mass",	&_info.observ.pair1_mass,	"pair1_mass/F");	
 	_tree->Branch("pair2_mass",	&_info.observ.pair2_mass,	"pair2_mass/F");	
 	
+  streamlog_out(DEBUG) << "Created tree branches." << std::endl ;
 
     _nRun = 0 ;
     _nEvt = 0 ;
@@ -93,8 +95,11 @@ void WWZZProcessor::processRunHeader( LCRunHeader* /*run*/) {
 
 void WWZZProcessor::processEvent( LCEvent * evt ) { 
 
-    // this gets called for every event 
-    // usually the working horse ...
+  // this gets called for every event 
+  // usually the working horse ...
+  
+  streamlog_out(DEBUG) << "Starting to process event " << evt->getEventNumber() 
+     << " in run " << evt->getRunNumber() << std::endl;
 
 	// Reset event variables to default, will be set within processor
 	_info.init();
@@ -106,11 +111,13 @@ void WWZZProcessor::processEvent( LCEvent * evt ) {
 	_info.process.cross_section = _cross_section; // evt->getParameters().getFloatVal("CrossSection_fb");
 	_info.process.e_pol = -1; //evt->getParameters().getFloatVal("Pol_em");
 	_info.process.p_pol = +1; //evt->getParameters().getFloatVal("Pol_ep");
+  
+  streamlog_out(DEBUG) << "Start reading input collections." << std::endl;
 
 	// All of these collections should always be non-empty
-    LCCollection* colAllPFOs 			= evt->getCollection( _colAllPFOs 		) ;
-	LCCollection* colFastJets 			= evt->getCollection( _colFastJets 		) ;
-    LCCollection* colMC 				= evt->getCollection( _colMC 			) ;
+  LCCollection* colAllPFOs   = evt->getCollection( _colAllPFOs ) ;
+	LCCollection* colFastJets  = evt->getCollection( _colFastJets ) ;
+  LCCollection* colMC 			 = evt->getCollection( _colMC ) ;
 
 	// Isoleps could be empty (ideally)
 	LCCollection* colIsoleps = NULL;
@@ -124,15 +131,20 @@ void WWZZProcessor::processEvent( LCEvent * evt ) {
     }
 
 	// Call analysis script on event
-    streamlog_out(DEBUG) << "   processing event: " << evt->getEventNumber() 
-       << "   in run:  " << evt->getRunNumber() << std::endl ;
+    streamlog_out(DEBUG) << "Analysing event." << std::endl ;
 
 	analyseEvent( colMC, colAllPFOs, colFastJets, colIsoleps, _info );
 
+  streamlog_out(DEBUG) << "Running event selection." << std::endl;
+
 	eventSelection( _info );		
+  
+  streamlog_out(DEBUG) << "Writing to tree." << std::endl;
 
 	// Fill the event into the tree
 	_tree->Fill();
+  
+  streamlog_out(DEBUG) << "Done with event." << std::endl;
 
     _nEvt ++ ;
 }

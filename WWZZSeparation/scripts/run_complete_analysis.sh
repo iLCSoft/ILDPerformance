@@ -3,8 +3,10 @@
 # ----------------------------- FLAGS FOR DIFFERENT STEPS ----------------------- #
 RUN_DDSIM=true
 RUN_PANDORA=true
+USE_PRERECONSTRUCTED=false
 RUN_ANALYSIS=true
 RUN_PLOTTING=true
+RUN_ON_ILCDIRAC=false
 
 # ----------------------------- GET INPUT PARAMETERS ---------------------------- #
 
@@ -18,64 +20,81 @@ ILDCONFIG_VERSION="local"
 for i in "$@"
 do
 case $i in
-    -N=*|--numberOfEvents=*)
+  -N=*|--numberOfEvents=*)
     N_EVENTS="${i#*=}"
     shift # past argument=value
-    ;;
-    --DetectorModel=*)
+  ;;
+  --DetectorModel=*)
     DETECTOR_MODEL="${i#*=}"
     shift # past argument=value
-    ;;
-    --no-ddsim)
-	RUN_DDSIM=false
+  ;;
+  --no-ddsim)
+    RUN_DDSIM=false
     shift # past argument=value
-    ;;
-    --no-pandora)
-	RUN_PANDORA=false
+  ;;
+  --no-pandora)
+    RUN_PANDORA=false
     shift # past argument=value
-    ;;
-    --no-analysis)
-	RUN_ANALYSIS=false
+  ;;
+  --no-analysis)
+    RUN_ANALYSIS=false
     shift # past argument=value
-    ;;
-    --no-plotting)
-	RUN_PLOTTING=false
+  ;;
+  --no-plotting)
+    RUN_PLOTTING=false
     shift # past argument=value
-    ;;
-    --UseILCDirac)
+  ;;
+  --UseILCDirac)
     RUN_ON_ILCDIRAC=true
     shift
     ILCSOFT_VERSION=$1
     shift
     ILDCONFIG_VERSION=$1
     shift
-    ;;
-	-h|--help)
-	echo ""
-	echo "In ./run_complete_analysis.sh: executed w/ asking for help:"
-	echo ""
-	echo "Script to run complete simulation, reconstruction and analysis of 2nu4q events."
-	echo "Usage: ./run_complete_analysis.sh [-N=number_of_events] [--DetectorModel=detector]"
-	echo "                                  [--no-{ddsim,pandora,analysis,plotting}]"
-	echo "                                  [--UseILCDirac ilcsoft_version ildconfig_version]"
-	echo ""
-	echo "The --no-... flags suppress the ... part of the process."
-  echo ""
-  echo "When using ILCDIRAC the versions of iLCsoft and ILDConfig have to be supplied."
-  echo "They must be versions known to the grid."
-  echo ""
-	echo "Further input information can be set in the input_config.sh script."
-	echo ""
-	echo "Exiting now."
-	exit
+  ;;
+  --useReconstructedFilesAt=*)
+    USE_PRERECONSTRUCTED=true
+    RECO_FILE_DIR="${i#*=}"
+    echo "No sim or reco - will search for local reconstructed files at ${RECO_FILE_DIR} ."
+    echo "They must follow ILC naming conventions or will be ignored!"
     shift # past argument=value
-    ;;
-    *)
-          # unknown option
+  ;;
+  -h|--help)
+    echo ""
+    echo "In ./run_complete_analysis.sh: executed w/ asking for help:"
+    echo ""
+    echo "Script to run complete simulation, reconstruction and analysis of 2nu4q events."
+    echo "Usage: ./run_complete_analysis.sh [-N=number_of_events] [--DetectorModel=detector]"
+    echo "                                  [--no-{ddsim,pandora,analysis,plotting}]"
+    echo "                                  [--UseILCDirac ilcsoft_version ildconfig_version]"
+    echo "                                  [--useReconstructedFilesAt=DSTFilesDirectory]"
+    echo ""
+    echo "The --no-... flags suppress the ... part of the process."
+    echo "The --useReconstructedFilesAt=... flag allows working with already reconstructed files."
+    echo ""
+    echo "When using ILCDIRAC the versions of iLCsoft and ILDConfig have to be supplied."
+    echo "They must be versions known to the grid."
+    echo ""
+    echo "Further input information can be set in the input_config.sh script."
+    echo ""
+    echo "Exiting now."
+    exit
+    shift # past argument=value
+  ;;
+  *)
+    # unknown option
     shift
-    ;;
+  ;;
 esac
 done
+
+# No Sim or Reco when already reconstructed files used
+if $USE_PRERECONSTRUCTED; then
+  RUN_DDSIM=false
+  RUN_PANDORA=false
+  RUN_ON_ILCDIRAC=false
+  ILDCONFIG_VERSION="none_UsingDSTFiles"
+fi
 
 WORKING_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -120,15 +139,16 @@ for (( i=0; i<$(( $N_STATES )); i++ )) do
 	{ # Brackets allow each process to be run in parallel (until plotting they are independent)
 	{
 
-  dst_output_file=''
-
   #--------------------- RUN SIM AND RECO ------------------------#
   output_subdir=${OUTPUT_BASE}/${final_state}
   if [[ ! -d ${output_subdir} ]] ; then
     mkdir ${output_subdir}
   fi
 
-  if $RUN_ON_ILCDIRAC; then
+  if $USE_PRERECONSTRUCTED; then
+    # Use already reconstructed DST files -> Link them to the output directory
+    ${WORKING_DIR}/link_local_files.sh ${final_state} ${DETECTOR_MODEL} ${RECO_FILE_DIR} ${output_subdir}
+  elif $RUN_ON_ILCDIRAC; then
     cd ${output_subdir}
     if $RUN_DDSIM && $RUN_PANDORA; then
       # Run
@@ -136,9 +156,7 @@ for (( i=0; i<$(( $N_STATES )); i++ )) do
     fi
     # Retrieve output
     dirac-repo-retrieve-jobs-output-data -r ${ILCSOFT_VERSION}_${ILDCONFIG_VERSION}_${final_state}_${DETECTOR_MODEL}.rep
-    dst_output_file="$( find $(pwd) -type f -name "*DST.slcio" | tr "\n" " " )" # List of absolute paths, line breaks replaced by spaces
     cd ${WORKING_DIR}
-
   else
     if $RUN_DDSIM && $RUN_PANDORA; then
       ./run_sim_and_rec.sh -N=${N_EVENTS} --DetectorModel=${DETECTOR_MODEL} --stdhepInput=${file} --processName=${final_state}
@@ -148,12 +166,17 @@ for (( i=0; i<$(( $N_STATES )); i++ )) do
       ./run_sim_and_rec.sh -N=${N_EVENTS} --DetectorModel=${DETECTOR_MODEL} --stdhepInput=${file} --processName=${final_state} --no-ddsim
     fi
 
-    # Clean up unneeded files
-    rm ${output_subdir}/${final_state}*.root
-
-    dst_output_file=${output_subdir}/${final_state}_DST.slcio
+    if $RUN_DDSIM || $RUN_PANDORA; then
+      # Clean up unneeded files
+      rm ${output_subdir}/${final_state}*.root
+    fi
   fi
-
+  
+  # Find all DST files that were created
+  cd ${output_subdir}
+  dst_output_file="$( find $(pwd) -iname "*dst*.slcio" | tr "\n" " " )" # List of absolute paths, line breaks replaced by spaces
+  cd ${WORKING_DIR}
+  
 	#--------------------- RUN ANALYSIS ----------------------------#
 	tmp_steering_dir=${STEERING_DIRECTORY}/tmp_${final_state}
 	steering_file=${tmp_steering_dir}/My_${final_state}.xml
@@ -170,9 +193,9 @@ for (( i=0; i<$(( $N_STATES )); i++ )) do
 		cp ${TEMPLATE} ${steering_file}
 
 		# Set the input and output file names in the steering file
-    sed -i "116s\.*\ ${cross_section}\ " ${steering_file}
-		sed -i "113s\.*\ ${output_root_name} \  " ${steering_file}
-		sed -i "12s\.*\ ${dst_output_file}\ " ${steering_file}
+    sed -i "123s\.*\ ${cross_section}\ " ${steering_file}
+		sed -i "120s\.*\ ${output_root_name} \  " ${steering_file}
+		sed -i "13s\.*\ ${dst_output_file}\ " ${steering_file}
 
 		cd ${tmp_steering_dir}
 
@@ -205,3 +228,5 @@ if $RUN_PLOTTING; then
 	echo "Start plotting."
 	./run_plotting.sh --InputBase=${OUTPUT_BASE}
 fi
+
+echo "Done!"
