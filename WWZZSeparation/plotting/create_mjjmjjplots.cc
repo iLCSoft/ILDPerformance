@@ -14,11 +14,14 @@ void create_mjjmjjplots(
 		string luminosity_str, string e_beam_pol_str, string p_beam_pol_str,
 		string input_dir_base ) {
 
-
 	// convert input to string
 	float luminosity = string_to_float(luminosity_str);
 	float e_beam_pol = string_to_float(e_beam_pol_str)/100; // -> from %
 	float p_beam_pol = string_to_float(p_beam_pol_str)/100;
+
+	// Physical constants (assumed to not change all that much)
+	float M_Z = 91.19; 
+	float M_W = 80.38;
 
 	// Standard ROOT plot setting
 	gROOT->Reset();
@@ -109,11 +112,21 @@ void create_mjjmjjplots(
 	h2_WW->SetLineColor(4);
 	h2_ZZ->SetLineColor(2);
 
-
 	// Do drawing and saving of plots
 	TCanvas *canvas_h1 = new TCanvas("can_h1", "", 0, 0, 600, 600);
 	h1_WW->Draw("hist");
 	h1_ZZ->Draw("hist same");
+	
+	gPad->Update();
+	float h1_y_min = gPad->GetFrame()->GetY1();
+  float h1_y_max = gPad->GetFrame()->GetY2();
+
+  TLine* h1_W_line = new TLine(M_W, h1_y_min, M_W, h1_y_max);
+  TLine* h1_Z_line = new TLine(M_Z, h1_y_min, M_Z, h1_y_max);
+  h1_W_line->SetLineColorAlpha(9, 0.5);
+  h1_Z_line->SetLineColorAlpha(46, 0.5);
+  h1_W_line->Draw("same");
+  h1_Z_line->Draw("same");
 
 	string plot_name_h1 = input_dir_base + "/m.pdf";
 	canvas_h1->Print(plot_name_h1.c_str());
@@ -121,6 +134,25 @@ void create_mjjmjjplots(
 	TCanvas *canvas_h2 = new TCanvas("can_h2", "", 0, 0, 800, 800);
 	h2_WW->Draw("box");
 	h2_ZZ->Draw("box same");
+	
+	gPad->Update();
+  float h2_x_min = gPad->GetFrame()->GetX1();
+  float h2_x_max = gPad->GetFrame()->GetX2();
+  float h2_y_min = gPad->GetFrame()->GetY1();
+  float h2_y_max = gPad->GetFrame()->GetY2();
+
+	TLine* h2_W_xline = new TLine(h2_x_min, M_W, h2_x_max, M_W);
+	TLine* h2_Z_xline = new TLine(h2_x_min, M_Z, h2_x_max, M_Z);
+	TLine* h2_W_yline = new TLine(M_W, h2_y_min, M_W, h2_y_max);
+	TLine* h2_Z_yline = new TLine(M_Z, h2_y_min, M_Z, h2_y_max);
+	h2_W_xline->SetLineColorAlpha(9, 0.5);
+	h2_W_yline->SetLineColorAlpha(9, 0.5);
+	h2_Z_xline->SetLineColorAlpha(46, 0.5);
+	h2_Z_yline->SetLineColorAlpha(46, 0.5);
+	h2_W_xline->Draw("same");
+	h2_W_yline->Draw("same");
+	h2_Z_xline->Draw("same");
+	h2_Z_yline->Draw("same");
 
 	string plot_name_h2 = input_dir_base + "/m_m.pdf";
 	canvas_h2->Print(plot_name_h2.c_str());
