@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#TODO Set isoleptagger weights path here manually
+
 #------------------------------------------------------------------------#
 #Set paths for stdhep files (should start with /pnfs/desy.de/...):
 vvXYYX=/pnfs/desy.de/ilc/prod/ilc/mc-dbd/generated/1000-B1b_ws/6f/E1000-B1b_ws.Pvvxyyx.Gwhizard-1.95.eL.pR.I35867.001.stdhep
@@ -31,6 +33,7 @@ elif [[ $1 == "luminosity" ]]; then
 elif [[ $1 == "polarisations" ]]; then
 	echo ${E_BEAM_POL} ${P_BEAM_POL}
 else
+	#TODO TURN THIS INTO STDERR
 	echo "ERROR in input_config.sh: No valid input argument supplied."
 	echo "Exiting."
 	exit

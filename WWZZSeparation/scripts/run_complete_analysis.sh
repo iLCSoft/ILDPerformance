@@ -194,8 +194,8 @@ for (( i=0; i<$(( $N_STATES )); i++ )) do
 
 		# Set the input and output file names in the steering file
     sed -i "123s\.*\ ${cross_section}\ " ${steering_file}
-		sed -i "120s\.*\ ${output_root_name} \  " ${steering_file}
-		sed -i "13s\.*\ ${dst_output_file}\ " ${steering_file}
+    sed -i "120s\.*\ ${output_root_name} \  " ${steering_file}
+    sed -i "13s\.*\ ${dst_output_file}\ " ${steering_file}
 
 		cd ${tmp_steering_dir}
 
