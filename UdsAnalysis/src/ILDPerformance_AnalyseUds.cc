@@ -208,7 +208,7 @@ public:
     std::string                  m_trueEnergiesStr;            ///< The list of true cms energies - as string
     std::string                  m_outputFile;                 ///< Output file to write histograms
     std::string                  m_treeName;                   ///< The root tree name
-
+    bool                         m_withoutNeutrinoEnergy;      ///< Whether to do not include MC neutrino energy in total energy distribution 
 private:
     /**
      *  @brief  Set the TChain branch addresses
@@ -294,7 +294,8 @@ UdsAnalysis::UdsAnalysis() :
     m_trueEnergies(),
     m_trueEnergiesStr(""),
     m_outputFile("ILDPerformance_UdsAnalysis.root"),
-    m_treeName("PfoAnalysisTree")
+    m_treeName("PfoAnalysisTree"),
+    m_withoutNeutrinoEnergy(false)
 {
 }
 
@@ -375,7 +376,9 @@ void UdsAnalysis::Process()
         int qPdg(0);
         float pfoEnergyTotal(0.f), mcEnergyENu(0.f), thrust(0.f);
         pTChain->SetBranchAddress("pfoEnergyTotal", &pfoEnergyTotal);
-        pTChain->SetBranchAddress("mcEnergyENu", &mcEnergyENu);
+        if(not m_withoutNeutrinoEnergy) {
+          pTChain->SetBranchAddress("mcEnergyENu", &mcEnergyENu);
+        }
         pTChain->SetBranchAddress("qPdg", &qPdg);
         pTChain->SetBranchAddress("thrust", &thrust);
         
@@ -410,21 +413,23 @@ void UdsAnalysis::Process()
         {
             pTChain->GetEntry(iTree);
 
-            if ((qPdg < 1) || (qPdg > 3))
+            if ((qPdg < 1) || (qPdg > 6))
                 continue;
 
-            pPFA->Fill(pfoEnergyTotal + mcEnergyENu, 1.);
+            const double totalEnergy = m_withoutNeutrinoEnergy ? pfoEnergyTotal : pfoEnergyTotal + mcEnergyENu;
+            
+            pPFA->Fill(totalEnergy, 1.);
             
             if (thrust <= 0.7f)
-                pPFAL7A->Fill(pfoEnergyTotal + mcEnergyENu, 1.);
+                pPFAL7A->Fill(totalEnergy, 1.);
                 
             if (thrust > 0.7f && thrust <= 0.98f)
-                pPFAH7A->Fill(pfoEnergyTotal + mcEnergyENu, 1.);
+                pPFAH7A->Fill(totalEnergy, 1.);
                 
             for (unsigned int i = 0; i < nRegionBins; ++i)
             {
                 if ((thrust >= pRegionBinEdges[i]) && (thrust < pRegionBinEdges[i + 1]))
-                    pRegionHistograms[i]->Fill(pfoEnergyTotal + mcEnergyENu, 1.);
+                    pRegionHistograms[i]->Fill(totalEnergy, 1.);
             }
         }
         
@@ -507,6 +512,9 @@ bool ParseCommandLine(int argc, char *argv[], UdsAnalysis &udsAnalysis)
         case 't':
             udsAnalysis.m_treeName = optarg;
             break;
+        case 'n':
+            udsAnalysis.m_withoutNeutrinoEnergy = true;
+            break;
         case 'h':
         default:
             std::cout << std::endl << "Usage: ILDPerformance_UdsAnalysis " << std::endl
@@ -514,6 +522,7 @@ bool ParseCommandLine(int argc, char *argv[], UdsAnalysis &udsAnalysis)
                       << "    -e energies  (mandatory, input energies column separated, i.e '40:91:200:360:500')                               " << std::endl
                       << "    -f pattern   (mandatory, input file pattern. Should contains %{energy} key, i.e ./PfoAnalysisUds_%{energy}.root) " << std::endl
                       << "    -t treename  (optional,  the tree name to look in root files, usually PfoAnalysisTree)                           " << std::endl
+                      << "    -n           (optional,  whether to do not include MC neutrino energy in total energy distribution, default is false)" << std::endl
                       << std::endl;
             return false;
         }
@@ -526,6 +535,7 @@ bool ParseCommandLine(int argc, char *argv[], UdsAnalysis &udsAnalysis)
                 << "    -e energies  (mandatory, input energies column separated, i.e '40:91:200:360:500')                               " << std::endl
                 << "    -f pattern   (mandatory, input file pattern. Should contains %{energy} key, i.e ./PfoAnalysisUds_%{energy}.root) " << std::endl
                 << "    -t treename  (optional,  the tree name to look in root files, usually PfoAnalysisTree)                           " << std::endl
+                << "    -n           (optional,  whether to do not include MC neutrino energy in total energy distribution, default is false)   " << std::endl
                 << std::endl;
       return false;
     }
