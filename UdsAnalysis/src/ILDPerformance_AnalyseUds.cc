@@ -499,7 +499,7 @@ bool ParseCommandLine(int argc, char *argv[], UdsAnalysis &udsAnalysis)
     int c(0);
     bool energiesSet(false), filePatternSet(false);
 
-    while (((c = getopt(argc, argv, "o:e:f:t:")) != -1) || (argc == 1))
+    while (((c = getopt(argc, argv, "o:e:f:t:n")) != -1) || (argc == 1))
     {
         switch (c)
         {
