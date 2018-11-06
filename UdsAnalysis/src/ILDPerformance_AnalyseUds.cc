@@ -395,6 +395,10 @@ void UdsAnalysis::Process()
         TH1F *pResVsCosThetaHist = new TH1F(("ResVsCosTheta" + energyStr + "GeV").c_str(), ("RMS_{90}(E_{j}) / Mean_{90}(E_{j}) vs |cos(#theta)| (" + energyStr + "GeV)").c_str(), nRegionBins, pRegionBinEdges);
         pResVsCosThetaHist->SetYTitle("RMS_{90}(E_{j}) / Mean_{90}(E_{j}) [%]");
         pResVsCosThetaHist->SetXTitle("|cos(#theta)|");
+        
+        TH1F *pRecVsCosThetaHist = new TH1F(("RecVsCosTheta" + energyStr + "GeV").c_str(), ("Mean_{90}(E_{j}) vs |cos(#theta)| (" + energyStr + "GeV)").c_str(), nRegionBins, pRegionBinEdges);
+        pRecVsCosThetaHist->SetYTitle("Mean_{90}(E_{j}) [GeV]");
+        pRecVsCosThetaHist->SetXTitle("|cos(#theta)|");
 
         TH1F **pRegionHistograms = new TH1F*[nRegionBins];
         TH1F *pPFA = new TH1F(("fPFA_" + energyStr).c_str(), ("TotalEnergy (" + energyStr + "GeV)").c_str(), nEnergyBins, energyRangeMin, energyRangeMax);
@@ -457,11 +461,12 @@ void UdsAnalysis::Process()
         fJer->SetPoint(e, trueEnergy/2., resolution);
         fJer->SetPointError(e, 0, resolutionError);
 
-        // JER for different cos(theta) regions
+        // JES/JER for different cos(theta) regions
         for (unsigned int i = 0; i < nRegionBins; ++i)
         {
             resolution = 0.f; resolutionError = 0.f; scale = 0.f; scaleError = 0.f;
             AnalysisHelper::CalculatePerformance(pRegionHistograms[i], resolution, resolutionError, scale, scaleError);
+            pRecVsCosThetaHist->SetBinContent(i + 1, scale); pRecVsCosThetaHist->SetBinError(i + 1, scaleError);
             pResVsCosThetaHist->SetBinContent(i + 1, resolution); pResVsCosThetaHist->SetBinError(i + 1, resolutionError);
         }
         
