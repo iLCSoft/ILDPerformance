@@ -157,6 +157,18 @@ void create_mjjmjjplots(
   string plot_name_h2 = input_dir_base + "/m_m.pdf";
   canvas_h2->Print(plot_name_h2.c_str());
 
+  // Save plots to root file too
+  string plot_file_name = input_dir_base + "/m_plots.root";
+  TFile *plot_file = new TFile(plot_file_name.c_str(), "recreate");
+
+  h1_WW->Write();
+  h1_ZZ->Write();
+  h2_WW->Write();
+  h2_ZZ->Write();
+
+  plot_file->Close();
+  delete plot_file;
+
   // Avoid memory leaks
   delete h1_WW;
   delete h2_WW;
