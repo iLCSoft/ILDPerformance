@@ -1,7 +1,5 @@
 #!/bin/bash
 
-DETECTOR_MODEL=ILCSoft-01-19-06_gcc49_ILDConfig_v01-19-06-p01 
-
 for i in "$@"
 do
 case $i in
