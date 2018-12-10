@@ -1,0 +1,11 @@
+[ch]
+name_l = Closest Hits
+colour = 630
+
+[fh]
+name_l = First Hit
+colour = 597
+
+[th]
+name_l = Last Tracker Hit
+colour = 414

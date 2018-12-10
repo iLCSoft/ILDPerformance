@@ -1,0 +1,13 @@
+[Environment]
+ILCSoftVersion   = 02-00-01
+ILDConfigVersion = 02-00-01
+OutputBase       = output
+
+[Experiment]
+DetectorModel = l5_o1_v02
+
+[SingleParticle]
+InputDirectory = /nfs/dust/ilc/user/ueinhaus/work/dEdx/mc-opt-3/single_prnd
+
+[ttbar]
+InputDirectory =

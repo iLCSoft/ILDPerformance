@@ -1,0 +1,29 @@
+[Proton]
+name_s = p
+pdgID  = 2212
+mass   = 0.938272
+colour = 633
+
+[Kaon]
+name_s = K
+pdgID  = 321
+mass   = 0.493677
+colour = 418
+
+[Pion]
+name_s = Pi
+pdgID  = 211
+mass   = 0.13957
+colour = 880
+
+[Electron]
+name_s = e1
+pdgID  = 11
+mass   = 0.000511
+colour = 433
+
+[Muon]
+name_s = e2
+pdgID  = 13
+mass   = 0.1056584
+colour = 597
