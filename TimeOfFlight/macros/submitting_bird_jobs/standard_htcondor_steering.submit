@@ -1,0 +1,15 @@
+# simple standard HTCondor submit file with transfer of the executable and usage of the shared filesystem
+# transfer of executable can be handy as you can keep working on the executable locally while the job is running
+# without interference with the binary the job is running
+executable          = standard_bash_run.sh
+transfer_executable = True
+universe            = vanilla
+
+output              = ../../BIRD_output/$(Cluster).$(Process).out
+error               = ../../BIRD_output/$(Cluster).$(Process).error
+log                 = ../../BIRD_output/$(Cluster).$(Process).log
+# _$(Cluster)_$(Process) gets substituted by cluster and process ID, putting it in the output files leads to individual files
+# for each job. Remember that regular filesystem rules about maximum files in a directory and maximum filesizes apply (warning)
+# htcondor will (as any other batchsystem) not create any directories for you, hence these need to exist.
+
+queue
