@@ -15,10 +15,6 @@ def get_TOF_branches_string(resolution):
 def main(args):
   template = args.steering_template
   
-  
-  # TODO get all TOF branches
-  # TODO Figure out how to read array of unknown size of input parameters
-  
   TOF_branches = [get_TOF_branches_string(tof_resolution) for tof_resolution in args.resolutions] #TODO Somewhere make sure its in ps!!!
   
   parameter_map = {
