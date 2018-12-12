@@ -2,8 +2,6 @@
 #include "../reading_config/read_config.cpp"
 
 void draw_tof_singleparticle(const string ConfigDir="../..", const string InFileBase = "../../output/SingleParticle_rv02-00-01_sv02-00-01_mILD_l5_o1_v02/", const string OutFileBase = "../../output/SP") {
-  // TODO Change input and output paths
- 
  string ptype_config_path = ConfigDir + "/ParticleTypes.cnf";
  string res_config_path   = ConfigDir + "/TimeResolutions.cnf";
  
