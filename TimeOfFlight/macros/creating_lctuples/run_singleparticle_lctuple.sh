@@ -45,7 +45,7 @@ time_resolutions="$(${PYTHON3} ${config_reader} --conf_file TimeResolutions.cnf 
 # Directory structures derived from configuration
 run_base="SingleParticle_rv${ilcsoft_ver}_sv${ildconf_ver}_mILD_${detector_model}"
 run_steering_dir="${scripts_dir}/${run_base}"
-run_output_dir="${output_base}/${run_base}"
+run_output_dir="${output_base}/${run_base}/lctuple"
 
 if [[ ! -d ${run_steering_dir} ]]; then
   mkdir --parents ${run_steering_dir}
@@ -55,7 +55,6 @@ if [[ ! -d ${run_output_dir} ]]; then
 fi
 
 # Loop to run lctuple for each particle type
-# TODO CHANGE CONVENTION OF LCTUPLE FILE NAMES IN PLOTTING SCRIPTS
 for ptype in $(${PYTHON3} ${config_reader} --conf_file ParticleTypes.cnf --format list_of_variables --variables pdgID); do
   echo "Starting to run single particle jobs for particle type: ${ptype}"
   {
@@ -83,7 +82,7 @@ for ptype in $(${PYTHON3} ${config_reader} --conf_file ParticleTypes.cnf --forma
           steering_path="${type_steering_dir}/${file_index}.xml"
           lctuple_output_base="${type_output_dir}/${file_index}"
 
-          ${PYTHON3} SetSteeringFile.py --steering_template ${template_file} --input_files ${file} --output_base ${lctuple_output_base} --resolutions ${time_resolutions} --result_path ${steering_path}
+          ${PYTHON3} ${dir}/SetSteeringFile.py --steering_template ${template_file} --input_files ${file} --output_base ${lctuple_output_base} --resolutions ${time_resolutions} --result_path ${steering_path}
           
           # Submit job and wait for it
           cd ${submit_file_dir}
@@ -108,7 +107,7 @@ for ptype in $(${PYTHON3} ${config_reader} --conf_file ParticleTypes.cnf --forma
       steering_path="${run_steering_dir}/${ptype}_all.xml"
       lctuple_output_base="${type_output_base}_lctuple"
 
-      ${PYTHON3} SetSteeringFile.py --steering_template ${template_file} --input_files ${files} --output_base ${lctuple_output_base} --resolutions ${time_resolutions} --result_path ${steering_path}
+      ${PYTHON3} ${dir}/SetSteeringFile.py --steering_template ${template_file} --input_files ${files} --output_base ${lctuple_output_base} --resolutions ${time_resolutions} --result_path ${steering_path}
       Marlin ${steering_path}
     fi
   } > ${run_steering_dir}/${ptype}.log 2>&1 &

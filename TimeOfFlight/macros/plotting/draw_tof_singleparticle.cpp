@@ -1,9 +1,13 @@
 #include "tof_helpers.cpp"
 #include "../reading_config/read_config.cpp"
 
-void draw_tof_singleparticle(const string InFileBase = "", const string OutFileBase = "SP") {
+void draw_tof_singleparticle(const string ConfigDir="../..", const string InFileBase = "../../output/SingleParticle_rv02-00-01_sv02-00-01_mILD_l5_o1_v02/", const string OutFileBase = "../../output/SP") {
+  // TODO Change input and output paths
  
-  ConfigReader ptype_reader("../../config/ParticleTypes.cnf"); // TODO Collect config strings in beginning
+ string ptype_config_path = ConfigDir + "/ParticleTypes.cnf";
+ string res_config_path   = ConfigDir + "/TimeResolutions.cnf";
+ 
+  ConfigReader ptype_reader(ptype_config_path);
   ParticleVec particle_types {};
   auto ptype_names = ptype_reader.get_keys();
   for (auto & ptype_name: ptype_names) { 
@@ -11,7 +15,7 @@ void draw_tof_singleparticle(const string InFileBase = "", const string OutFileB
     particle_types.push_back( ParticleType(stoi(ptype_sec["pdgID"]), ptype_sec["name_s"],  ptype_name, stod(ptype_sec["mass"]), stoi(ptype_sec["colour"])) );
   }
   
-  ConfigReader res_reader("../../config/TimeResolutions.cnf"); // TODO Collect config strings in beginning
+  ConfigReader res_reader(res_config_path);
   ResVec resolutions {};
   auto res_values = res_reader.get_keys();
   for (auto & res_value: res_values) {
@@ -19,7 +23,6 @@ void draw_tof_singleparticle(const string InFileBase = "", const string OutFileB
     resolutions.push_back( Resolution(stof(res_value), stoi(res_sec["colour"])) );
   }
   
-  // TODO FROM HERE: Change input and output paths
   
   HistoMap beta_histos {};
   
@@ -28,7 +31,6 @@ void draw_tof_singleparticle(const string InFileBase = "", const string OutFileB
       beta_histos.addHisto( ptype, res );
     }
   }
-
   // TODO Also loop over different time estimators?? (Here: CH -> Closest Hit)
 
   unique_ptr<TCanvas> c_dummy {new TCanvas("dummy","",1000,800)}; // To write histos to that don't need to be written to current canvas
