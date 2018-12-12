@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# TODO NEEDS PYTHON3 AND ILCSOFT (DUH)
-
 # Read input parameters
 RUN_ON_CONDOR=true
 
