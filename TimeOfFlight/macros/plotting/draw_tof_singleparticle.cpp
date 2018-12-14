@@ -128,6 +128,12 @@ void draw_tof_singleparticle(const string ConfigDir="../..", const string InFile
           
           double p = slice_p1.p;
           
+          if ( ! (slice_p1.fit_successful && slice_p2.fit_successful) ) {
+            cout << ptype1.name_l << " - " << ptype2.name_l << ", " << res.w_unit() << 
+                    " : Fit in slice p=" << p << " not successful, point won't be drawn." << endl;
+            continue;
+          }
+          
           double diff_mean     = abs(slice_p1.mean - slice_p2.mean);
           double sigma_sqr_sum = pow(slice_p1.sigma, 2) + pow(slice_p2.sigma, 2); 
           double ms_sigma      = sigma_sqr_sum / 2.0; // ms = mean squared 
