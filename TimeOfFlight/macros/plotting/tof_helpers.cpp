@@ -56,6 +56,7 @@ struct Slice {
   double sigma {};
   double mean_err {};
   double sigma_err {};
+  bool fit_successful {false};
   
   void extract_fit_parameters(string fit_name="gaus") {
     this->mean      = this->histo->GetFunction(fit_name.c_str())->GetParameter(1);
@@ -88,10 +89,19 @@ struct Histo {
       slice.extract_fit_parameters();
       float fit_range_min = slice.mean-(2.5*slice.sigma);
       float fit_range_max = slice.mean+(2.5*slice.sigma);
+      if (fit_range_min > 1) { fit_range_min = 0.99;}
       if (fit_range_max > slice.histo->GetXaxis()->GetXmax()) {fit_range_max = slice.histo->GetXaxis()->GetXmax();}
-      fit_success = slice.histo->Fit("gaus","QI","",fit_range_min,fit_range_max);
+      fit_success = slice.histo->Fit("gaus","I","",fit_range_min,fit_range_max);
       if ( fit_success == 0 ) { // Confusingly meaning fit was successful
+        slice.fit_successful = true;
         slice.extract_fit_parameters();
+      } else {
+        ROOT::Math::MinimizerOptions::SetDefaultStrategy(1); // 
+        fit_success = slice.histo->Fit("gaus","I","",fit_range_min,fit_range_max);
+        if ( fit_success == 0 ) { // Confusingly meaning fit was successful
+          slice.fit_successful = true;
+          slice.extract_fit_parameters();
+        }
       }
     }
   }
@@ -117,6 +127,7 @@ struct Histo {
       TString slice_name = TString( "beta_CH_" + ptype.name_s + "_bin" + to_string(step_center) + "_p" + to_string(p) );
       slice.histo = histo->ProjectionY(slice_name,step_begin,step_end,"e");
       slice.histo->SetTitle( TString( "#beta_{CH} sliced at p=" + to_string(p) + "GeV, bin " + to_string(step_center) + ", " + ptype.name_l ) );
+      slice.histo->Scale(1.0/slice.histo->Integral());
       
       if (do_fit) {
         this->perform_slice_fit(slice, beta);
