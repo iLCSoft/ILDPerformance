@@ -56,6 +56,13 @@ struct Slice {
   double sigma {};
   double mean_err {};
   double sigma_err {};
+  
+  void extract_fit_parameters(string fit_name="gaus") {
+    this->mean      = this->histo->GetFunction(fit_name.c_str())->GetParameter(1);
+    this->sigma     = this->histo->GetFunction(fit_name.c_str())->GetParameter(2);
+    this->mean_err  = this->histo->GetFunction(fit_name.c_str())->GetParError(1);
+    this->sigma_err = this->histo->GetFunction(fit_name.c_str())->GetParError(2);
+  }
 };
 
 struct Histo {
@@ -74,20 +81,18 @@ struct Histo {
   }
   
   void perform_slice_fit(Slice &slice, double &beta) {
-    int fit_success = slice.histo->Fit("gaus","QI","",beta*0.95,beta*1.05);
+    int fit_success = 1;
+    ROOT::Math::MinimizerOptions::SetDefaultStrategy(2); // More accurate error calculation
+    fit_success = slice.histo->Fit("gaus","QI","",beta*0.95,beta*1.05);
     if ( fit_success == 0 ) { // Confusingly meaning fit was successful
-      slice.mean  = slice.histo->GetFunction("gaus")->GetParameter(1);
-      slice.sigma = slice.histo->GetFunction("gaus")->GetParameter(2);
-      slice.mean_err  = slice.histo->GetFunction("gaus")->GetParError(1);
-      slice.sigma_err = slice.histo->GetFunction("gaus")->GetParError(2);
-    }
-    
-    fit_success = slice.histo->Fit("gaus","QI","",slice.mean-(2.5*slice.sigma),slice.mean+(2.5*slice.sigma));
-    if ( fit_success == 0 ) {
-      slice.mean      = slice.histo->GetFunction("gaus")->GetParameter(1);
-      slice.sigma     = slice.histo->GetFunction("gaus")->GetParameter(2);
-      slice.mean_err  = slice.histo->GetFunction("gaus")->GetParError(1);
-      slice.sigma_err = slice.histo->GetFunction("gaus")->GetParError(2);
+      slice.extract_fit_parameters();
+      float fit_range_min = slice.mean-(2.5*slice.sigma);
+      float fit_range_max = slice.mean+(2.5*slice.sigma);
+      if (fit_range_max > slice.histo->GetXaxis()->GetXmax()) {fit_range_max = slice.histo->GetXaxis()->GetXmax();}
+      fit_success = slice.histo->Fit("gaus","QI","",fit_range_min,fit_range_max);
+      if ( fit_success == 0 ) { // Confusingly meaning fit was successful
+        slice.extract_fit_parameters();
+      }
     }
   }
   
