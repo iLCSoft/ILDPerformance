@@ -19,6 +19,7 @@ Currently only the Closest Hits TOF-approach is taken into account.
 
 The configuration files can be found in ```./config```.
 - `ParticleTypes.cnf` : Set the single particle types that should be investigated.
+- `PlottingSettings.cnf` : Set the binning for the beta-momentum plots (May be relevant for whether Gaussian fits succeed).
 - `Setup.cnf` : Set the environmental parameters for the setup that should be run (e.g. versions used in slcio file production, detector model).
 - `TimeResolutions.cnf` : Set the time resolutions that should be investigated. Only resolutions available in the REC files can be used.
 
@@ -48,3 +49,4 @@ Not yet implemented, only plotting macro and Config included.
   In the scripts the exact version that is used is hardcoded.
 - The REC files provided to the scripts must already contain the TOF information for each particle.
 - The REC files must follow the ILD file naming conventions.
+- Not all possible possibilities are tested (e.g. different TOF methods, ttbar) as of now.

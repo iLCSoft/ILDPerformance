@@ -2,9 +2,18 @@
 #include "../reading_config/read_config.cpp"
 
 void draw_tof_singleparticle(const string ConfigDir="../..", const string InFileBase = "../../output/SingleParticle_rv02-00-01_sv02-00-01_mILD_l5_o1_v02/", const string OutFileBase = "../../output/SP") {
- string ptype_config_path = ConfigDir + "/ParticleTypes.cnf";
- string res_config_path   = ConfigDir + "/TimeResolutions.cnf";
- 
+  string plot_config_path  = ConfigDir + "/PlottingSettings.cnf";
+  string ptype_config_path = ConfigDir + "/ParticleTypes.cnf";
+  string res_config_path   = ConfigDir + "/TimeResolutions.cnf";
+
+  float min_p    = 0,   max_p    = 100;
+  float min_beta = 0.5, max_beta = 1.05;
+  ConfigReader plot_settings_reader(plot_config_path);
+  auto beta_p_settings = plot_settings_reader["BetaPPlots"];
+  int bins_p        = stoi(beta_p_settings["NbinsBeta"]);
+  int bins_beta     = stoi(beta_p_settings["NbinsP"]);
+  int every_nth_bin = stoi(beta_p_settings["BinJumpsPerSlice"]); // Consider only every n-th bin (=slice) in the momentum distribution
+  
   ConfigReader ptype_reader(ptype_config_path);
   ParticleVec particle_types {};
   auto ptype_names = ptype_reader.get_keys();
@@ -12,6 +21,7 @@ void draw_tof_singleparticle(const string ConfigDir="../..", const string InFile
     auto ptype_sec = ptype_reader[ptype_name]; // Section 
     particle_types.push_back( ParticleType(stoi(ptype_sec["pdgID"]), ptype_sec["name_s"],  ptype_name, stod(ptype_sec["mass"]), stoi(ptype_sec["colour"])) );
   }
+  int N_ptypes = particle_types.size();
   
   ConfigReader res_reader(res_config_path);
   ResVec resolutions {};
@@ -20,7 +30,7 @@ void draw_tof_singleparticle(const string ConfigDir="../..", const string InFile
     auto res_sec = res_reader[res_value]; 
     resolutions.push_back( Resolution(stof(res_value), stoi(res_sec["colour"])) );
   }
-  
+  int N_ress = resolutions.size();
   
   HistoMap beta_histos {};
   
@@ -33,24 +43,32 @@ void draw_tof_singleparticle(const string ConfigDir="../..", const string InFile
 
   unique_ptr<TCanvas> c_dummy {new TCanvas("dummy","",1000,800)}; // To write histos to that don't need to be written to current canvas
 
-  unique_ptr<TCanvas> c_beta_p {new TCanvas("c","#beta_{CH} vs momentum",1000,800)}; 
+  unique_ptr<TCanvas> c_beta_p {new TCanvas("c_beta_p","#beta_{CH} vs momentum",400*N_ress,400*N_ptypes)}; 
+  unique_ptr<TCanvas> c_beta_p_average {new TCanvas("c_beta_p_average","#beta_{CH}^{average} vs momentum",400*N_ress,400*N_ptypes)}; 
   c_beta_p->Clear();
+  c_beta_p_average->Clear();
   c_beta_p->Divide(resolutions.size(), particle_types.size());
-  int i_pad=1;
-
-  int bins_p = 2000, bins_beta = 200;
-  float min_p = 0,   max_p = 100;
-  float min_beta = 0.5, max_beta = 1.05;
+  c_beta_p_average->Divide(resolutions.size(), particle_types.size());
+  int i_pad=0;
   
-  int bins_per_slice = 10;
+  vector<TFile*> closables {}; // Because ROOT... To collect files that I need to close later
+  
+  unique_ptr<TFile> file_beta_p {new TFile ( ( OutFileBase + "_beta_p.root" ).c_str() ,"recreate")};
   
   // Get the beta vs p histograms and save for each particle type
   for ( auto & ptype : particle_types ) {
-    TFile* file = new TFile ( ( InFileBase + to_string(ptype.pdg_id) + "_lctuple.root" ).c_str() ,"r") ;
+    TFile* file = new TFile ( ( InFileBase + to_string(ptype.pdg_id) + "_lctuple.root" ).c_str() ,"r");
     TTree* tree = (TTree*) file->Get("MyLCTuple");
     
+    TF1* beta_func = new TF1( ("beta_func_" + ptype.name_s).c_str(), "x / sqrt(x^2 + [0]^2)", min_p, max_p);
+    beta_func->SetParameter(0, ptype.mass);
+    beta_func->SetLineWidth(1);
+    beta_func->SetLineColorAlpha(6, 0.5);
+    file_beta_p->WriteTObject(beta_func);
+    
     for (auto &res : resolutions) {
-      c_beta_p->cd(i_pad++);
+      i_pad++;
+      c_beta_p->cd(i_pad);
 
       string h_beta_name = "h_beta_" + ptype.name_s + "_" + res.str();
 
@@ -63,22 +81,42 @@ void draw_tof_singleparticle(const string ConfigDir="../..", const string InFile
       string draw_string = tof_res + "len/" + tof_res + "ch/299.8:sqrt(rcmox*rcmox+rcmoy*rcmoy+rcmoz*rcmoz)>>" + h_beta_name;
       string cut_string  = tof_res + "len>1.&&" + tof_res + "ch>0.1&&(" + tof_res + "len/" + tof_res + "ch/299.8)<1.1 && sqrt(rcmox*rcmox+rcmoy*rcmoy+rcmoz*rcmoz)<100.&&abs(rccha)>0.005 && abs(rcmoz)/sqrt(rcmox*rcmox+rcmoy*rcmoy+rcmoz*rcmoz) < 0.792573 && sqrt(rcmox*rcmox+rcmoy*rcmoy) > 0.948543 && nrec==1";
         
-      tree->Draw( draw_string.c_str(), cut_string.c_str() );
-
-      TF1* beta_func = new TF1( ("beta_func_" + ptype.name_s + "_" + res.str()).c_str(), "x / sqrt(x^2 + [0]^2)", min_p, max_p);
-      beta_func->SetParameter(0, ptype.mass);
+      tree->Draw( draw_string.c_str(), cut_string.c_str(), "colz" );
+      file_beta_p->WriteTObject(h_beta);
       beta_func->Draw("same");
-      beta_func->SetLineColor(kRed+1);
       
       c_dummy->cd();
       beta_histos.getHisto(res, ptype)->histo = h_beta;
-      beta_histos.getHisto(res, ptype)->slice_histo(bins_per_slice);
+      beta_histos.getHisto(res, ptype)->slice_histo(every_nth_bin);
+      
+      c_beta_p_average->cd(i_pad);
+      string h_beta_average_name = "h_beta_average_" + ptype.name_s + "_" + res.str();
+      TH1F* h_beta_average = new TH1F( h_beta_average_name.c_str(),
+                                       ("#beta_{CH}^{average} vs momentum, " + ptype.name_l + ", " + res.w_unit() + ", error = #sigma_{gaus}; p [GeV/c] ; #beta ").c_str(),
+                                       bins_p, min_p, max_p
+                                     );
+      for ( auto & slice: beta_histos.getHisto(res, ptype)->slices ) {
+        int bin = h_beta_average->FindBin(slice.p);
+        if (slice.fit_successful) {
+          h_beta_average->SetBinContent(bin, slice.mean);
+          h_beta_average->SetBinError(  bin, slice.sigma);
+        }
+      }
+      h_beta_average->SetMarkerSize(0);
+      h_beta_average->SetFillColor(2);
+      h_beta_average->Draw("E5");
+      beta_func->Draw("same");
+      
+      file_beta_p->WriteTObject(h_beta_average);
+      file->cd();
     }
-    // file->Close();
+    closables.push_back(file);
   }
   c_beta_p->Print( (OutFileBase + "_beta_p.pdf").c_str() );
+  c_beta_p_average->Print( (OutFileBase + "_beta_p_average.pdf").c_str() );
   
-
+  file_beta_p->Close();
+  
   // Save the sliced histograms
   for ( auto & res: resolutions ) {
     unique_ptr<TFile> file_slices { new TFile( (OutFileBase + "_slices_" + res.w_unit() + ".root").c_str(), "RECREATE" ) };
@@ -91,10 +129,8 @@ void draw_tof_singleparticle(const string ConfigDir="../..", const string InFile
     file_slices->Close();
   }
   
-  
   unique_ptr<TFile> file_sep_pwr { new TFile( (OutFileBase + "_separation_powers.root").c_str(), "RECREATE" ) };
   // Find separation power for all combinations 
-  int N_ptypes = particle_types.size();
   for (int i=0; i<N_ptypes-1; i++) {
     if ( 1 == N_ptypes ) {
       cout << "Only one particle type given, not creating separation power plots." << endl;
@@ -151,7 +187,7 @@ void draw_tof_singleparticle(const string ConfigDir="../..", const string InFile
         h_seppwr->Write();
         
         c_sep_pwr->cd(i_seppwr_pad++);
-        h_seppwr->Draw("hist e");
+        h_seppwr->Draw("pe"); // TODO Better drawing style: Set some better markers, REMOVE X ERROR
         h_seppwr->SetMinimum(0);
         h_seppwr->SetMaximum(40);
         
@@ -186,4 +222,8 @@ void draw_tof_singleparticle(const string ConfigDir="../..", const string InFile
   }
   file_sep_pwr->Close();
 
+  for ( auto & closable : closables ) { 
+    closable->Close();
+    delete closable;
+  } 
 }
