@@ -59,10 +59,11 @@ struct Slice {
   bool fit_successful {false};
   
   void extract_fit_parameters(string fit_name="gaus") {
-    this->mean      = this->histo->GetFunction(fit_name.c_str())->GetParameter(1);
-    this->sigma     = this->histo->GetFunction(fit_name.c_str())->GetParameter(2);
-    this->mean_err  = this->histo->GetFunction(fit_name.c_str())->GetParError(1);
-    this->sigma_err = this->histo->GetFunction(fit_name.c_str())->GetParError(2);
+    auto fit_result = this->histo->GetFunction(fit_name.c_str());
+    this->mean      = fit_result->GetParameter(1);
+    this->sigma     = fit_result->GetParameter(2);
+    this->mean_err  = fit_result->GetParError(1);
+    this->sigma_err = fit_result->GetParError(2);
   }
 };
 
@@ -81,29 +82,36 @@ struct Histo {
     // delete histo;
   }
   
-  void perform_slice_fit(Slice &slice, double &beta) {
+  void perform_slice_fit(Slice &slice, double &beta_low, double &beta_up) {
+    if (slice.histo->GetEntries() < 1) { return; }
+    
+    double delta_beta = (beta_up-beta_low)/2.0;
+    
+    double fit_low_edge = max( 0.99 * (beta_low - 3.0*delta_beta), 0.0 );
+    double fit_up_edge  = min( 1.01 * (beta_up  + 3.0*delta_beta), 1.1 );
+    
+    ((TF1*)gROOT->GetFunction("gaus"))->SetParLimits(0, 0, 2.0); // Gaussian amplitude
+    ((TF1*)gROOT->GetFunction("gaus"))->SetParLimits(1, 0, 1.5); // Mean
+    ((TF1*)gROOT->GetFunction("gaus"))->SetParLimits(2, delta_beta/2.0, 1.0); // Sigma
+    
     int fit_success = 1;
-    ROOT::Math::MinimizerOptions::SetDefaultStrategy(2); // More accurate error calculation
-    fit_success = slice.histo->Fit("gaus","QI","",beta*0.95,beta*1.05);
+    ROOT::Math::MinimizerOptions::SetDefaultMinimizer("Minuit2");
+    fit_success = slice.histo->Fit("gaus","QI","",fit_low_edge,fit_up_edge);
     if ( fit_success == 0 ) { // Confusingly meaning fit was successful
       slice.extract_fit_parameters();
-      float fit_range_min = slice.mean-(2.5*slice.sigma);
-      float fit_range_max = slice.mean+(2.5*slice.sigma);
-      if (fit_range_min > 1) { fit_range_min = 0.99;}
-      if (fit_range_max > slice.histo->GetXaxis()->GetXmax()) {fit_range_max = slice.histo->GetXaxis()->GetXmax();}
-      fit_success = slice.histo->Fit("gaus","I","",fit_range_min,fit_range_max);
+      
+      fit_low_edge = min( slice.mean-(2.5*slice.sigma), 0.99 );
+      fit_up_edge  = max( slice.mean+(2.5*slice.sigma), 1.1  );
+      
+      ROOT::Math::MinimizerOptions::SetDefaultStrategy(2); // More accurate error calculation
+      fit_success = slice.histo->Fit("gaus","QI","",fit_low_edge,fit_up_edge);
       if ( fit_success == 0 ) { // Confusingly meaning fit was successful
         slice.fit_successful = true;
         slice.extract_fit_parameters();
-      } else {
-        ROOT::Math::MinimizerOptions::SetDefaultStrategy(1); // 
-        fit_success = slice.histo->Fit("gaus","I","",fit_range_min,fit_range_max);
-        if ( fit_success == 0 ) { // Confusingly meaning fit was successful
-          slice.fit_successful = true;
-          slice.extract_fit_parameters();
-        }
       }
+      ROOT::Math::MinimizerOptions::SetDefaultStrategy(1); // Re-set to default
     }
+    
   }
   
   void slice_histo(int bin_step_size, bool do_fit=true){
@@ -112,25 +120,23 @@ struct Histo {
       return;
     }
     
-    for (int step_begin=1; step_begin<histo->GetNbinsX()+1; step_begin+=bin_step_size){
-      int step_end = step_begin + bin_step_size - 1;
-      if (step_end > histo->GetNbinsX()) {
-        step_end = histo->GetNbinsX();
-      }
-      int step_center = int(float(step_begin + step_end)/2.0);
+    for (int slice_bin=1; slice_bin<histo->GetNbinsX()+1; slice_bin+=bin_step_size){
+      double p = histo->GetXaxis()->GetBinCenter(slice_bin);
+      double p_low = histo->GetXaxis()->GetBinLowEdge(slice_bin);
+      double p_up  = histo->GetXaxis()->GetBinUpEdge(slice_bin);
       
-      double p = histo->GetXaxis()->GetBinCenter(step_center);
-      double beta = p/sqrt(ptype.mass*ptype.mass + p*p);
-
+      double beta_low = p_low/sqrt(ptype.mass*ptype.mass + p_low*p_low);
+      double beta_up  = p_up /sqrt(ptype.mass*ptype.mass + p_up *p_up);
+      
       Slice slice;
       slice.p = p;
-      TString slice_name = TString( "beta_CH_" + ptype.name_s + "_bin" + to_string(step_center) + "_p" + to_string(p) );
-      slice.histo = histo->ProjectionY(slice_name,step_begin,step_end,"e");
-      slice.histo->SetTitle( TString( "#beta_{CH} sliced at p=" + to_string(p) + "GeV, bin " + to_string(step_center) + ", " + ptype.name_l ) );
+      TString slice_name = TString( "beta_CH_" + ptype.name_s + "_bin" + to_string(slice_bin) + "_p" + to_string(p) );
+      slice.histo = histo->ProjectionY(slice_name,slice_bin,slice_bin,"e");
+      slice.histo->SetTitle( TString( "#beta_{CH} sliced at p=" + to_string(p) + "GeV, bin " + to_string(slice_bin) + ", " + ptype.name_l ) );
       slice.histo->Scale(1.0/slice.histo->Integral());
       
       if (do_fit) {
-        this->perform_slice_fit(slice, beta);
+        this->perform_slice_fit(slice, beta_low, beta_up);
       }
       
       slices.push_back(slice);
@@ -182,13 +188,3 @@ typedef vector<Resolution>    ResVec;
 typedef vector<Method>        MethodVec;
 typedef vector<float> FloatVec;
 typedef vector<int>   IntVec;
-
-// This is awful...
-// TODO INSTEAD: Add option to add pdg vector to ParticleType
-map<string, IntVec> pdg_map {
-  {"p",   {2212}},
-  {"K",   {130, 310, 311, 321}},
-  {"Pi",  {111, 211}},
-  {"e1",  {11}},
-  {"e2",  {13}}
-};

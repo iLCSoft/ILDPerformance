@@ -1,0 +1,4 @@
+[BetaPPlots]
+NbinsBeta = 2000
+NbinsP    = 500
+BinJumpsPerSlice = 10
