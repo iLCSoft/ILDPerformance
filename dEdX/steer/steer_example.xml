@@ -1,0 +1,159 @@
+<!-- 
+  Top level Marlin steering file defining the ILD reconstruction chain.
+  
+  !! WARNING !! This file may have been generated from 'Marlin -n MarlinstdReco.xml'. 
+  In this case you will find that : 
+  - no <include ref="..."> element is present
+  - some values differ between the constants section and the actual values in the global section or the processor parameter (e.g the compact file).
+    In this case, please refer to values in the global section or the processor parameters and not the constants section ! 
+  
+  Mandatory parameters :
+    * global.LCIOInputFiles : The input lcio input file(s)
+    * constant.lcgeo_DIR : the lcgeo directory must point on the one sourced in your current ilcsoft
+  
+  Optional parameters :
+    * constant.DetectorModel : the detector model to use the pre-defined lcgeo_DIR as ${lcgeo_DIR}/ILD/compact/${DetectorModel}/${DetectorModel}.xml
+    * constant.RunOverlay250GeV (350, 500 or 1000 GeV) : whether to run the background overlay. If set to true, you must ensure that the overlay background files are correctly set 
+    * constant.PandoraSettingsFile : The pandora settings file to use
+    * constant.PidPDFFile : A single root file name for the PID likelihood processor
+    * constant.PidWeightFiles : A list (space separated) of XML files containing weights for low momentum pi/mu separation (from TMVA)
+
+  Author : Remi Ete, DESY
+-->
+
+
+<marlin>
+  <constants>
+    <!-- ***** Global constant for reconstruction ***** -->
+    <!-- The lcgeo directory where to look for the ILD model -->
+    <constant name="lcgeo_DIR" value="/cvmfs/ilc.desy.de/sw/x86_64_gcc49_sl6/v02-00-01/lcgeo/v00-16-01" />
+    <!-- ILD detector model -->
+    <constant name="DetectorModel" value="ILD_l5_o1_v02" />
+    <!-- The full compact file name -->
+    <constant name="CompactFile" value="${lcgeo_DIR}/ILD/compact/${DetectorModel}/${DetectorModel}.xml" />
+    <!-- location of ILDConfig production folder -->
+    <constant name="productionfolder" value="/cvmfs/ilc.desy.de/sw/ILDConfig/v02-00-01/StandardConfig/production" />
+    <!-- ILD calibration file -->
+    <constant name="CalibrationFile" value="${productionfolder}/Calibration/Calibration_${DetectorModel}.xml" />
+	<!-- location of input files -->
+    <constant name="inputfolder" value="/pnfs/desy.de/ilc/prod/ilc/mc-opt-3/ild/dst-merged/1-calib/single/ILD_l5_o1_v02_nobg/v02-00-01" />
+	
+  
+    <!-- Whether to run the overlay background -->
+    <!-- WARNING : By setting this value to true (or True), you must ensure that the overlay files are set in the processor parameters -->
+    <constant name="RunOverlay" value="false" />
+    <!-- The center of mass energy (unit GeV). Mainly used for background overlay -->
+    <constant name="CMSEnergy" value="250" />
+    <!-- The energy dependant parameters file to include -->
+    <constant name="EnergyParametersFile" value="${productionfolder}/Config/Parameters${CMSEnergy}GeV.xml" />
+    <!--Whether to run the BeamCal reconstruction-->
+    <constant name="RunBeamCalReco" value="true" />
+    <!--The BeamCal calibration constant, sim hit energy to calibrated calo hit energy-->
+    <constant name="BeamCalCalibrationFactor">79.6</constant>
+    
+    <!-- ***** Input files constants ***** -->    
+    <!-- Special Beamcal overlay background file -->
+    <constant name="BeamCalBackgroundFile" value="${productionfolder}/HighLevelReco/BeamCalBackground/BeamCal_bg_E500-TDR_ws.root" />
+
+    
+    <!-- Geometry model dependant calibration constants from external file -->
+    <include ref="${CalibrationFile}" />
+    
+    <!-- Energy dependant parameters -->
+    <include ref="${EnergyParametersFile}" />
+    
+    <!-- Output files constants -->
+    <constant name="OutputBaseName" value="/PATH/OUTPUT/FILENAME" />
+    <constant name="AIDAFileName" value="${OutputBaseName}" />
+  </constants>
+  
+  
+  <!-- ***** Execute section ***** -->
+  <execute>
+
+    <processor name="MyAIDAProcessor" />
+    <processor name="InitDD4hep" />
+    <processor name="MyStatusmonitor" />
+    <processor name="MydEdxAnalyser" />
+
+  </execute>
+  
+  <!-- ***** Global section ***** -->
+  <global>
+    <parameter name="LCIOInputFiles">
+      ${inputfolder}/rv02-00-01.sv02-00-01.mILD_l5_o1_v02_nobg.E1-calib.I110081.Ps_pm11_prnd.e0.p0.n001.d_dstm_10752_0.slcio
+      ${inputfolder}/rv02-00-01.sv02-00-01.mILD_l5_o1_v02_nobg.E1-calib.I110082.Ps_pm13_prnd.e0.p0.n001.d_dstm_10752_0.slcio
+      ${inputfolder}/rv02-00-01.sv02-00-01.mILD_l5_o1_v02_nobg.E1-calib.I110083.Ps_pm211_prnd.e0.p0.n001.d_dstm_10752_0.slcio
+      ${inputfolder}/rv02-00-01.sv02-00-01.mILD_l5_o1_v02_nobg.E1-calib.I110084.Ps_pm321_prnd.e0.p0.n001.d_dstm_10752_0.slcio
+      ${inputfolder}/rv02-00-01.sv02-00-01.mILD_l5_o1_v02_nobg.E1-calib.I110085.Ps_pm2212_prnd.e0.p0.n001.d_dstm_10752_0.slcio
+
+      
+    </parameter>
+    <parameter name="MaxRecordNumber" value="0"/>
+    <parameter name="SkipNEvents" value="0"/>
+    <parameter name="SupressCheck" value="false"/>
+    <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT"> MESSAGE </parameter>
+    <parameter name="RandomSeed" value="1234567890" />
+  </global>
+  
+  
+  
+  <!-- Init processors : histograming, logging, geometry ... -->
+  <processor name="MyAIDAProcessor" type="AIDAProcessor">
+    <!--Processor that handles AIDA files. Creates on directory per processor.  Processors only need to create and fill the histograms, clouds and tuples. Needs to be the first ActiveProcessor-->
+    <!-- compression of output file 0: false >0: true (default) -->
+    <parameter name="Compress" type="int" value="1"/>
+    <!-- filename without extension-->
+    <parameter name="FileName" type="string" value="${AIDAFileName}"/>
+    <!-- type of output file xml (default) or root ( only OpenScientist)-->
+    <parameter name="FileType" type="string" value="root "/>
+  </processor>
+  
+  <processor name="InitDD4hep" type="InitializeDD4hep">
+    <!--InitializeDD4hep reads a compact xml file and initializes the DD4hep::LCDD object-->
+    <!--Name of the DD4hep compact xml file to load-->
+    <parameter name="DD4hepXMLFile" type="string"> ${CompactFile} </parameter>
+  </processor>
+  
+  <processor name="MyStatusmonitor" type="Statusmonitor">
+    <!--Statusmonitor prints out information on running Marlin Job: Prints number of runs run and current number of the event. Counting is sequential and not the run or event ID.-->
+    <!--Print the event number every N events-->
+    <parameter name="HowOften" type="int"> 1000 </parameter>
+    <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+    <!-- <parameter name="Verbosity" type="string">MESSAGE </parameter> -->
+  </processor>
+
+
+  <processor name="MydEdxAnalyser" type="dEdxAnalyser">
+   
+    <parameter name="TrackCollection" type="string"> MarlinTrkTracks </parameter>
+    <parameter name="TrackMCTruthLink" type="string"> MarlinTrkTracksMCTruthLink </parameter>
+    <parameter name="MCParticleCollection" type="string"> MCParticle </parameter>
+    <parameter name="PFOCollection" type="string"> PandoraPFOs </parameter>
+    
+    <parameter name="nBinsX" type="int"> 100 </parameter>
+    <parameter name="nBinsY" type="int"> 300 </parameter>
+    <parameter name="minBinX" type="int"> -1 </parameter>
+    <parameter name="maxBinX" type="int">  2 </parameter>
+    <parameter name="minBinY" type="int">  0 </parameter>
+    <parameter name="maxBinY" type="int"> 1e-6 </parameter>
+    
+    <parameter name="usePFOTracks" type="bool"> false </parameter>
+    <parameter name="useOneTrack" type="bool"> false </parameter>
+    <parameter name="cutdEdx" type="bool"> false </parameter>
+    <parameter name="cutTrackPurity" type="bool"> false </parameter>
+    <parameter name="cutTrackPurityMom" type="bool"> false </parameter>
+    <parameter name="cutD0" type="double"> 0 </parameter>
+    <parameter name="cutZ0" type="double"> 0 </parameter>
+    <parameter name="cutMomMin" type="double"> 0 </parameter>
+    <parameter name="cutMomMax" type="double"> 0 </parameter>
+    <parameter name="usePFOTracks" type="bool"> false </parameter>
+    <parameter name="usePFOTracks" type="bool"> false </parameter>
+    
+    <parameter name="plotStuff" type="bool"> false </parameter>
+    <parameter name="fileFormat" type="string"> .png </parameter>
+    
+  </processor>
+
+  
+</marlin>
