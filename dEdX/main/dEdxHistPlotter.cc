@@ -33,9 +33,9 @@ const char* namepart(string name, int fl, unsigned int n)
   if (name.size()>=n)
   {
     if (fl==1) return (string (name,0,n)).c_str();
-    else return (string (name,name.size()-n,name.size())).c_str();
+    if (fl==-1) return (string (name,name.size()-n,name.size())).c_str();
   }
-  else return (const char*)("");
+  return (const char*)("");
 }
 
 void PlotHist(TObject* obj, string outpath)
