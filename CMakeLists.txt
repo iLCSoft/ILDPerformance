@@ -81,7 +81,16 @@ ENDIF()
 #ADD_DEFINITIONS( "-Wno-long-long" )
 
 # include directories
-INCLUDE_DIRECTORIES( ./tracking/include  ./PID/include  ./pi0/include ./validateSim/include ./singlePhotonVal/include ./trackerHitCtr/include ./WWZZSeparation/processor/include )
+INCLUDE_DIRECTORIES( 
+  ./tracking/include
+  ./PID/include  
+  ./pi0/include 
+  ./validateSim/include 
+  ./singlePhotonVal/include 
+  ./trackerHitCtr/include 
+  ./WWZZSeparation/processor/include
+  ./dEdX/include
+)
 #INSTALL_DIRECTORY( ./include DESTINATION . FILES_MATCHING PATTERN "*.h" )
 
 # add library
@@ -92,12 +101,15 @@ AUX_SOURCE_DIRECTORY( ./validateSim/src library_sources )
 AUX_SOURCE_DIRECTORY( ./singlePhotonVal/src library_sources )
 AUX_SOURCE_DIRECTORY( ./trackerHitCtr/src library_sources )
 AUX_SOURCE_DIRECTORY( ./WWZZSeparation/processor/src library_sources )
+AUX_SOURCE_DIRECTORY( ./dEdX/src library_sources )
 ADD_SHARED_LIBRARY( ${PROJECT_NAME} ${library_sources} )
 INSTALL_SHARED_LIBRARY( ${PROJECT_NAME} DESTINATION lib )
 
 # add binaries
 ADD_EXECUTABLE( ILDPerformance_UdsAnalysis UdsAnalysis/src/ILDPerformance_AnalyseUds.cc )
 INSTALL( TARGETS ILDPerformance_UdsAnalysis RUNTIME DESTINATION bin )
+ADD_EXECUTABLE( ILDPerformance_dEdXHistPlotter dEdX/main/dEdxHistPlotter.cc )
+INSTALL( TARGETS ILDPerformance_dEdXHistPlotter RUNTIME DESTINATION bin )
 
 # display some variables and write them to cache
 DISPLAY_STD_VARIABLES()
