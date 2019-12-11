@@ -1,3 +1,25 @@
+# v01-07
+
+* 2019-05-07 Ete Remi ([PR#28](https://github.com/iLCSoft/ILDPerformance/pull/28))
+  - Added dEdX performance scripts
+     - `dEdXAnalyzer` processor creates plots
+     - Example steering file in `steer` directory
+     - Binary `dEdxHistPlotter` to create fancy plots out of the root files produced by the processor
+  - See Readme file for more information
+
+* 2019-01-03 Jakob Beyer ([PR#27](https://github.com/iLCSoft/ILDPerformance/pull/27))
+  - Add scripts to create TOF-separation plots for single particles (based on Sukees code), including config files for steering.
+  - In WWZZSeparation: Remove legacy parameter in plotting script and save TH1s in plotting macro.
+
+* 2018-11-06 Ete Remi ([PR#26](https://github.com/iLCSoft/ILDPerformance/pull/26))
+  - Added `-n` option to include/exclude MC neutrino energy. 
+  - Added b, c and t quarks to analysis
+
+* 2018-10-01 Jakob Beyer ([PR#25](https://github.com/iLCSoft/ILDPerformance/pull/25))
+  - Updated bash scripts, now also possible to run on already reconstructed files (DSTs).
+  - Added vector boson mass lines to plots. 
+  - Added another FastJet processor to the Marlin script to remove overlay which is included in new production.
+
 # v01-06
 
 * 2018-04-12 Jakob Beyer ([PR#22](https://github.com/ilcsoft/ILDPerformance/pull/22))
