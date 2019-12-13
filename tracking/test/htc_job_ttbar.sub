@@ -57,6 +57,6 @@ RequestMemory = 1024 * 2
 #
 # Default is 1 job per submit
 # Job Id is $(Cluster).$(Process) e.g. 20202.0
-request_cpus=10
+#request_cpus=10
 
 Queue 1

@@ -5,13 +5,13 @@
 #==============================================================
 
 ILDMODEL=ILD_l5_v02
-ILCSOFTVER=v01-19-06
+ILCSOFTVER=HEAD-2019-06-04 # v01-19-06
 
 . /afs/desy.de/project/ilcsoft/sw/x86_64_gcc49_sl6/${ILCSOFTVER}/init_ilcsoft.sh
 
 
 PolarAngles=('10' '20' '40' '85')
-Mom=( '1' '3' '5' '10' '15' '25' '50' '100' )
+Mom=( '1' '3' '5' '10' '15' '25' '50' '100' '200')
 
 
 #==================================================
@@ -19,7 +19,7 @@ Mom=( '1' '3' '5' '10' '15' '25' '50' '100' )
 for i in {0..3}
 do
 
-for j in {0..7}
+for j in {0..8}
 do
 
 python lcio_particle_gun.py ${Mom[j]} ${PolarAngles[i]}  mcparticles_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio 13 -1. &
@@ -37,7 +37,7 @@ mv mcparticles_MuonsAngle_*_Mom_*.slcio Results/GenFiles
 for i in {0..3}
 do
 
-for j in {0..7}
+for j in {0..8}
 do
 
 ddsim \
@@ -60,7 +60,7 @@ mv ${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_*_Mom_*_SIM.slcio Results/SimFiles
 for i in {0..3}
 do
 
-for j in {0..7}
+for j in {0..8}
 do
 
 Marlin MarlinStdReco.xml \
@@ -93,7 +93,7 @@ rm ${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_*_Mom_*_PfoAnalysis.root
 for i in {0..3}
 do
 
-for j in {0..7}
+for j in {0..8}
 do
 
 # diagnostics
@@ -117,7 +117,7 @@ wait
 for i in {0..3}
 do
 
-for j in {0..7}
+for j in {0..8}
 do
 
 cp analysis_${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.root ../Results/Analysis/analysis_${ILDMODEL}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.root

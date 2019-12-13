@@ -50,7 +50,7 @@ void eff_comp(){
   grth3->SetMarkerStyle(22);
   grth3->Draw("P");
 
-  leg = new TLegend(0.2,0.36,0.55,0.68);
+  TLegend* leg = new TLegend(0.2,0.36,0.55,0.68);
   leg->AddEntry(grb1,"","p");
   leg->AddEntry(grb2,"","p");
   leg->AddEntry(grb3,"","p");

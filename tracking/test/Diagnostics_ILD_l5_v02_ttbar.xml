@@ -16,7 +16,7 @@
     <!-- ILC software version -->
     <constant name="ILCSoftVersion" value="v01-19-05" />
     <!-- ILD detector model -->
-    <constant name="DetectorModel" value="ILD_l5_v02" />
+    <constant name="DetectorModel" value="ILD_s5_v02" />
     <!-- The full compact file name -->
     <constant name="CompactFile" value="${lcgeo_DIR}/ILD/compact/${DetectorModel}/${DetectorModel}.xml" />
   </constants> 
@@ -40,11 +40,101 @@
 	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_7_REC.slcio
 	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_8_REC.slcio
 	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_9_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_10_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_11_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_12_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_13_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_14_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_15_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_16_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_17_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_18_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_19_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_20_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_21_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_22_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_23_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_24_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_25_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_26_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_27_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_28_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_29_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_30_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_31_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_32_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_33_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_34_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_35_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_36_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_37_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_38_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_39_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_40_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_41_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_42_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_43_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_44_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_45_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_46_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_47_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_48_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_49_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_50_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_51_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_52_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_53_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_54_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_55_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_56_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_57_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_58_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_59_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_60_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_61_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_62_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_63_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_64_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_65_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_66_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_67_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_68_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_69_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_70_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_71_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_72_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_73_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_74_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_75_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_76_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_77_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_78_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_79_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_80_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_81_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_82_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_83_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_84_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_85_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_86_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_87_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_88_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_89_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_90_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_91_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_92_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_93_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_94_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_95_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_96_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_97_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_98_REC.slcio
+	Results/RecoFiles/${DetectorModel}_${ILCSoftVersion}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_99_REC.slcio
     </parameter>
     <parameter name="MaxRecordNumber" value="0"/>
     <parameter name="SkipNEvents" value="0"/>
     <parameter name="SupressCheck" value="false"/>
-    <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT"> MESSAGE </parameter>
+    <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT"> DEBUG MESSAGE </parameter>
     <parameter name="RandomSeed" value="1234567890" />
   </global>
 
@@ -196,7 +286,7 @@
     <parameter name="ReqInnVXDHit" type="bool"> false </parameter>
     <parameter name="SimTrackerHitCollections" type="StringVec" lcioInType="SimTrackerHit"> VXDCollection FTDCollection SITCollection TPCCollection </parameter>
     <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
-    <parameter name="Verbosity" type="string"> MESSAGE </parameter>
+    <parameter name="Verbosity" type="string">DEBUG  MESSAGE </parameter>
   </processor>
 
 
