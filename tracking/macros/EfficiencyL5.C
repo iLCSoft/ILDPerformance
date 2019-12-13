@@ -1,6 +1,6 @@
 void EfficiencyL5(){
 
-  TFile* fttbar = new TFile("../Results/Analysis/analysis_ILD_l5_v02_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05.root");
+  TFile* fttbar = new TFile("../Results/Analysis/ILD_l5_v02/analysis_ILD_l5_v02_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05.root");
 
   /*
   TCanvas *eff = (TCanvas*) f->Get("eff");
