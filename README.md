@@ -1,5 +1,5 @@
 # ILDPerformance
-[![Build Status](https://travis-ci.org/iLCSoft/ILDPerformance.svg?branch=master)](https://travis-ci.org/iLCSoft/ILDPerformance)
+![linux](https://github.com/iLCSoft/MarlinReco/workflows/linux/badge.svg)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/12351/badge.svg)](https://scan.coverity.com/projects/ilcsoft-ildperformance)
 
 Package to evalute the Performance of the ILD detector simulation 
