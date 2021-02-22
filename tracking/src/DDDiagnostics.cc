@@ -92,12 +92,23 @@ void DDDiagnostics::initHist(void) {
 
   hist_thm_t  = new TH1F( "hist_thm_t", "Cos theta distributions of true tracks", 21, -1., 1. ) ;
   hist_thm_f  = new TH1F( "hist_thm_f", "Cos theta distribution of found tracks", 21, -1., 1. ) ;
+  
+  hist_2d_t = new TH2F("hist_2d_t","",42,-1.,1.,100,0.,1.);
+  hist_2d_f = new TH2F("hist_2d_f","",42,-1.,1.,100,0.,1.);
+  
+  hist_2d = new TH2F("hist_2d","",42,-1.,1.,100,0.,1.);
+  
+   
 
   pulls = new TCanvas("pulls","Track par. pulls",800,800);
   residuals =  new TCanvas("residuals","Track par. residuals",800,800);
 
   eff = new TCanvas("eff","Trk Eff",800,800);
   effPM = new TCanvas("effPM","Trk Eff",800,800);
+  eff2d = new TCanvas("eff2d","Trk Eff",800,800);
+  eff2d = new TCanvas("eff2d","Trk Eff",800,800);
+  eff2d_t = new TCanvas("eff2dt","Trk Eff",800,800);
+  eff2d_f = new TCanvas("eff2df","Trk Eff",800,800);
 
   myfunc = new TF1("myfunc","gaus(0)");
 
@@ -200,6 +211,25 @@ void DDDiagnostics::fillCanvas(void) {
   gp->Write("gp");
   gthm->Write("gthM");
   effPM->Write();
+  
+  eff2d->cd();
+  hist_2d=(TH2F*)hist_2d_f->Clone();
+  hist_2d->Divide(hist_2d_t);
+  hist_2d->GetYaxis()->SetTitle( "P_{T}[GeV]" );
+  hist_2d->GetXaxis()->SetTitle( "cos(#theta)" );
+  hist_2d->Draw("colz");
+  
+  hist_2d->Write("hist_2d");
+  eff2d->Write();
+  
+  eff2d_t->cd();
+  hist_2d_t->Write("hist_2d_t");
+  eff2d_t->Write();
+  
+  eff2d_f->cd();
+  hist_2d_f->Write("hist_2d_f");
+  eff2d_f->Write();
+  
 
 }
 
@@ -303,12 +333,12 @@ void DDDiagnostics::initParameters(void) {
   registerProcessorParameter("PCut",
                              "Minimum momentum of examined MCParticles sample (in GeV)",
                              _pCut,
-                             double(0.3));
+                             double(0));
 
   registerProcessorParameter("PTCut",
                              "Minimum transverse momentum of examined MCParticles sample (in GeV)",
                              _ptCut,
-                             double(0.3));
+                             double(0));
 
   registerProcessorParameter("DistFromIP",
                              "Maximum distance from IP of examined MCParticles sample (in mm)",
@@ -567,13 +597,13 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
 	
 	//APPLY_CUT( DEBUG, cut, e.rho()==0.0  || e.rho() > 400.   ) ; // end at rho > 40 cm
 	
-	APPLY_CUT( DEBUG, cut, p.r() > _pCut ) ; 
+	//APPLY_CUT( DEBUG, cut, p.r() > _pCut ) ; 
 	
-	APPLY_CUT( DEBUG, cut, p.rho() > _ptCut ) ; 
+	//APPLY_CUT( DEBUG, cut, p.rho() > _ptCut ) ; 
 	
-	APPLY_CUT( DEBUG, cut, fabs( cos( p.theta() ) )  < _cosTheta  ) ;
+	//APPLY_CUT( DEBUG, cut, fabs( cos( p.theta() ) )  < _cosTheta  ) ;
 
-	APPLY_CUT( DEBUG, cut, !(mcp->isDecayedInTracker())) ;
+	//APPLY_CUT( DEBUG, cut, !(mcp->isDecayedInTracker())) ;
 	
 	int SiHits_mcp = hitMapVXD[ mcp ] + hitMapSIT[ mcp ] + hitMapFTD[ mcp ];
 	if( _minSiHits > 0 ) APPLY_CUT( DEBUG, cut, SiHits_mcp >= _minSiHits ) ;
@@ -622,12 +652,15 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
       TVector3 p( pxmcp, pymcp,  pzmcp ) ;
       double costhmcp  = fabs(cos( p.Theta() )) ;
       double costhmcpm  = cos( p.Theta() ) ;
-
+       double costh_2d=0;
       if (fabs(mcpTracks[ii]->getCharge())<10.){
 	hist_th_t->Fill(costhmcp);
 	hist_thm_t->Fill(costhmcpm);
+	costh_2d = costhmcpm;
+	
       }
-
+      
+      hist_2d_t->Fill(costh_2d, ptmcp);
       
       streamlog_out(DEBUG4) << " Checking: pt mcp = " << ptmcp << " of particle " << mcpTracks[ii] << " no of tracks associated " << testFromWgt.size() << std::endl ;
       
@@ -774,6 +807,8 @@ void DDDiagnostics::processEvent( LCEvent * evt ) {
 
 	  hist_th_f->Fill(costhmcp2);
 	  hist_thm_f->Fill(costhmcp2m);
+	  
+	  hist_2d_f->Fill(costhmcp2m,ptmcp);
 
 	  double foundTrkChi2 = ((Track*)trkvec[jj])->getChi2();
 	  double foundTrkNdf = ((Track*)trkvec[jj])->getNdf();

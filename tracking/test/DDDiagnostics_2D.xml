@@ -1,0 +1,84 @@
+<!--
+      Example steering file to run a standard reconstruction on the ttbar events
+      simulated with ddsim in this example dierectory.
+
+      Works with ilcsoft v01-19_xx
+
+      Defines the standard reconstruction for ILD.
+-->
+
+
+<marlin>
+
+  <execute>
+    <processor name="MyAIDAProcessor"/>
+    <processor name="InitDD4hep"/>
+    <processor name="MyDiagnostics"/>
+  </execute>
+
+  <global>
+    <parameter name="LCIOInputFiles">
+      ../RecoFiles/reco_sim_0_ILD_l5_v02.slcio
+    </parameter>
+    <parameter name="MaxRecordNumber" value="0"/>
+    <parameter name="SkipNEvents" value="0"/>
+    <parameter name="SupressCheck" value="false"/>
+    <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT"> MESSAGE </parameter>
+    <parameter name="RandomSeed" value="1234567890" />
+  </global>
+
+
+  <processor name="MyAIDAProcessor" type="AIDAProcessor">
+    <!--Processor that handles AIDA files. Creates on directory per processor.  Processors only need to create and fill the histograms, clouds and tuples. Needs to be the first ActiveProcessor-->
+    <!-- compression of output file 0: false >0: true (default) -->
+    <parameter name="Compress" type="int" value="1"/>
+    <!-- filename without extension-->
+    <parameter name="FileName" type="string" value="analysis_output"/>
+    <!-- type of output file xml (default) or root ( only OpenScientist)-->
+    <parameter name="FileType" type="string" value="root "/>
+  </processor>
+
+  <processor name="InitDD4hep" type="InitializeDD4hep">
+    <!--InitializeDD4hep reads a compact xml file and initializes the DD4hep::LCDD object-->
+    <!--Name of the DD4hep compact xml file to load-->
+    <parameter name="DD4hepXMLFile" type="string"> $lcgeo_DIR/ILD/compact/ILD_l5_v02/ILD_l5_v02.xml </parameter>
+  </processor>
+
+  <processor name="MyDiagnostics" type="DDDiagnostics">
+    <!--Fill the more detail information into TTree for DEBUG.-->
+    <parameter name="FillBigTTree" type="bool">false </parameter>
+    <!--Name of the studied track collection-->
+    <parameter name="StudiedTracks" type="string" lcioInType="Track"> MarlinTrkTracks </parameter>
+    <!--true - reco relation collection-->
+    <parameter name="MCTracksTruthLinkCollectionName" type="string" lcioInType="Track"> MCTruthMarlinTrkTracksLink </parameter>
+    <!--reco - true relation collection-->
+    <parameter name="TracksMCTruthLinkCollectionName" type="string" lcioInType="Track"> MarlinTrkTracksMCTruthLink </parameter>
+    <!--Name of the MCParticle input collection-->
+    <parameter name="MCParticleCollection" type="string" lcioInType="MCParticle"> MCParticle </parameter>
+    <!--Enables cuts to define the examined track sample-->
+    <parameter name="TrkEffOn" type="bool"> true </parameter>
+    <!--To study the Silicon tracking efficiency-->
+    <parameter name="SiTrkEffOn" type="bool"> false </parameter>
+    <!--Should be true when we study a simulated physics sample-->
+    <parameter name="PhysSampleOn" type="bool"> false </parameter>
+    <!--Maximum costheta of examined MCParticles sample-->
+    <parameter name="CosThetaCut" type="double"> 0 </parameter>
+    <!--Minimum momentum of examined MCParticles sample (in GeV)-->
+    <parameter name="PCut" type="double"> 0.0 </parameter>
+    <!--Minimum transverse momentum of examined MCParticles sample (in GeV)-->
+    <parameter name="PTCut" type="double"> 0.0 </parameter>
+    <!--Maximum distance from IP of examined MCParticles sample (in mm)-->
+    <parameter name="DistFromIP" type="double"> 10.0 </parameter>
+    <!--ratio of hits belonging to the dominant MC particle to total number of track hits-->
+    <parameter name="RequiredPurity" type="double"> 0.74 </parameter>
+    <!--minimum required hits on Si detectors in order to consider the track found-->
+    <parameter name="RequiredSiHits" type="int"> 4 </parameter>
+    <!--Requirement that the innermost VXD hit should be found-->
+    <parameter name="ReqInnVXDHit" type="bool"> false </parameter>
+    <parameter name="SimTrackerHitCollections" type="StringVec" lcioInType="SimTrackerHit"> VXDCollection FTDCollection SITCollection TPCCollection </parameter>
+    <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+    <parameter name="Verbosity" type="string"> MESSAGE </parameter>
+  </processor>
+
+
+</marlin>
