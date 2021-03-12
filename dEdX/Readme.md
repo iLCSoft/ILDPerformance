@@ -1,8 +1,8 @@
 # ILDPerformance/dEdx
 
-Performance plots for dE/dx .
+Performance plots for dE/dx.
 
-- U. Einhaus, Apr 2019
+- U. Einhaus, Mar 2021
 
 ## Overview
 
@@ -29,7 +29,7 @@ The separation power is calculated for each combination of the *_nPart* species.
 All histograms, including the auto-generated fit results, are stored via AIDA in a root file.
 Finally, many of the histograms can be plotted and saved as images to the current working directory.
 
-Processor parameters:
+General processor parameters:
 
 - **plotStuff** - Set to true to switch on automatic image generation of many histograms in the current working directory.
   bool, default: false.
@@ -37,22 +37,58 @@ Processor parameters:
   string, default: .png
 - **usePFOTracks** - Set to true to use tracks attached to charged PFO, instead of all tracks in the track collection. This should be used with events which are more busy than single particle files.
   bool, default: false.
+
 You can make a track selection via the optional parameters, e. g. to reduce 'contamination' from mis-linked Tracks and MCParticles.
+
 - **useOneTrack** - Set true if from every event only the first track should be used.
-  default: false.
+  bool, default: false.
 - **cutdEdx** - Set true if particles with a very off dE/dx value (hard-coded) should be ignored.
-  default: false.
+  bool, default: false.
 - **cutTrackPurity** - Set true if particles should be ignored, where the MCParticle is connected to more than one track.
-  default: false.
+  bool, default: false.
 - **cutD0** - Tracks with a d0 larger than the given value should be ignored. Set to 0 to accept all particles.
-  default: 0.
+  double, default: 0.
 - **cutZ0** - Tracks with a z0 larger than the given value should be ignored. Set to 0 to accept all particles.
-  default: 0.
+  double, default: 0.
+- **cutMomMin** - Tracks with a momentum smaller than the given value should be ignored. Set to 0 to accept all particles.
+  double, default: 0.
+- **cutMomMax** - Tracks with a momentum larger than the given value should be ignored. Set to 0 to accept all particles.
+  double, default: 0.
+ 
+For calibration with beam test results, so-called fiducial electrons are selected, which ought to be similar to beam-test conditions, and their properties stored in separate histograms.
+
+- **fidMomMin** - Fiducial minimum absolut momentum / GeV.
+  double, default: 3.
+- **fidMomMax** - Fiducial maximum absolut momentum / GeV.
+  double, default: 10.
+- **fidLamMin** - Fiducial minimum absolut lambda / deg.
+  double, default: 1.
+- **fidLamMax** - Fiducial maximum absolut lambda / deg.
+  double, default: 10.
+- **fidNHitsMin** - Fiducial minimum number of hits.
+  int, default: 200.
+
+For some of the histograms, the axis binning can be adapted, which can be useful in case of very high or low statistics.
+
+- **nBinsX** - Number of bins of the momentum axis in histograms.
+  int, default: 100.
+- **nBinsY** - Number of bins of the dE/dx axis in histograms.
+  int, default: 300.
+- **minBinX** - log_10(momentum/GeV) of the lower end of the momentum axis in histograms.
+  double, default: -1 (= 0.1 GeV).
+- **maxBinX** - log_10(momentum/GeV) of the upper end of the momentum axis in histograms.
+  double, default: 2 (= 100 GeV).
+- **minBinY** - Lower end of the dE/dx axis in GeV/mm in histograms.
+  double, default: 0.
+- **maxBinY** - Upper end of the dE/dx axis in GeV/mm in histograms.
+  double, default: 1e-6.
 
 You can run this Analyser over any selection of tracks, e. g. only pion and kaon tracks.
 In that case, only the pion and kaon resolution as well as only the pion-kaon separation would give sensible plots, but all other plots would be generated empty alongside.
 The Analyser has mostly been used to extract the dE/dx performance from single-particle random-momentum files, but also to check e. g. 6f-ttbar events.
 
+Note that the hit energy histograms will only be filled, if the track hits are available, which is usually only the case for REC-files.
+The hit number histograms are unaffected by this.
 
 ## dEdxHistPlotter
 
