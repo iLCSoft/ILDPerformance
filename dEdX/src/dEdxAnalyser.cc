@@ -379,18 +379,7 @@ void dEdxAnalyser::init() {
   _FitLambdaFull_Res[_nPart]->SetYTitle("dE/dx resolution");
 
 
-  for (int i=0; i<_nPart; i++)
-
   // fiducial electrons
-  //_BB_FiducialElectrons = new TH2D("BB_FiducialElectrons","Bethe-Bloch histogram for electrons inside fiducial parameters", _nBinsX,histbinsX, _nBinsY,histbinsY);
-  //_Fit_FiducialElectrons = new TObjArray();
-  //_Res_FiducialElectrons = new TH1D("Res_FiducialElectrons", "dE/dx resolution over momentum for fiducial electrons", _nBinsX, histbinsX);
-  //_Res_FiducialElectrons->SetXTitle("momentum / GeV/c");
-  //_Res_FiducialElectrons->SetYTitle("dE/dx resolution");
-  //_ResSum_FiducialElectrons = new TH1D("ResSum_FiducialElectrons", "dE/dx resolution distribution for fiducial electrons", 100, 0, .2);
-  //_ResSum_FiducialElectrons->SetXTitle("dE/dx resolution");
-  //_ResSum_FiducialElectrons->SetYTitle("weighted number of momentum bins with that resolution");
-
   _ResNorm_FiducialElectrons = new TH1D("ResNorm_FiducialElectrons", "Relative dE/dx resolution distribution for fiducial electrons", 100, 0, 2);
 
   // some other histograms for cross-checks etc.
@@ -426,9 +415,12 @@ void dEdxAnalyser::init() {
   _NTracksHist     = new TH1D("NTracksHist"    ,"Number of tracks of each event",20,0,0);
   _NTracksUsedHist = new TH1D("NTracksUsedHist","Number of tracks of each event actually used after cuts",20,0,0);
   _NTracksMomHist  = new TH1D("NTracksMomHist" ,"Number of tracks of each event actually used after cuts and with p > 100 MeV",20,0,0);
-  _TrackMomHist = new TH1D("TrackMomHist","Momentum of Tracks",_nBinsX,histbinsX2);
+  _TrackMomHist = new TH1D("TrackMomHist","Momentum of tracks after cuts",_nBinsX,histbinsX2);
   _TrackMomHist->SetXTitle("momentum (GeV)");
   _TrackMomHist->SetYTitle("abundance");
+  _TrackSiblingsMomHist = new TH1D("TrackSiblingsMomHist","Momentum of tracks after cuts in events with nTracks > 1",_nBinsX,histbinsX2);
+  _TrackSiblingsMomHist->SetXTitle("momentum (GeV)");
+  _TrackSiblingsMomHist->SetYTitle("abundance");
 
   _dEdxOutlierAbundance = new TH1D("dEdxOutlierAbundance","Number of tracks with dE/dx values that don't match the MC PDG",5,-.5,4.5);
   _dEdxOutlierAbundance->GetXaxis()->SetBinLabel(1,"MCPion - dE/dx too large");
@@ -492,7 +484,9 @@ void dEdxAnalyser::init() {
 
   delete[] histbinsX;
   delete[] histbinsX2;
+  delete[] histbinsX3;
   delete[] histbinsY;
+  delete[] histbinsY2;
 }
 
 
@@ -544,9 +538,10 @@ void dEdxAnalyser::processEvent( LCEvent * evt ) {
   int n_track_mod = _useOneTrack  ? std::min(n_track_pfo,1) : n_track_pfo;
   for (int i=0; i<n_track_mod; ++i)
   {
-    int pdg = 0, mcpdg_s = 0;
+    int pdg = 0;
     double maxweight = 0;
     double maxtrackmom=0;
+    int icut = 0;
 
     Track* track = NULL;
     ReconstructedParticle* pfo = NULL;
@@ -574,7 +569,7 @@ void dEdxAnalyser::processEvent( LCEvent * evt ) {
         {
           mcpar = vec_mcpar[j];
           int mcpdg = abs(vec_mcpar[j]->getPDG());
-          if(mcpdg==11 || mcpdg==13 || mcpdg==211 || mcpdg==321 || mcpdg==2212) {pdg = mcpdg; mcpdg_s = vec_mcpar[j]->getPDG();}
+          if(mcpdg==11 || mcpdg==13 || mcpdg==211 || mcpdg==321 || mcpdg==2212) pdg = mcpdg;
           else pdg = 10;  // flag: other particle
           maxweight = wei_mcpar[j];
         }
@@ -582,6 +577,7 @@ void dEdxAnalyser::processEvent( LCEvent * evt ) {
     }
 
     _MCmult->Fill(vec_mcpar.size());
+    _CutAnaHist->Fill(icut); ++icut;
 
     float dEdx = track->getdEdx();
 
@@ -591,6 +587,7 @@ void dEdxAnalyser::processEvent( LCEvent * evt ) {
 
       // If more other tracks are connected to the same MCParticle, skip this track.
       if (_cutTrackPurity) if (n_rel_tracks>1) continue;
+      _CutAnaHist->Fill(icut); ++icut;
 
       HelixClass trkHelixC;
       trkHelixC.Initialize_Canonical(track->getPhi(),track->getD0(),track->getZ0(),track->getOmega(),track->getTanLambda(),_bField);
@@ -600,6 +597,7 @@ void dEdxAnalyser::processEvent( LCEvent * evt ) {
       // Momentum cuts
       if (_cutMomMin) if (mom<_cutMomMin) continue;
       if (_cutMomMax) if (mom>_cutMomMax) continue;
+      _CutAnaHist->Fill(icut); ++icut;
 
       // If more other tracks are connected to the same MCParticle and this is not the track with the highest momentum among them, skip this track.
       if (_cutTrackPurityMom) if (n_rel_tracks>1)
@@ -615,10 +613,12 @@ void dEdxAnalyser::processEvent( LCEvent * evt ) {
         }
         if (mom < maxtrackmom) continue;
       }
+      _CutAnaHist->Fill(icut); ++icut;
 
       // If the track is too far away from the IP, skip this track.
       if (_cutD0) if (track->getD0()>_cutD0) continue;
       if (_cutZ0) if (track->getZ0()>_cutZ0) continue;
+      _CutAnaHist->Fill(icut); ++icut;
 
       // Register outlier dE/dx values.
       bool cutdEdx = false;
@@ -649,54 +649,46 @@ void dEdxAnalyser::processEvent( LCEvent * evt ) {
 
       // If the track dE/dx value is obviously not matching the MCParticle PDG, skip this track.
       if (_cutdEdx) if (cutdEdx) continue;
+      _CutAnaHist->Fill(icut); ++icut;
 
       // All cuts passed!
       n_track_used++;
       if (mom > .1) n_track_mom++;
-      if (n_track > 1 ) _TrackMomHist->Fill(mom);
+      _TrackMomHist->Fill(mom);
+      if (n_track > 1 ) _TrackSiblingsMomHist->Fill(mom);
       momVec.push_back(mom);
       int nHits = track->getSubdetectorHitNumbers()[_TPCindex];
 
-      for (int j=0; j<_nPart; j++) if (pdg==_PDG[j] && mom>.3 && mom<100) _dEdxVec[j].push_back(std::array<double,6> {{mom,dEdx,track->getdEdxError(),track->getTanLambda(),(double)track->getSubdetectorHitNumbers()[_TPCindex],mom_t}});
-      for (int j=0; j<_nPart; j++) if (pdg==_PDG[j]) _BBHist[j]->Fill(mom,dEdx);
+      for (int j=0; j<_nPart; j++)
+      {
+        if (pdg==_PDG[j])
+        {
+          _BBHist[j]->Fill(mom,dEdx);
+          if (mom>.3 && mom<100) _dEdxVec[j].emplace_back(std::array<double,6> {{mom,dEdx,track->getdEdxError(),track->getTanLambda(),(double)track->getSubdetectorHitNumbers()[_TPCindex],mom_t}});
+        }
+      }
+
       if (pdg==10) _BBHist[_nPart]->Fill(mom,dEdx);
       _BBHist[_nPart+1]->Fill(mom,dEdx);
 
       if (pdg==11 && mom>.3) _ResElectrons->Fill(dEdx);
-      _CutAnaHist->Fill(0);
       _dEdxErrorCorrelation->Fill(dEdx,track->getdEdxError());
 
       if (_usePFOTracks)
       {
-        //int PFO_pdg = pfo->getParticleIDs()[0]->getPDG();
         int PFO_pdg = pidh->getParticleID(pfo,pidh->getAlgorithmID("dEdxPID")).getPDG();
-        //streamlog_out(MESSAGE) << PFO_pdg << std::endl;
+
         if (PFO_pdg==0) PFO_pdg=10;
-        for (int j=0; j<_nPart+1; j++) if (pdg==_PDG[j])
-          for (int k=0; k<_nPart+1; k++) if (PFO_pdg==_PDG[k])
-            { _PDGCheck->Fill(j,k); _PDGCheck_weight->Fill(j,k,pidh->getParticleID(pfo,pidh->getAlgorithmID("dEdxPID")).getLikelihood()); }
-      }
-
-
-      if (0 && pdg==2212 && dEdx<(.3-mom/5.)*1e-6)  //  pions that are pdg-registered as protons
-      {
-        streamlog_out(MESSAGE) << mom << " " << dEdx << " " << vec_mcpar.size() << " " << maxweight << std::endl;
-        if (mcpdg_s== 2212) _CutAnaHist->Fill(1);
-        if (mcpdg_s==-2212) _CutAnaHist->Fill(2);
-        if (maxweight>=1) _CutAnaHist->Fill(3);
-        for (unsigned int j=0; j<std::min(vec_mcpar.size(), wei_mcpar.size()); j++)
+        for (int j=0; j<_nPart+1; j++)
         {
-          streamlog_out(MESSAGE) << wei_mcpar[j];
-          if (j<5) _CutAnaHist->Fill(j+4);
+          if (pdg!=_PDG[j]) continue;
+          for (int k=0; k<_nPart+1; k++)
+          {
+            if (PFO_pdg!=_PDG[k]) continue;
+            _PDGCheck->Fill(j,k);
+            _PDGCheck_weight->Fill(j,k,pidh->getParticleID(pfo,pidh->getAlgorithmID("dEdxPID")).getLikelihood());
+          }
         }
-        streamlog_out(MESSAGE) << std::endl;
-
-        LCCollection *col_mcpar{};
-        col_mcpar = evt->getCollection( _MCParColName );
-        MCParticle* mcpar0 = dynamic_cast<MCParticle*>(col_mcpar->getElementAt(0));
-        _MCmomVec.push_back(mcpar0->getMomentum()[0]);
-        _MCmomVec.push_back(mcpar0->getMomentum()[1]);
-        _MCmomVec.push_back(mcpar0->getMomentum()[2]);
       }
 
       // check which hits are inside the TPC
@@ -716,33 +708,33 @@ void dEdxAnalyser::processEvent( LCEvent * evt ) {
       //if(_useHitCol)
       //{
         //const TrackerHitVec Hits = track->getTrackerHits();
-        for (unsigned int h=0; h<trkHits.size(); ++h)
+      for (unsigned int h=0; h<trkHits.size(); ++h)
+      {
+        double EDep = trkHits[h]->getEDep();
+        for (int j=0; j<_nPart; j++) if (pdg==_PDG[j]) _HitEnergySpectrum[j]->Fill(EDep);
+        if (pdg==10) _HitEnergySpectrum[_nPart]->Fill(EDep);
+        _HitEnergySpectrum[_nPart+1]->Fill(EDep);
+        if (.9<mom && mom<1.15)  // around 1 GeV
         {
-          double EDep = trkHits[h]->getEDep();
-          for (int j=0; j<_nPart; j++) if (pdg==_PDG[j]) _HitEnergySpectrum[j]->Fill(EDep);
-          if (pdg==10) _HitEnergySpectrum[_nPart]->Fill(EDep);
-          _HitEnergySpectrum[_nPart+1]->Fill(EDep);
-          if (.9<mom && mom<1.15)  // around 1 GeV
-          {
-            for (int j=0; j<_nPart; j++) if (pdg==_PDG[j]) _HitEnergySpectrum_at1[j]->Fill(EDep);
-            if (pdg==10) _HitEnergySpectrum_at1[_nPart]->Fill(EDep);
-            _HitEnergySpectrum_at1[_nPart+1]->Fill(EDep);
-          }
-          if (2<mom && mom<3)  // around 2.5 GeV
-          {
-            for (int j=0; j<_nPart; j++) if (pdg==_PDG[j]) _HitEnergySpectrum_at25[j]->Fill(EDep);
-            if (pdg==10) _HitEnergySpectrum_at25[_nPart]->Fill(EDep);
-            _HitEnergySpectrum_at25[_nPart+1]->Fill(EDep);
-          }
-          if (1) //(mom_t>=1 && nHits>=200)
-          {
-            for (int j=0; j<_nPart; j++) if (pdg==_PDG[j]) _HEHist[j]->Fill(mom,EDep);
-            if (pdg==10) _HEHist[_nPart]->Fill(mom,EDep);
-            _HEHist[_nPart+1]->Fill(mom,EDep);
-            //for (int j=0; j<_nPart; j++) if (pdg==_PDG[j]) _HEHist_bg[j]->Fill(mom/_Masses[j],EDep);
-            //for (int j=0; j<_nPart; j++) if (pdg==_PDG[j]) _HEHist_bg[_nPart+1]->Fill(mom/_Masses[j],EDep);
-          }
+          for (int j=0; j<_nPart; j++) if (pdg==_PDG[j]) _HitEnergySpectrum_at1[j]->Fill(EDep);
+          if (pdg==10) _HitEnergySpectrum_at1[_nPart]->Fill(EDep);
+          _HitEnergySpectrum_at1[_nPart+1]->Fill(EDep);
         }
+        if (2<mom && mom<3)  // around 2.5 GeV
+        {
+          for (int j=0; j<_nPart; j++) if (pdg==_PDG[j]) _HitEnergySpectrum_at25[j]->Fill(EDep);
+          if (pdg==10) _HitEnergySpectrum_at25[_nPart]->Fill(EDep);
+          _HitEnergySpectrum_at25[_nPart+1]->Fill(EDep);
+        }
+        if (1) //(mom_t>=1 && nHits>=200)
+        {
+          for (int j=0; j<_nPart; j++) if (pdg==_PDG[j]) _HEHist[j]->Fill(mom,EDep);
+          if (pdg==10) _HEHist[_nPart]->Fill(mom,EDep);
+          _HEHist[_nPart+1]->Fill(mom,EDep);
+          //for (int j=0; j<_nPart; j++) if (pdg==_PDG[j]) _HEHist_bg[j]->Fill(mom/_Masses[j],EDep);
+          //for (int j=0; j<_nPart; j++) if (pdg==_PDG[j]) _HEHist_bg[_nPart+1]->Fill(mom/_Masses[j],EDep);
+        }
+      }
       //}
 
       for (int j=0; j<_nPart; j++) if (pdg==_PDG[j]) _HitNumberSpectrum[j]->Fill(nHits);
@@ -764,7 +756,7 @@ void dEdxAnalyser::processEvent( LCEvent * evt ) {
   _NTracksUsedHist->Fill(n_track_used);
   _NTracksMomHist ->Fill(n_track_mom);
   std::sort(momVec.begin(),momVec.end());
-  if (momVec.size() > 1) if (momVec[0] > 1.5*momVec[1])
+  //if (momVec.size() > 1) if (momVec[0] > 1.5*momVec[1])
 
   //delete nav_t2trel;
 
@@ -842,21 +834,20 @@ void dEdxAnalyser::end()
 
       if (binMean > 0)
       {
-                                   _ResNormHist[i]       ->Fill(normMean);
+        if (1)                     _ResNormHist[i]       ->Fill(normMean);
         if (mom_t>1)               _ResNormHist_1GeV[i]  ->Fill(normMean);
         
         if (mom_t>1 && nHits>=200) _NormLambdaHist[i]    ->Fill(lambda,normMean);
         if (lambda<20)             _NormNHitHist[i]      ->Fill(nHits, normMean);
         
-                     _NormBothHist[i]      ->Fill(lambda,nHits,normMean);
-        if (mom_t>1) _NormBothHist_1GeV[i] ->Fill(lambda,nHits,normMean);
+        if (1)                     _NormBothHist[i]      ->Fill(lambda,nHits,normMean);
+        if (mom_t>1)               _NormBothHist_1GeV[i] ->Fill(lambda,nHits,normMean);
         
         if (mom_t>1) _NormLambdaFullHist[i]     ->Fill(lambda,normMean);
         if (mom_t>1) _NormLambdaFullHist[_nPart]->Fill(lambda,normMean);
 
         // fiducial electrons
-        if (i==0) if (_fidMomMin<=mom && mom<=_fidMomMax && _fidLamMin<=lambda && lambda<=_fidLamMax && nHits>=_fidNHitsMin) _ResNorm_FiducialElectrons->Fill(normMean);
-        //_BB_FiducialElectrons->Fill(mom,dEdx);
+        if (i==0 && _fidMomMin<=mom && mom<=_fidMomMax && _fidLamMin<=lambda && lambda<=_fidLamMax && nHits>=_fidNHitsMin) _ResNorm_FiducialElectrons->Fill(normMean);
 
         if (i==1 && normMean>1.5) {streamlog_out(MESSAGE) << v << " " << _dEdxVec[i][v][0] << " " << _dEdxVec[i][v][1] << " " << _dEdxVec[i][v][2] << " " << _dEdxVec[i][v][3] << " " << _dEdxVec[i][v][4] << " " << _dEdxVec[i][v][5] << " " << normMean << " " << relError << std::endl; }
       }
@@ -866,34 +857,22 @@ void dEdxAnalyser::end()
     _ResNorm_FiducialElectrons->Fit("gaus","Q");
 
     _NormLambdaHist[i]->FitSlicesY(gausfitrel,0,-1,0,"QR",_FitLambda[i]);  // angular distribution
-    TH1* FitLambda_ampl  = (TH1D*)_FitLambda[i]->At(1);
+    TH1* FitLambda_mean  = (TH1D*)_FitLambda[i]->At(1);
     TH1* FitLambda_sigma = (TH1D*)_FitLambda[i]->At(2);
-    for (int d=1; d<=18; d++)
-    {
-      double res = FitLambda_sigma->GetBinContent(d)*1. / FitLambda_ampl->GetBinContent(d);
-      if (std::isnan(res)) res = 0;
-      _FitLambda_Res[i]->SetBinContent(d,res);
-    }
+    _FitLambda_Res[i]->Divide(FitLambda_sigma,FitLambda_mean);
 
     _NormNHitHist[i]->FitSlicesY(gausfitrel,0,-1,0,"QR",_FitNHit[i]);  // number-of-hits distribution
-    TH1* FitNHit_ampl  = (TH1D*)_FitNHit[i]->At(1);
+    TH1* FitNHit_mean  = (TH1D*)_FitNHit[i]->At(1);
     TH1* FitNHit_sigma = (TH1D*)_FitNHit[i]->At(2);
-    for (int d=1; d<=110; d++)
-    {
-      double res = FitNHit_sigma->GetBinContent(d)*1. / FitNHit_ampl->GetBinContent(d);
-      if (std::isnan(res)) res = 0;
-      _FitNHit_Res[i]->SetBinContent(d,res);
-    }
+    _FitNHit_Res[i]->Divide(FitNHit_sigma,FitNHit_mean);
 
     _NormBothHist[i]->FitSlicesZ(gausfitrel,0,-1,0,-1,0,"QR");  // angular and number-of-hits distribution
-    //TH2* FitBoth_ampl  = (TH2D*)gDirectory->Get(_NormBothHistNames[i][0].c_str());
     TH2* FitBoth_mean  = (TH2D*)gDirectory->Get(_NormBothHistNames[i][1].c_str());
     TH2* FitBoth_sigma = (TH2D*)gDirectory->Get(_NormBothHistNames[i][2].c_str());
-    //TH2* FitBoth_chi2  = (TH2D*)gDirectory->Get(_NormBothHistNames[i][3].c_str());
     TH2* ProjZ = dynamic_cast<TH2*>(_NormBothHist[i]->Project3D("yx"));
-    for (int d=1; d<=18; d++)
+    for (int d=1; d<=18; d++)  // nBinsX lambda
     {
-      for (int e=1; e<=110; e++)
+      for (int e=1; e<=110; e++)  // nBinsX nHits up to 220
       {
         double mu = FitBoth_mean ->GetBinContent(d,e);
         double si = FitBoth_sigma->GetBinContent(d,e);
@@ -912,14 +891,12 @@ void dEdxAnalyser::end()
     _FitBoth_Res[i]->Fit(powla2,"Q");
 
     _NormBothHist_1GeV[i]->FitSlicesZ(gausfitrel,0,-1,0,-1,0,"QR");  // angular and number-of-hits distribution above 1 GeV
-    //TH2* FitBoth_1GeV_ampl  = (TH2D*)gDirectory->Get(_NormBothHistNames_1GeV[i][0].c_str());
     TH2* FitBoth_1GeV_mean  = (TH2D*)gDirectory->Get(_NormBothHistNames_1GeV[i][1].c_str());
     TH2* FitBoth_1GeV_sigma = (TH2D*)gDirectory->Get(_NormBothHistNames_1GeV[i][2].c_str());
-    //TH2* FitBoth_1GeV_chi2  = (TH2D*)gDirectory->Get(_NormBothHistNames_1GeV[i][3].c_str());
     TH2* ProjZ_1GeV = dynamic_cast<TH2*>(_NormBothHist_1GeV[i]->Project3D("yx"));
-    for (int d=1; d<=18; d++)
+    for (int d=1; d<=18; d++)  // nBinsX lambda
     {
-      for (int e=1; e<=110; e++)
+      for (int e=1; e<=110; e++)  // nBinsX nHits up to 220
       {
         double mu = FitBoth_1GeV_mean ->GetBinContent(d,e);
         double si = FitBoth_1GeV_sigma->GetBinContent(d,e);
@@ -938,12 +915,7 @@ void dEdxAnalyser::end()
     _NormLambdaFullHist[i]->FitSlicesY(gausfitrel,0,-1,0,"QR",_FitLambdaFull[i]);  // angular distribution, no nHits cut
     TH1* FitLambdaFull_mean  = (TH1D*)_FitLambdaFull[i]->At(1);
     TH1* FitLambdaFull_sigma = (TH1D*)_FitLambdaFull[i]->At(2);
-    for (int d=1; d<=18; d++)
-    {
-      double res = FitLambdaFull_sigma->GetBinContent(d)*1. / FitLambdaFull_mean->GetBinContent(d);
-      if (std::isnan(res)) res = 0;
-      _FitLambdaFull_Res[i]->SetBinContent(d,res);
-    }
+    _FitLambdaFull_Res[i]->Divide(FitLambdaFull_sigma,FitLambdaFull_mean);
     FitLambdaFull_mean->Fit(poly3fit,"Q");
 
     for (int j=i+1; j<_nPart; j++)  // Separation Power
@@ -986,29 +958,10 @@ void dEdxAnalyser::end()
   _NormLambdaFullHist[_nPart]->FitSlicesY(gausfitrel,0,-1,0,"QR",_FitLambdaFull[_nPart]);  // angular distribution, no nHits cut
   TH1* FitLambdaFull_mean  = (TH1D*)_FitLambdaFull[_nPart]->At(1);
   TH1* FitLambdaFull_sigma = (TH1D*)_FitLambdaFull[_nPart]->At(2);
-  for (int d=1; d<=18; d++)
-  {
-    double res = FitLambdaFull_sigma->GetBinContent(d)*1. / FitLambdaFull_mean->GetBinContent(d);
-    if (std::isnan(res)) res = 0;
-    _FitLambdaFull_Res[_nPart]->SetBinContent(d,res);
-  }
+  _FitLambdaFull_Res[_nPart]->Divide(FitLambdaFull_sigma,FitLambdaFull_mean);
   FitLambdaFull_mean->Fit(poly3fit,"Q");
 
-  // fiducial electrons resolution
-//  _BB_FiducialElectrons->FitSlicesY(gausfit,0,-1,0,"QR",_Fit_FiducialElectrons);
-//  TH1* FitHist_ampl  = (TH1D*)_Fit_FiducialElectrons->At(0);
-//  TH1* FitHist_mean  = (TH1D*)_Fit_FiducialElectrons->At(1);
-//  TH1* FitHist_sigma = (TH1D*)_Fit_FiducialElectrons->At(2);
-//  for (int k=1; k<_nBinsX+1; k++)  // Resolution from fit results; 0 is underflow bin, nBinsx+1 is overflow bin
-//  {
-//    double res = FitHist_sigma->GetBinContent(k)*1. / FitHist_mean->GetBinContent(k);
-//    if (std::isnan(res)) res = 0;
-//    _Res_FiducialElectrons->SetBinContent(k,res);
-//    if (histbinsX[k] >= 1) _ResSum_FiducialElectrons->Fill(res,FitHist_ampl->GetBinContent(k));
-//  }
-//  _ResSum_FiducialElectrons->Fit("gaus","Q","",0.005,0.2);
-
-
+  // PDGCheck
   for (int i=0; i<_nPart+1; i++)
   {
     double vsum = 0, hsum = 0;
@@ -1064,28 +1017,11 @@ void dEdxAnalyser::end()
     PlotTH2(can, _BBHist[_nPart]);
     PlotTH2(can, _BBHist[_nPart+1]);
 
-    //PlotTH1(can, img, _ResNorm_FiducialElectrons);
-
-//    PlotTH2(can, img, _BB_FiducialElectrons);
-//    _Res_FiducialElectrons->SetAxisRange(0,.2,"Y");
-//    PlotTH1(can, img, _Res_FiducialElectrons);
-//    for (int j=0; j<4; j++)
-//    {
-//      ((TH1D*) _Fit_FiducialElectrons->At(j))->SetAxisRange(0,YMax[j],"Y");
-//      ((TH1D*) _Fit_FiducialElectrons->At(j))->Draw();
-//      img->FromPad(can);
-//      std::stringstream s; s << _BB_FiducialElectrons->GetName() << "_FitPar" << j << _fileFormat;
-//      img->WriteImage(s.str().c_str());
-//    }
-
-
     for (int i=0; i<sp_c; i++)
     {
       _SPHist[i]->SetAxisRange(0,20,"Y");
       PlotTH1(can, _SPHist[i]);
     }
-
-    PlotTH1(can, _TrackMomHist);
 
     for (int i=0; i<_nPart; i++)
     {
@@ -1102,6 +1038,9 @@ void dEdxAnalyser::end()
     }
     PlotTH2(can, _HEHist[_nPart]);
     PlotTH2(can, _HEHist[_nPart+1]);
+
+    PlotTH1(can, _TrackMomHist);
+    PlotTH1(can, _TrackSiblingsMomHist);
 
     // linear x-axis plots
     can->SetLogx(0);
@@ -1191,8 +1130,8 @@ void dEdxAnalyser::end()
     streamlog_out(DEBUG) << "TrackMomHist Entries" << std::endl;
     for (int j=0; j<_nBinsX; j++) streamlog_out(DEBUG) << j << "  " << histbinsX2[j] << "  " << _TrackMomHist->GetBinContent(j) << std::endl;
 
-    streamlog_out(DEBUG) << "MCmomVec Entries" << std::endl;
-    for (unsigned int j=0; j<_MCmomVec.size()/3; j++) streamlog_out(DEBUG) << j << "  " << _MCmomVec[3*j] << "  " << _MCmomVec[3*j+1] << "  " << _MCmomVec[3*j+2] << std::endl;
+    //streamlog_out(DEBUG) << "MCmomVec Entries" << std::endl;
+    //for (unsigned int j=0; j<_MCmomVec.size()/3; j++) streamlog_out(DEBUG) << j << "  " << _MCmomVec[3*j] << "  " << _MCmomVec[3*j+1] << "  " << _MCmomVec[3*j+2] << std::endl;
 
     delete can;
     delete img;
@@ -1201,6 +1140,8 @@ void dEdxAnalyser::end()
   delete gausfit;
   delete gausfitrel;
   delete powla2;
+  delete landaufit;
+  delete poly3fit;
 
   delete[] histbinsX;
   delete[] histbinsX2;
@@ -1209,19 +1150,15 @@ void dEdxAnalyser::end()
 void dEdxAnalyser::PlotTH1( TCanvas* can, TH1* hist )
 {
   hist->Draw();
-  //img->FromPad(can);
   can->Update();
   std::stringstream s; s << hist->GetName() << _fileFormat;
-  //img->WriteImage(s.str().c_str());
   can->Print(s.str().c_str());
 }
 
 void dEdxAnalyser::PlotTH2( TCanvas* can, TH2* hist )
 {
   hist->Draw("colz");
-  //img->FromPad(can);
   can->Update();
   std::stringstream s; s << hist->GetName() << _fileFormat;
-  //img->WriteImage(s.str().c_str());
   can->Print(s.str().c_str());
 }
