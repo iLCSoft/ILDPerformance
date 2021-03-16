@@ -147,7 +147,7 @@ class dEdxAnalyser : public Processor {
   float _TPC_inner = 0;
   float _TPC_outer = 0;
   double _bField{};
-  std::vector<double> _MCmomVec{};
+  //std::vector<double> _MCmomVec{};
 
   // collection names
   std::string _trackColName{};
@@ -185,8 +185,8 @@ class dEdxAnalyser : public Processor {
   static const int _nPart = 5;
 
   // pdg numbers and masses of particles, to be specified in ::init() (along with corresponding strings for names and descriptions)
-  std::vector<int> _PDG{};
-  std::vector<double> _Masses{};
+  std::array<int, _nPart+1> _PDG{};
+  std::array<double, _nPart> _Masses{};
 
   // Bethe-Bloch histograms (including one for "other particles" and one for "all particles")
   TH2* _BBHist[_nPart+2];
@@ -223,7 +223,7 @@ class dEdxAnalyser : public Processor {
   TH2* _NormLambdaFullHist[_nPart+1];  // relative dEdx vs. lambda of track, for tracks with p>1GeV
   TH1* _FitLambdaFull_Res[_nPart+1];  // resolution vs. lambda from fit results
 
-  // Vector array of all momentum, dE/dx, dE/dx error, tan lambda and number of hits values for each track
+  // Vector array of all momentum, dE/dx, dE/dx error, tan lambda, number of hits and transverse momentum values for each track
   std::vector< std::array<double,6> > _dEdxVec[_nPart];
 
   // Separation power between all particle combinations
@@ -244,6 +244,7 @@ class dEdxAnalyser : public Processor {
   TH1* _NTracksUsedHist{};
   TH1* _NTracksMomHist{};
   TH1* _TrackMomHist{};
+  TH1* _TrackSiblingsMomHist{};
   TH1* _dEdxOutlierAbundance{};
   TH1* _dEdxOutlierProportion{};
 
