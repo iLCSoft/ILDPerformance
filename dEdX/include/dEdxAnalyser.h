@@ -17,6 +17,8 @@
 #include "TF2.h"
 #include "TCanvas.h"
 #include "TImage.h"
+#include "TFitResultPtr.h"
+#include "TFitResult.h"
 
 #ifdef MARLIN_AIDA //AIDA
 #include <marlin/AIDAProcessor.h>
@@ -35,38 +37,53 @@ using namespace marlin;
  *  If tracks attached to PFOs should be used, also a PFO collection is required.
  *  The number of particle species to be investigated and their properties are hard-coded and must be set:
  *  _nPart is the number of species, set in this header, while the PDG number and the names of the particles (for labelling the histograms) are set in the init().
- *  default: _nPart = 5; species: electrons, muons, pions, kaon, protons.
+ *  This version: _nPart = 5; species: electrons, muons, pions, kaon, protons.
  *
- *  First, in processEvent(), the dE/dx values of each track is filled in the corresponding histogram, resulting in Bethe-Bloch curves.
+ *  First, in processEvent(), the dE/dx value of each track is filled in the corresponding histogram, resulting in Bethe-Bloch curves.
  *  The correct PDG is received from the MCParticle linked to the track.
  *  In end(), these histograms are then fitted with FitSlices, and the resulting mean and sigma values for each momentum bin are used to calculate resolution and separation power.
  *  The separation power is calculated for each combination of the _nPart species.
  *  All histograms, including the auto-generated fit results, are stored via AIDA in a root file.
  *  Finally, many of the histograms can be plotted and saved as images to the current working directory.
  *
+ *  Several special histograms for calibration purposes are provided.
+ *  The FiducialElectrons histograms collects electrons which are similar to electrons at the test beam. The resulting dE/dx resolution in ResNorm_FiducialElectrons should be used to calibrate the smearing factor in the Compute_dEdxProcessor.
+ *  The histogram NormLambdaFullAll_1 contains the mean dE/dx over |lambda| incl. a poly3 fit, which is used in the AngularCorrection_dEdxProcessor for correction of the angular dependence.
+ *  The histogram NormCosThFullAll_1 contains the mean dE/dx over cos(theta), and shows the information of NormLambdaFullAll_1 over an alternative angular scale.
+ *  The Bethe-Bloch curves in BBHist are fitted to provide the parameters of the reference curves for the dEdxPID in the LikelihoodPIDProcessor.
+ *  The fit results are stored with the histograms and also printed on the console at the end of the processor.
+ *
+ *  You can run this Analyser over any selection of tracks, e. g. only pion and kaon tracks.
+ *  In that case, only the pion and kaon resolution as well as only the pion-kaon separation would give sensible plots, but all other plots are be generated empty alongside.
+ *  The Analyser has mostly been used to extract the dE/dx performance from single-particle random-momentum files, but also to check e. g. 6f-ttbar events.
+ *
+ *  Note that the hit energy histograms will only be filled, if the track hits are available, which is usually only the case for REC-files.
+ *  The hit number histograms are unaffected by this.
+ *
  *  @param _plotStuff - Set to true to switch on automatic image generation of many histograms in the current working directory.
  *    bool, default: false.
  *  @param _fileFormat - Select the file extension to be used for the automatically generated images.
- *    See https://root.cern.ch/doc/master/classTPad.html#ad2fc5f449e4cb5480b9fb05fda3a8307 for options.
+ *    Selection depends on root TPad::Print() capabilities, typically: [.ps, .eps, .pdf, .svg, .tex, .gif, .xpm, .png, .jpg, .tiff, .cxx, .xml, .json, .root].
+ *    See https://root.cern.ch/doc/master/classTPad.html#ad2fc5f449e4cb5480b9fb05fda3a8307 for details.
  *    string, default: .png
  *
  *  @param _usePFOTracks - Set to true to use tracks attached to charged PFO, instead of all tracks in the track collection. This should be used with events which are more busy than single particle files.
  *    bool, default: false.
+ *  @param _useOneTrack - Set true if from every event only the first object in the selected collection (track or PFO) should be used. Usually, don't combine this with _usePFOTracks.
+ *    bool, default: false.
  *
  *  You can make a track selection via the optional parameters, e. g. to reduce 'contamination' from mis-linked Tracks and MCParticles.
- *  @param _useOneTrack - Set true if from every event only the first track should be used.
- *    bool, default: false.
  *  @param _cutdEdx - Set true if particles with a very off dE/dx value (hard-coded) should be ignored.
  *    bool, default: false.
  *  @param _cutTrackPurity - Set true if particles should be ignored, where the MCParticle is connected to more than one track.
  *    bool, default: false.
- *  @param _cutD0 - Tracks with a d0 larger than the given value should be ignored. Set to 0 to accept all particles.
+ *  @param _cutD0 - Tracks with a d0 larger than the given value will be ignored. Set to 0 to accept all particles.
  *    double, default: 0.
- *  @param _cutZ0 - Tracks with a z0 larger than the given value should be ignored. Set to 0 to accept all particles.
+ *  @param _cutZ0 - Tracks with a z0 larger than the given value will be ignored. Set to 0 to accept all particles.
  *    double, default: 0.
- *  @param _cutMomMin - Tracks with a momentum smaller than the given value should be ignored. Set to 0 to accept all particles.
+ *  @param _cutMomMin - Tracks with a momentum smaller than the given value will be ignored. Set to 0 to accept all particles.
  *    double, default: 0.
- *  @param _cutMomMax - Tracks with a momentum larger than the given value should be ignored. Set to 0 to accept all particles.
+ *  @param _cutMomMax - Tracks with a momentum larger than the given value will be ignored. Set to 0 to accept all particles.
  *    double, default: 0.
  *
  *  For calibration with beam test results, so-called fiducial electrons are selected, which ought to be similar to beam-test conditions, and their properties stored in separate histograms.
@@ -95,15 +112,8 @@ using namespace marlin;
  *  @param _maxBinY - Upper end of the dE/dx axis in GeV/mm in histograms.
  *    double, default: 1e-6.
  *
- *  You can run this Analyser over any selection of tracks, e. g. only pion and kaon tracks.
- *  In that case, only the pion and kaon resolution as well as only the pion-kaon separation would give sensible plots, but all other plots would be generated empty alongside.
- *  The Analyser has mostly been used to extract the dE/dx performance from single-particle random-momentum files, but also to check e. g. 6f-ttbar events.
- *
- *  Note that the hit energy histograms will only be filled, if the track hits are available, which is usually only the case for REC-files.
- *  The hit number histograms are unaffected by this.
- *
  *  @author U. Einhaus, DESY
- *  @version $1.1$
+ *  @version $1.2$
  */
 
 
@@ -135,6 +145,7 @@ class dEdxAnalyser : public Processor {
 
   virtual void PlotTH1( TCanvas* can, TH1* hist );
   virtual void PlotTH2( TCanvas* can, TH2* hist );
+  //virtual double BB_Fit( double* x, double* p );
 
 
  protected:
@@ -162,7 +173,6 @@ class dEdxAnalyser : public Processor {
 
   bool _usePFOTracks=false;
   bool _useOneTrack=false;
-  bool _useHitCol=false;
   bool _cutdEdx=false;
   bool _cutTrackPurity=false;
   bool _cutTrackPurityMom=false;
@@ -194,10 +204,11 @@ class dEdxAnalyser : public Processor {
   // Gaussian fit results: each TObjArray has 4 histograms (amplitude, mean, sigma and chi2)
   TObjArray* _FitHist[_nPart];
   TObjArray* _FitLambda[_nPart];
-  TObjArray* _FitNHit[_nPart];
+  TObjArray* _FitNHit[_nPart+1];
   TObjArray* _FitBoth[_nPart];
   TObjArray* _FitBoth_1GeV[_nPart];
   TObjArray* _FitLambdaFull[_nPart+1];
+  TObjArray* _FitCosThFull[_nPart+1];
 
   // Storage for names of histograms to have a handle on fit results that are 'free floating' in memory, since TH3::FitSlicesZ has no direct transfer
   std::vector< std::string > _NormBothHistNames[_nPart];
@@ -214,14 +225,16 @@ class dEdxAnalyser : public Processor {
   // Resolution dependence on different parameters, fit histograms
   TH2* _NormLambdaHist[_nPart];  // relative dEdx vs. lambda of track, for tracks with p>1GeV, nHits>=200
   TH1* _FitLambda_Res[_nPart];  // resolution vs. lambda from fit results
-  TH2* _NormNHitHist[_nPart];  // normalised dEdx vs. number of hits of track, for tracks with |lambda|<20deg
-  TH1* _FitNHit_Res[_nPart];  // resolution vs. number of hits from fit results
+  TH2* _NormNHitHist[_nPart+1];  // normalised dEdx vs. number of hits of track, for tracks with |lambda|<20deg
+  TH1* _FitNHit_Res[_nPart+1];  // resolution vs. number of hits from fit results
   TH3* _NormBothHist[_nPart];  // relative dEdx vs. lambda of track and vs. number of hits
   TH2* _FitBoth_Res[_nPart];  // resolution vs. lambda and vs. number of hits from fit results
   TH3* _NormBothHist_1GeV[_nPart];  // relative dEdx vs. lambda of track and vs. number of hits, for tracks with p>1GeV
   TH2* _FitBoth_Res_1GeV[_nPart];  // resolution vs. lambda and vs. number of hits from fit results, for tracks with p>1GeV
   TH2* _NormLambdaFullHist[_nPart+1];  // relative dEdx vs. lambda of track, for tracks with p>1GeV
   TH1* _FitLambdaFull_Res[_nPart+1];  // resolution vs. lambda from fit results
+  TH2* _NormCosThFullHist[_nPart+1];  // relative dEdx vs. lambda of track, for tracks with p>1GeV
+  TH1* _FitCosThFull_Res[_nPart+1];  // resolution vs. lambda from fit results
 
   // Vector array of all momentum, dE/dx, dE/dx error, tan lambda, number of hits and transverse momentum values for each track
   std::vector< std::array<double,6> > _dEdxVec[_nPart];

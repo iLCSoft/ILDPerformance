@@ -20,6 +20,7 @@
 #include "TStyle.h"
 #include "TDirectory.h"
 #include "TObjArray.h"
+#include "TMath.h"
 
 #include <math.h>
 #include <iostream>
@@ -29,6 +30,13 @@
 using namespace lcio;
 using namespace marlin;
 
+
+double BB_Fit( double* x, double* p )
+{
+  double bg = x[0]/p[0];
+  double bb = sqrt(bg*bg/(1+bg*bg));
+  return 1.35e-7 * (.5*p[1]*TMath::Log(p[2]*pow(bg,2)*pow(bg,2)) - p[3]*bb*bb - p[4]*bg/2.) / (bb*bb);
+}
 
 dEdxAnalyser adEdxAnalyser;
 
@@ -97,13 +105,8 @@ dEdxAnalyser::dEdxAnalyser() : Processor("dEdxAnalyser") {
                  bool(false));
 
   registerProcessorParameter("useOneTrack",
-                 "Set true if from every event only the first track should be used.",
+                 "Set true if from every event only the first object in the selected collection (track or PFO) should be used.",
                  _useOneTrack,
-                 bool(false));
-
-  registerProcessorParameter("useHitCol",
-                 "Set true if from every event only the first track should be used.",
-                 _useHitCol,
                  bool(false));
 
   registerProcessorParameter("cutdEdx",
@@ -122,22 +125,22 @@ dEdxAnalyser::dEdxAnalyser() : Processor("dEdxAnalyser") {
                  bool(false));
 
   registerProcessorParameter("cutD0",
-                 "Tracks with a d0 larger than the given value should be ignored. Set to 0 to accept all particles.",
+                 "Tracks with a d0 larger than the given value will be ignored. Set to 0 to accept all particles.",
                  _cutD0,
                  double(0));
 
   registerProcessorParameter("cutZ0",
-                 "Tracks with a z0 larger than the given value should be ignored. Set to 0 to accept all particles.",
+                 "Tracks with a z0 larger than the given value will be ignored. Set to 0 to accept all particles.",
                  _cutZ0,
                  double(0));
 
   registerProcessorParameter("cutMomMin",
-                 "Tracks with a momentum smaller than the given value should be ignored. Set to 0 to accept all particles.",
+                 "Tracks with a momentum smaller than the given value will be ignored. Set to 0 to accept all particles.",
                  _cutMomMin,
                  double(0));
 
   registerProcessorParameter("cutMomMax",
-                 "Tracks with a momentum larger than the given value should be ignored. Set to 0 to accept all particles.",
+                 "Tracks with a momentum larger than the given value will be ignored. Set to 0 to accept all particles.",
                  _cutMomMax,
                  double(0));
 
@@ -177,10 +180,9 @@ dEdxAnalyser::dEdxAnalyser() : Processor("dEdxAnalyser") {
                  bool(false));
 
   registerProcessorParameter("fileFormat",
-                 "Specify the format of the automatically plotted images (if chosen). Selection depends on root TASImage capabilities, typically: [.gif, .png, .xpm, .jpg, .tiff, .xcf]. Default: .png.",
+                 "Specify the format of the automatically plotted images (if chosen). Selection depends on root TPad::Print() capabilities, typically: [.ps, .eps, .pdf, .svg, .tex, .gif, .xpm, .png, .jpg, .tiff, .cxx, .xml, .json, .root]. Default: .png.",
                  _fileFormat,
                  std::string(".png"));
-  // .pdf, .ps, .eps, .svg, .tex, .C, .root, .xml,
 
 }
 
@@ -245,10 +247,11 @@ void dEdxAnalyser::init() {
   // create space for fit results
   for (int i=0; i<_nPart; i++) _FitHist[i]      = new TObjArray();
   for (int i=0; i<_nPart; i++) _FitLambda[i]    = new TObjArray();
-  for (int i=0; i<_nPart; i++) _FitNHit[i]      = new TObjArray();
+  for (int i=0; i<_nPart+1; i++) _FitNHit[i]      = new TObjArray();
   for (int i=0; i<_nPart; i++) _FitBoth[i]      = new TObjArray();
   for (int i=0; i<_nPart; i++) _FitBoth_1GeV[i] = new TObjArray();
   for (int i=0; i<_nPart+1; i++) _FitLambdaFull[i]= new TObjArray();
+  for (int i=0; i<_nPart+1; i++) _FitCosThFull[i]= new TObjArray();
 
   // create resolution and separation power histograms
   int sp_c = 0;
@@ -355,6 +358,18 @@ void dEdxAnalyser::init() {
     _FitLambdaFull_Res[i]->SetXTitle("|lambda| / deg");
     _FitLambdaFull_Res[i]->SetYTitle("dE/dx resolution");
 
+    std::stringstream s32; s32 << "NormCosThFull" << Particles[i] << "";
+    std::stringstream s33; s33 << "Relative dE/dx distribution over cos(theta) with p>1 GeV for " << particles[i] << " from all entries";
+    _NormCosThFullHist[i] = new TH2D(s32.str().c_str(), s33.str().c_str(), 20, 0, 1, 100, 0, 2);
+    _NormCosThFullHist[i]->SetXTitle("cos(theta)");
+    _NormCosThFullHist[i]->SetYTitle("relative dE/dx");
+
+    std::stringstream s34; s34 << "NormCosThFull" << Particles[i] << "_FitRes";
+    std::stringstream s35; s35 << "dE/dx resolution for " << particles[i] << " over cos(theta) from fit result";
+    _FitCosThFull_Res[i] = new TH1D(s34.str().c_str(), s35.str().c_str(), 20, 0, 1);
+    _FitCosThFull_Res[i]->SetXTitle("cos(theta)");
+    _FitCosThFull_Res[i]->SetYTitle("dE/dx resolution");
+
     for (int j=i+1; j<_nPart; j++)  // Separation Power
     {
       std::stringstream s17; s17 << "SP_" << SP_part[i] << "_" << SP_part[j];
@@ -366,6 +381,18 @@ void dEdxAnalyser::init() {
     }
   }
 
+  std::stringstream s13; s13 << "NormNHit" << Particles[_nPart+1] << "";
+  std::stringstream s14; s14 << "Relative dE/dx distribution over number of hits with p>1GeV and |lambda|<20deg for " << particles[_nPart+1] << " from all entries";
+  _NormNHitHist[_nPart] = new TH2D(s13.str().c_str(), s14.str().c_str(), 110, 0.5, 220.5, 100, 0, 2);
+  _NormNHitHist[_nPart]->SetXTitle("number of hits");
+  _NormNHitHist[_nPart]->SetYTitle("relative dE/dx");
+
+  std::stringstream s15; s15 << "NormNHit" << Particles[_nPart+1] << "_FitRes";
+  std::stringstream s16; s16 << "dE/dx resolution for " << particles[_nPart+1] << " over number of hits from fit result";
+  _FitNHit_Res[_nPart] = new TH1D(s15.str().c_str(), s16.str().c_str(), 110, 0.5, 220.5);
+  _FitNHit_Res[_nPart]->SetXTitle("number of hits");
+  _FitNHit_Res[_nPart]->SetYTitle("dE/dx resolution");
+  
   std::stringstream s38; s38 << "NormLambdaFull" << Particles[_nPart+1] << "";
   std::stringstream s39; s39 << "Relative dE/dx distribution over lambda with p>1 GeV for " << particles[_nPart+1] << " from all entries";
   _NormLambdaFullHist[_nPart] = new TH2D(s38.str().c_str(), s39.str().c_str(), 36, 0, 90, 100, 0, 2);
@@ -378,6 +405,17 @@ void dEdxAnalyser::init() {
   _FitLambdaFull_Res[_nPart]->SetXTitle("|lambda| / deg");
   _FitLambdaFull_Res[_nPart]->SetYTitle("dE/dx resolution");
 
+  std::stringstream s42; s42 << "NormCosThFull" << Particles[_nPart+1] << "";
+  std::stringstream s43; s43 << "Relative dE/dx distribution over cos(theta) with p>1 GeV for " << particles[_nPart+1] << " from all entries";
+  _NormCosThFullHist[_nPart] = new TH2D(s42.str().c_str(), s43.str().c_str(), 20, 0, 1, 100, 0, 2);
+  _NormCosThFullHist[_nPart]->SetXTitle("cos(theta)");
+  _NormCosThFullHist[_nPart]->SetYTitle("relative dE/dx");
+
+  std::stringstream s44; s44 << "NormCosThFull" << Particles[_nPart+1] << "_FitRes";
+  std::stringstream s45; s45 << "dE/dx resolution for " << particles[_nPart+1] << " over cos(theta) from fit result";
+  _FitCosThFull_Res[_nPart] = new TH1D(s44.str().c_str(), s45.str().c_str(), 20, 0, 1);
+  _FitCosThFull_Res[_nPart]->SetXTitle("cos(theta)");
+  _FitCosThFull_Res[_nPart]->SetYTitle("dE/dx resolution");
 
   // fiducial electrons
   _ResNorm_FiducialElectrons = new TH1D("ResNorm_FiducialElectrons", "Relative dE/dx resolution distribution for fiducial electrons", 100, 0, 2);
@@ -704,10 +742,6 @@ void dEdxAnalyser::processEvent( LCEvent * evt ) {
         }
       }
 
-      // if track hits are available check hit spectrum
-      //if(_useHitCol)
-      //{
-        //const TrackerHitVec Hits = track->getTrackerHits();
       for (unsigned int h=0; h<trkHits.size(); ++h)
       {
         double EDep = trkHits[h]->getEDep();
@@ -769,7 +803,7 @@ void dEdxAnalyser::end()
 {
   // axes stuff - todo: the limits should be imported from ::init()!!
   //const int nBinsX=100;
-  //double minBinX=-1, maxBinX=2, minBinX2=-3;
+  double minBinX=-1, maxBinX=2; //, minBinX2=-3;
   //double maxBinY=1e-6;
   //double histbinsX[nBinsX+1], histbinsX2[nBinsX+1];
   double* histbinsX = new double[_nBinsX+1];
@@ -795,9 +829,27 @@ void dEdxAnalyser::end()
 
   TF1* landaufit = new TF1("landaufit","landau(0)",0,maxBinY2);
 
+  TF1* poly2fit = new TF1("poly2fit","pol2",0,90);
   TF1* poly3fit = new TF1("poly3fit","pol3",0,90);
 
-  // fit the BB histograms for each momentum bin, put fit result histograms in _FitHist
+  TF1* angcorr = new TF1("angcorr" ,"1./(1+[0]*x*x)",0,1); // x = cos(theta)
+  angcorr->SetParameter(0,-.1);
+  TF1* nhitcorr= new TF1("nhitcorr","1+exp(-x/[0])",1e-6,1e6); // x = nHits
+  nhitcorr->SetParameter(0,1e1);
+
+  //TF1* angcorr2 = new TF1("angcorr2" ,"1./([0]+[1]*acos(x)+[2]*acos(x)*acos(x))",0,1); // x = cos(theta)
+  //angcorr2->SetParameters(1,0,0);
+  //TF1* angcorr3 = new TF1("angcorr3" ,"1./([0]+[1]/sin(acos(x))+[2]/pow(sin(acos(x)),2))",0,1); // x = cos(theta)
+  //angcorr3->SetParameters(1,0,0);
+  //TF1* angcorr4 = new TF1("angcorr4" ,"[0]+[1]*acos(x)+[2]*acos(x)*acos(x)",0,1); // x = cos(theta)
+  //angcorr4->SetParameters(1,0,0);
+
+  TF1* BBfit = new TF1("BBfit",BB_Fit,pow(10,minBinX),pow(10,maxBinX),5);
+  BBfit->SetParameters(_Masses[0], -1.28883368e-02, 2.72959919e+02, -1.74534200e+00, -9.84887586e-07);
+  std::array<TFitResultPtr,_nPart> ptr_BBfit;
+
+
+  // fit the BB histograms vertically for each momentum bin, put fit result histograms in _FitHist
   for (int i=0; i<_nPart; i++) _BBHist[i]->FitSlicesY(gausfit,0,-1,0,"QR",_FitHist[i]);
 
   // from fit results calculate separation power for each particle combination and each momentum bin
@@ -817,6 +869,9 @@ void dEdxAnalyser::end()
     }
     _FitHist_ResSum[i]->Fit("gaus","Q");
 
+    BBfit->FixParameter(0,_Masses[i]);
+    ptr_BBfit[i] = FitHist1_mean->Fit(BBfit,"+S");
+
     for (unsigned int v=0; v<_dEdxVec[i].size(); v++)  // Normalised Resolution
     {
       // _dEdxVec[i][v] = mom,dEdx,track->getdEdxError(),track->getTanLambda(),(double)track->getSubdetectorHitNumbers()[_TPCindex],mom_t
@@ -828,7 +883,9 @@ void dEdxAnalyser::end()
       double normMean = dEdx/binMean;
       double absError = sqrt( pow(_dEdxVec[i][v][2]/binMean,2) + pow(dEdx/binMean/binMean*binError,2) );
       double relError = absError/normMean;   // _dEdxVec[i][v][1]/_dEdxVec[i][v][2]/(binError*1e8);
-      double lambda   = fabs(atan(_dEdxVec[i][v][3])) *180/M_PI;
+      double tanl     = _dEdxVec[i][v][3];
+      double lambda   = fabs(atan(tanl)) *180/M_PI;
+      double costh    = sqrt(tanl*tanl/(1+tanl*tanl));
       int    nHits    = _dEdxVec[i][v][4];
       double mom_t    = _dEdxVec[i][v][5];
 
@@ -839,12 +896,16 @@ void dEdxAnalyser::end()
         
         if (mom_t>1 && nHits>=200) _NormLambdaHist[i]    ->Fill(lambda,normMean);
         if (lambda<20)             _NormNHitHist[i]      ->Fill(nHits, normMean);
+	    if (1)		               _NormNHitHist[_nPart] ->Fill(nHits, normMean);
         
         if (1)                     _NormBothHist[i]      ->Fill(lambda,nHits,normMean);
         if (mom_t>1)               _NormBothHist_1GeV[i] ->Fill(lambda,nHits,normMean);
         
         if (mom_t>1) _NormLambdaFullHist[i]     ->Fill(lambda,normMean);
         if (mom_t>1) _NormLambdaFullHist[_nPart]->Fill(lambda,normMean);
+
+        if (mom_t>1) _NormCosThFullHist[i]     ->Fill(costh,normMean);
+        if (mom_t>1) _NormCosThFullHist[_nPart]->Fill(costh,normMean);
 
         // fiducial electrons
         if (i==0 && _fidMomMin<=mom && mom<=_fidMomMax && _fidLamMin<=lambda && lambda<=_fidLamMax && nHits>=_fidNHitsMin) _ResNorm_FiducialElectrons->Fill(normMean);
@@ -854,7 +915,6 @@ void dEdxAnalyser::end()
     }
     _ResNormHist[i]->Fit("gaus","Q");
     _ResNormHist_1GeV[i]->Fit("gaus","Q");
-    _ResNorm_FiducialElectrons->Fit("gaus","Q");
 
     _NormLambdaHist[i]->FitSlicesY(gausfitrel,0,-1,0,"QR",_FitLambda[i]);  // angular distribution
     TH1* FitLambda_mean  = (TH1D*)_FitLambda[i]->At(1);
@@ -865,6 +925,7 @@ void dEdxAnalyser::end()
     TH1* FitNHit_mean  = (TH1D*)_FitNHit[i]->At(1);
     TH1* FitNHit_sigma = (TH1D*)_FitNHit[i]->At(2);
     _FitNHit_Res[i]->Divide(FitNHit_sigma,FitNHit_mean);
+    FitNHit_mean->Fit(nhitcorr,"Q");
 
     _NormBothHist[i]->FitSlicesZ(gausfitrel,0,-1,0,-1,0,"QR");  // angular and number-of-hits distribution
     TH2* FitBoth_mean  = (TH2D*)gDirectory->Get(_NormBothHistNames[i][1].c_str());
@@ -912,11 +973,18 @@ void dEdxAnalyser::end()
     }
     _FitBoth_Res_1GeV[i]->Fit(powla2,"Q");
 
-    _NormLambdaFullHist[i]->FitSlicesY(gausfitrel,0,-1,0,"QR",_FitLambdaFull[i]);  // angular distribution, no nHits cut
+    _NormLambdaFullHist[i]->FitSlicesY(gausfitrel,0,-1,0,"QR",_FitLambdaFull[i]);  // angular distribution in lambda, no nHits cut
     TH1* FitLambdaFull_mean  = (TH1D*)_FitLambdaFull[i]->At(1);
     TH1* FitLambdaFull_sigma = (TH1D*)_FitLambdaFull[i]->At(2);
     _FitLambdaFull_Res[i]->Divide(FitLambdaFull_sigma,FitLambdaFull_mean);
     FitLambdaFull_mean->Fit(poly3fit,"Q");
+
+    _NormCosThFullHist[i]->FitSlicesY(gausfitrel,0,-1,0,"QR",_FitCosThFull[i]);  // angular distribution in cos(theta), no nHits cut
+    TH1* FitCosThFull_mean  = (TH1D*)_FitCosThFull[i]->At(1);
+    TH1* FitCosThFull_sigma = (TH1D*)_FitCosThFull[i]->At(2);
+    _FitCosThFull_Res[i]->Divide(FitCosThFull_sigma,FitCosThFull_mean);
+    FitCosThFull_mean->Scale(1./FitCosThFull_mean->GetBinContent(1));
+    FitCosThFull_mean->Fit(angcorr,"Q");
 
     for (int j=i+1; j<_nPart; j++)  // Separation Power
     {
@@ -953,13 +1021,37 @@ void dEdxAnalyser::end()
       }
       sp_c++;
     }
-  }
+  }  //end of for (int i=0; i<_nPart; i++)
 
-  _NormLambdaFullHist[_nPart]->FitSlicesY(gausfitrel,0,-1,0,"QR",_FitLambdaFull[_nPart]);  // angular distribution, no nHits cut
+  TFitResultPtr ptr_fe = _ResNorm_FiducialElectrons->Fit("gaus","QS");
+
+  _NormNHitHist[_nPart]->FitSlicesY(gausfitrel,0,-1,0,"QR",_FitNHit[_nPart]);  // number-of-hits distribution
+  TH1* FitNHit_mean  = (TH1D*)_FitNHit[_nPart]->At(1);
+  TH1* FitNHit_sigma = (TH1D*)_FitNHit[_nPart]->At(2);
+  _FitNHit_Res[_nPart]->Divide(FitNHit_sigma,FitNHit_mean);
+  
+  TFitResultPtr ptr_nhit = FitNHit_mean->Fit(nhitcorr,"+QS");
+  
+  _NormLambdaFullHist[_nPart]->FitSlicesY(gausfitrel,0,-1,0,"QR",_FitLambdaFull[_nPart]);  // angular distribution in lambda, no nHits cut
   TH1* FitLambdaFull_mean  = (TH1D*)_FitLambdaFull[_nPart]->At(1);
   TH1* FitLambdaFull_sigma = (TH1D*)_FitLambdaFull[_nPart]->At(2);
   _FitLambdaFull_Res[_nPart]->Divide(FitLambdaFull_sigma,FitLambdaFull_mean);
-  FitLambdaFull_mean->Fit(poly3fit,"Q");
+
+  TFitResultPtr ptr_lm_pol2 = FitLambdaFull_mean->Fit(poly2fit,"+QS");
+  TFitResultPtr ptr_lm_pol3 = FitLambdaFull_mean->Fit(poly3fit,"+QS");
+
+  _NormCosThFullHist[_nPart]->FitSlicesY(gausfitrel,0,-1,0,"QR",_FitCosThFull[_nPart]);  // angular distribution in cos(theta), no nHits cut
+  TH1* FitCosThFull_mean  = (TH1D*)_FitCosThFull[_nPart]->At(1);
+  TH1* FitCosThFull_sigma = (TH1D*)_FitCosThFull[_nPart]->At(2);
+  _FitCosThFull_Res[_nPart]->Divide(FitCosThFull_sigma,FitCosThFull_mean);
+  FitCosThFull_mean->Scale(1./FitCosThFull_mean->GetBinContent(1));
+  angcorr->SetParameter(0,-.1);
+
+  TFitResultPtr ptr_ac  = FitCosThFull_mean->Fit(angcorr, "+QS");
+  //TFitResultPtr ptr_ac2 = FitCosThFull_mean->Fit(angcorr2,"+QS");
+  //TFitResultPtr ptr_ac3 = FitCosThFull_mean->Fit(angcorr3,"+QS");
+  //TFitResultPtr ptr_ac4 = FitCosThFull_mean->Fit(angcorr4,"+QS");
+
 
   // PDGCheck
   for (int i=0; i<_nPart+1; i++)
@@ -1012,6 +1104,8 @@ void dEdxAnalyser::end()
         std::stringstream s; s << _BBHist[i]->GetName() << "_FitPar" << j << _fileFormat;
         img->WriteImage(s.str().c_str());
       }
+      if (ptr_BBfit[i].Get()) ptr_BBfit[i]->Print();
+      else {streamlog_out(MESSAGE) << "Mass " << _Masses[i] << ": fit result pointer empty!" << std::endl;}
     }
 
     PlotTH2(can, _BBHist[_nPart]);
@@ -1078,10 +1172,22 @@ void dEdxAnalyser::end()
     PlotTH1(can, _FitLambdaFull_Res[_nPart]);
 
     gStyle->SetOptFit(1);
-    PlotTH1(can, FitLambdaFull_mean);
 
+    PlotTH1(can, FitNHit_mean);
+    ptr_nhit->Print();
+
+    PlotTH1(can, FitLambdaFull_mean);
+    ptr_lm_pol2->Print();
+    ptr_lm_pol3->Print();
+
+    PlotTH1(can, FitCosThFull_mean);
+    ptr_ac ->Print();
+    //ptr_ac2->Print();
+    //ptr_ac3->Print();
+    //ptr_ac4->Print();
 
     PlotTH1(can, _ResNorm_FiducialElectrons);
+
     gStyle->SetOptFit(0);
 
     PlotTH1(can, _CutAnaHist);
@@ -1116,32 +1222,61 @@ void dEdxAnalyser::end()
     PlotTH2(can, _PDGCheck_eff);
     PlotTH2(can, _PDGCheck_pur);
 
-
-    // some final output
-    streamlog_out(DEBUG) << "CutAnaHist Entries" << std::endl;
-    for (unsigned int j=0; j<10; j++) streamlog_out(DEBUG) << j << "  " << _CutAnaHist->GetBinContent(j) << std::endl;
-
-    streamlog_out(DEBUG) << "NTracksHist Entries" << std::endl;
-    for (unsigned int j=0; j<10; j++) streamlog_out(DEBUG) << j << "  " << _NTracksHist->GetBinContent(j) << std::endl;
-
-    streamlog_out(DEBUG) << "NTracksMomHist Entries" << std::endl;
-    for (unsigned int j=0; j<10; j++) streamlog_out(DEBUG) << j << "  " << _NTracksMomHist->GetBinContent(j) << std::endl;
-
-    streamlog_out(DEBUG) << "TrackMomHist Entries" << std::endl;
-    for (int j=0; j<_nBinsX; j++) streamlog_out(DEBUG) << j << "  " << histbinsX2[j] << "  " << _TrackMomHist->GetBinContent(j) << std::endl;
-
-    //streamlog_out(DEBUG) << "MCmomVec Entries" << std::endl;
-    //for (unsigned int j=0; j<_MCmomVec.size()/3; j++) streamlog_out(DEBUG) << j << "  " << _MCmomVec[3*j] << "  " << _MCmomVec[3*j+1] << "  " << _MCmomVec[3*j+2] << std::endl;
-
     delete can;
     delete img;
   }
+
+
+  // Fit results for calibration
+  streamlog_out(MESSAGE) << "\nFiducial electrons dE/dx resolution: " << ptr_fe->Parameter(2)*100 << " %" << std::endl;
+
+  streamlog_out(MESSAGE) << "\nAngular dependence fit (poly3 vs. lambda) result:" << std::endl;
+  streamlog_out(MESSAGE) << ptr_lm_pol3->Parameter(0) << " "
+                         << ptr_lm_pol3->Parameter(1) << " "
+                         << ptr_lm_pol3->Parameter(2) << " "
+                         << ptr_lm_pol3->Parameter(3) << "\nwith a chi2/ndf of  "
+                         << ptr_lm_pol3->Chi2() << "/" << ptr_lm_pol3->Ndf() << std::endl;
+
+  streamlog_out(MESSAGE) << "\nBethe-Bloch fit results, used as input for the LikelihoodPIDProcessor:" << std::endl;
+  streamlog_out(MESSAGE) << "  note: par2 and par3 are redundant, so par3=1 is chosen" << std::endl;
+  streamlog_out(MESSAGE) << "mass      chi2/ndf    parameters 1-5" << std::endl;
+  for (int i=0; i<_nPart; ++i)
+  {
+    streamlog_out(MESSAGE) << _Masses[i] << "  " << ptr_BBfit[i]->Chi2() << "/" << ptr_BBfit[i]->Ndf() << "  "
+                           << ptr_BBfit[i]->Parameter(1) << " "
+                           << ptr_BBfit[i]->Parameter(2) << " 1 "
+                           << ptr_BBfit[i]->Parameter(3) << " "
+                           << ptr_BBfit[i]->Parameter(4) << " " << std::endl;
+  }
+  streamlog_out(MESSAGE) << std::endl;
+
+
+  // some final debug output
+  streamlog_out(DEBUG) << "CutAnaHist Entries" << std::endl;
+  for (unsigned int j=0; j<10; j++) streamlog_out(DEBUG) << j << "  " << _CutAnaHist->GetBinContent(j) << std::endl;
+
+  streamlog_out(DEBUG) << "NTracksHist Entries" << std::endl;
+  for (unsigned int j=0; j<10; j++) streamlog_out(DEBUG) << j << "  " << _NTracksHist->GetBinContent(j) << std::endl;
+
+  streamlog_out(DEBUG) << "NTracksMomHist Entries" << std::endl;
+  for (unsigned int j=0; j<10; j++) streamlog_out(DEBUG) << j << "  " << _NTracksMomHist->GetBinContent(j) << std::endl;
+
+  streamlog_out(DEBUG) << "TrackMomHist Entries" << std::endl;
+  for (int j=0; j<_nBinsX; j++) streamlog_out(DEBUG) << j << "  " << histbinsX2[j] << "  " << _TrackMomHist->GetBinContent(j) << std::endl;
+
+  //streamlog_out(DEBUG) << "MCmomVec Entries" << std::endl;
+  //for (unsigned int j=0; j<_MCmomVec.size()/3; j++) streamlog_out(DEBUG) << j << "  " << _MCmomVec[3*j] << "  " << _MCmomVec[3*j+1] << "  " << _MCmomVec[3*j+2] << std::endl;
+
 
   delete gausfit;
   delete gausfitrel;
   delete powla2;
   delete landaufit;
+  delete poly2fit;
   delete poly3fit;
+  delete angcorr;
+  delete nhitcorr;
+  delete BBfit;
 
   delete[] histbinsX;
   delete[] histbinsX2;
