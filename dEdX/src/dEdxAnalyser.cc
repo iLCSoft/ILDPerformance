@@ -654,8 +654,8 @@ void dEdxAnalyser::processEvent( LCEvent * evt ) {
       _CutAnaHist->Fill(icut); ++icut;
 
       // If the track is too far away from the IP, skip this track.
-      if (_cutD0) if (track->getD0()>_cutD0) continue;
-      if (_cutZ0) if (track->getZ0()>_cutZ0) continue;
+      if (_cutD0) if (fabs(track->getD0())>_cutD0) continue;
+      if (_cutZ0) if (fabs(track->getZ0())>_cutZ0) continue;
       _CutAnaHist->Fill(icut); ++icut;
 
       // Register outlier dE/dx values.
@@ -697,21 +697,22 @@ void dEdxAnalyser::processEvent( LCEvent * evt ) {
       momVec.push_back(mom);
       int nHits = track->getSubdetectorHitNumbers()[_TPCindex];
 
+      // Fill Bethe-Bloch histograms and data vector used in ::end()
       for (int j=0; j<_nPart; j++)
       {
         if (pdg==_PDG[j])
         {
           _BBHist[j]->Fill(mom,dEdx);
-          if (mom>.3 && mom<100) _dEdxVec[j].emplace_back(std::array<double,6> {{mom,dEdx,track->getdEdxError(),track->getTanLambda(),(double)track->getSubdetectorHitNumbers()[_TPCindex],mom_t}});
+          if (mom>.3 && mom<100) _dEdxVec[j].emplace_back(std::array<double,6> {{mom,dEdx,track->getdEdxError(),track->getTanLambda(),(double)nHits,mom_t}});
         }
       }
-
       if (pdg==10) _BBHist[_nPart]->Fill(mom,dEdx);
       _BBHist[_nPart+1]->Fill(mom,dEdx);
 
       if (pdg==11 && mom>.3) _ResElectrons->Fill(dEdx);
       _dEdxErrorCorrelation->Fill(dEdx,track->getdEdxError());
 
+      // Fill histogram correlating MC and reco PDG
       if (_usePFOTracks)
       {
         int PFO_pdg = pidh->getParticleID(pfo,pidh->getAlgorithmID("dEdxPID")).getPDG();
@@ -742,6 +743,7 @@ void dEdxAnalyser::processEvent( LCEvent * evt ) {
         }
       }
 
+      // If hits exist (REC files), fill hit energy histograms
       for (unsigned int h=0; h<trkHits.size(); ++h)
       {
         double EDep = trkHits[h]->getEDep();
@@ -775,13 +777,8 @@ void dEdxAnalyser::processEvent( LCEvent * evt ) {
       if (pdg==10) _HitNumberSpectrum[_nPart]->Fill(nHits);
       _HitNumberSpectrum[_nPart+1]->Fill(nHits);
 
-    }  // if (pdg!=0 && dEdx>1e-8 && mcpar)  // make sure, there is a mcpar linked and a finite dE/dx
+    }  // end of if (pdg!=0 && dEdx>1e-8 && mcpar)  // make sure, there is a mcpar linked and a finite dE/dx
 
-
-
-    // check the error exponents by reconstructing the dependence on the number of hits and the angle
-    //int nHits = track->getSubdetectorHitNumbers()[_TPCindex];
-    //float tanLam = track->getTanLambda();
 
     if (_usePFOTracks) delete pidh;
 
@@ -874,7 +871,7 @@ void dEdxAnalyser::end()
 
     for (unsigned int v=0; v<_dEdxVec[i].size(); v++)  // Normalised Resolution
     {
-      // _dEdxVec[i][v] = mom,dEdx,track->getdEdxError(),track->getTanLambda(),(double)track->getSubdetectorHitNumbers()[_TPCindex],mom_t
+      // _dEdxVec[i][v] = mom,dEdx,track->getdEdxError(),track->getTanLambda(),(double)nHits,mom_t
       double mom      = _dEdxVec[i][v][0];
       double dEdx     = _dEdxVec[i][v][1];
       int    bin      = FitHist1_mean->FindBin(mom);
@@ -1174,17 +1171,19 @@ void dEdxAnalyser::end()
     gStyle->SetOptFit(1);
 
     PlotTH1(can, FitNHit_mean);
-    ptr_nhit->Print();
+    if (ptr_nhit.Get()) ptr_nhit->Print();
+    else {streamlog_out(MESSAGE) << FitNHit_mean->GetName() << ": fit result pointer empty!" << std::endl;}
 
     PlotTH1(can, FitLambdaFull_mean);
-    ptr_lm_pol2->Print();
-    ptr_lm_pol3->Print();
+    if (ptr_lm_pol2.Get()) ptr_lm_pol2->Print();
+    else {streamlog_out(MESSAGE) << FitLambdaFull_mean->GetName() << ": poly2 fit result pointer empty!" << std::endl;}
+    if (ptr_lm_pol3.Get()) ptr_lm_pol3->Print();
+    else {streamlog_out(MESSAGE) << FitLambdaFull_mean->GetName() << ": poly3 fit result pointer empty!" << std::endl;}
 
     PlotTH1(can, FitCosThFull_mean);
-    ptr_ac ->Print();
-    //ptr_ac2->Print();
-    //ptr_ac3->Print();
-    //ptr_ac4->Print();
+    if (ptr_ac.Get()) ptr_ac->Print();
+    else {streamlog_out(MESSAGE) << FitCosThFull_mean->GetName() << ": fit result pointer empty!" << std::endl;}
+
 
     PlotTH1(can, _ResNorm_FiducialElectrons);
 
@@ -1228,25 +1227,34 @@ void dEdxAnalyser::end()
 
 
   // Fit results for calibration
-  streamlog_out(MESSAGE) << "\nFiducial electrons dE/dx resolution: " << ptr_fe->Parameter(2)*100 << " %" << std::endl;
+  if (ptr_fe.Get()){
+    streamlog_out(MESSAGE) << "\nFiducial electrons dE/dx resolution: " << ptr_fe->Parameter(2)*100 << " %" << std::endl;}
+  else {
+    streamlog_out(MESSAGE) << "\nFiducial electrons fit result pointer is empty!" << std::endl;}
 
-  streamlog_out(MESSAGE) << "\nAngular dependence fit (poly3 vs. lambda) result:" << std::endl;
-  streamlog_out(MESSAGE) << ptr_lm_pol3->Parameter(0) << " "
-                         << ptr_lm_pol3->Parameter(1) << " "
-                         << ptr_lm_pol3->Parameter(2) << " "
-                         << ptr_lm_pol3->Parameter(3) << "\nwith a chi2/ndf of  "
-                         << ptr_lm_pol3->Chi2() << "/" << ptr_lm_pol3->Ndf() << std::endl;
+  if (ptr_lm_pol3.Get()){
+    streamlog_out(MESSAGE) << "\nAngular dependence fit (poly3 vs. lambda) result:" << std::endl;
+    streamlog_out(MESSAGE) << ptr_lm_pol3->Parameter(0) << " "
+                           << ptr_lm_pol3->Parameter(1) << " "
+                           << ptr_lm_pol3->Parameter(2) << " "
+                           << ptr_lm_pol3->Parameter(3) << "\nwith a chi2/ndf of  "
+                           << ptr_lm_pol3->Chi2() << "/" << ptr_lm_pol3->Ndf() << std::endl;}
+  else {
+    streamlog_out(MESSAGE) << "\nAngular dependence fit result pointer is empty!" << std::endl;}
 
   streamlog_out(MESSAGE) << "\nBethe-Bloch fit results, used as input for the LikelihoodPIDProcessor:" << std::endl;
   streamlog_out(MESSAGE) << "  note: par2 and par3 are redundant, so par3=1 is chosen" << std::endl;
   streamlog_out(MESSAGE) << "mass      chi2/ndf    parameters 1-5" << std::endl;
   for (int i=0; i<_nPart; ++i)
   {
-    streamlog_out(MESSAGE) << _Masses[i] << "  " << ptr_BBfit[i]->Chi2() << "/" << ptr_BBfit[i]->Ndf() << "  "
-                           << ptr_BBfit[i]->Parameter(1) << " "
-                           << ptr_BBfit[i]->Parameter(2) << " 1 "
-                           << ptr_BBfit[i]->Parameter(3) << " "
-                           << ptr_BBfit[i]->Parameter(4) << " " << std::endl;
+    if (ptr_BBfit[i].Get()){
+      streamlog_out(MESSAGE) << _Masses[i] << "  " << ptr_BBfit[i]->Chi2() << "/" << ptr_BBfit[i]->Ndf() << "  "
+                             << ptr_BBfit[i]->Parameter(1) << " "
+                             << ptr_BBfit[i]->Parameter(2) << " 1 "
+                             << ptr_BBfit[i]->Parameter(3) << " "
+                             << ptr_BBfit[i]->Parameter(4) << " " << std::endl;}
+    else {
+      streamlog_out(MESSAGE) << _Masses[i] << " fit result pointer is empty!" << std::endl;}
   }
   streamlog_out(MESSAGE) << std::endl;
 
