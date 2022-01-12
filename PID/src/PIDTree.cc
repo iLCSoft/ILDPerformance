@@ -385,13 +385,13 @@ void PIDTree::processEvent( LCEvent * evt ) {
 
       // Particle IDs
         LCCollection* rpcol = evt->getCollection( _pandoraPFOs ) ;
-        PIDHandler *pidh = new PIDHandler(rpcol);
+        PIDHandler pidh(rpcol);
 
-        basicPDG.push_back(pidh->getParticleID(rcp, pidh->getAlgorithmID("BasicVariablePID")).getPDG());
-        dEdxPDG.push_back(pidh->getParticleID(rcp, pidh->getAlgorithmID("dEdxPID")).getPDG());
-        showerPDG.push_back(pidh->getParticleID(rcp, pidh->getAlgorithmID("ShowerShapesPID")).getPDG());
-        likeliPDG.push_back(pidh->getParticleID(rcp, pidh->getAlgorithmID("LikelihoodPID")).getPDG());
-        lowmomPDG.push_back(pidh->getParticleID(rcp, pidh->getAlgorithmID("LowMomMuID")).getPDG());
+        basicPDG.push_back(pidh.getParticleID(rcp, pidh.getAlgorithmID("BasicVariablePID")).getPDG());
+        dEdxPDG.push_back(pidh.getParticleID(rcp, pidh.getAlgorithmID("dEdxPID")).getPDG());
+        showerPDG.push_back(pidh.getParticleID(rcp, pidh.getAlgorithmID("ShowerShapesPID")).getPDG());
+        likeliPDG.push_back(pidh.getParticleID(rcp, pidh.getAlgorithmID("LikelihoodPID")).getPDG());
+        lowmomPDG.push_back(pidh.getParticleID(rcp, pidh.getAlgorithmID("LowMomMuID")).getPDG());
 
 
 // JL July 25, 2016 : ParticleIDVec does not seem to get filled !!!
@@ -436,7 +436,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
 //         }
 
 
-        const ParticleID* likeliPID = &(pidh->getParticleID(rcp, pidh->getAlgorithmID("LikelihoodPID")));
+        const ParticleID* likeliPID = &(pidh.getParticleID(rcp, pidh.getAlgorithmID("LikelihoodPID")));
         float likelihood[5] = {999.,999.,999.,999.,999};
         if (likeliPID && likeliPID->getParameters().size() > 4 ) {
           for ( int ihyp = 0 ; ihyp < 5; ihyp++ ) {
@@ -461,7 +461,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
         LiPDG_ka.push_back(likelihood[3]);
         LiPDG_pr.push_back(likelihood[4]);
 
-        const ParticleID* dedxPID = &(pidh->getParticleID(rcp, pidh->getAlgorithmID("dEdxPID")));
+        const ParticleID* dedxPID = &(pidh.getParticleID(rcp, pidh.getAlgorithmID("dEdxPID")));
         float dedxlikeli[5] = {999.,999.,999.,999.,999.};
         float distance[5] = {999.,999.,999.,999.,999.};
         if (dedxPID && dedxPID->getParameters().size() > 17 ) {
@@ -475,7 +475,7 @@ void PIDTree::processEvent( LCEvent * evt ) {
             if ( std::isinf(distance[ihyp]) ) {
               distance[ihyp] = 888.;
             }
-            streamlog_out(DEBUG3) << pidh->getParameterNames(pidh->getAlgorithmID("dEdxPID"))[13+ihyp] << " = " << distance[ihyp] << std::endl;
+            streamlog_out(DEBUG3) << pidh.getParameterNames(pidh.getAlgorithmID("dEdxPID"))[13+ihyp] << " = " << distance[ihyp] << std::endl;
           }
           streamlog_out(DEBUG) << " dEdx liklihood electron hyp = " << dedxlikeli[0] << std::endl;
           streamlog_out(DEBUG) << " dEdx liklihood muon hyp = "     << dedxlikeli[1] << std::endl;
