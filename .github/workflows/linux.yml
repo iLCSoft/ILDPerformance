@@ -7,14 +7,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        COMPILER: [gcc, llvm]
+        COMPILER: [gcc10, clang11]
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: cvmfs-contrib/github-action-cvmfs@v2
-    - name: Start container
-      run: |
-        docker run -it --name CI_container -v ${GITHUB_WORKSPACE}:/Package -v /cvmfs:/cvmfs:shared -e COMPILER=${{ matrix.COMPILER }} -d ghcr.io/aidasoft/centos7:latest /bin/bash
-    - name: Compile and test
-      run: |
-        docker exec CI_container /bin/bash -c "./Package/.github/scripts/compile_and_test.sh"
+    - uses: actions/checkout@v3
+    - uses: cvmfs-contrib/github-action-cvmfs@v3
+    - uses: aidasoft/run-lcg-view@v4
+      with:
+        view-path: "/cvmfs/clicdp.cern.ch/iLCSoft/lcg/100/nightly/x86_64-centos7-${{ matrix.COMPILER }}-opt"
+        setup-script: "init_ilcsoft.sh"
+        run: |
+          mkdir build
+          cd build
+          cmake -GNinja -C $ILCSOFT/ILCSoft.cmake -DCMAKE_CXX_FLAGS="-fdiagnostics-color=always" ..
+          ninja -k0
+          ctest --output-on-failure
+          ninja install
