@@ -24,6 +24,7 @@
 
 #include <math.h>
 #include <iostream>
+#include <fstream>
 
 #include "HelixClass.h"
 
@@ -107,6 +108,11 @@ dEdxAnalyser::dEdxAnalyser() : Processor("dEdxAnalyser") {
   registerProcessorParameter("useOneTrack",
                  "Set true if from every event only the first object in the selected collection (track or PFO) should be used.",
                  _useOneTrack,
+                 bool(false));
+
+  registerProcessorParameter("usePFOTruthLink",
+                 "Set true if the LCRelation from PFO to MCTruth instead of Track to MCTruth should be used to determine MC PDG.",
+                 _usePFOTruthLink,
                  bool(false));
 
   registerProcessorParameter("cutdEdx",
@@ -422,7 +428,7 @@ void dEdxAnalyser::init() {
 
   // some other histograms for cross-checks etc.
   _ResElectrons = new TH1D("ResElectrons","dE/dx resolution distribution above .3 GeV for electrons from all entries, not normalised", 100, _minBinY, _maxBinY/2.);
-  _MCmult = new TH1D("MCmult","MC Particle multiplicity",11,-.5,10.5);
+  _MCmult = new TH1D("MCmult","MC particle multiplicity of linked reco objects (tracks or PFOs)",11,-.5,10.5);
 
   _PDGCheck        = new TH2I("PDGCheck"       ,"PDG cross check PFO vs. MCTruth",_nPart+1,-.5,_nPart+.5,_nPart+1,-.5,_nPart+.5);
   _PDGCheck_weight = new TH2D("PDGCheck_weight","PDG cross check PFO vs. MCTruth, likelihood weighted",_nPart+1,-.5,_nPart+.5,_nPart+1,-.5,_nPart+.5);
@@ -535,32 +541,47 @@ void dEdxAnalyser::processRunHeader( LCRunHeader* ) {
 
 void dEdxAnalyser::processEvent( LCEvent * evt ) {
 
-  //streamlog_out(MESSAGE) << _nEvt << std::endl;
-
+  // load input collections
   LCCollection *col_track{}, *col_t2trel{}, *col_pfo{};
 
-  try
-  {
-    col_track  = evt->getCollection( _trackColName );
-    col_t2trel = evt->getCollection( _tracktruthLinkName );
-  }
+  try {col_track  = evt->getCollection( _trackColName );}
   catch(DataNotAvailableException &e)
   {
-    streamlog_out(MESSAGE) << "Input collection not found - skipping event " << _nEvt << std::endl;
+    streamlog_out(MESSAGE) << "Input Track collection not found - skipping event " << _nEvt << std::endl;
     return;
   }
   int n_track = col_track->getNumberOfElements();
-  int n_pfo = 0;
 
+  if (!_usePFOTruthLink || !_usePFOTracks)
+  {
+    try {col_t2trel = evt->getCollection( _tracktruthLinkName );}
+    catch(DataNotAvailableException &e)
+    {
+      streamlog_out(MESSAGE) << "Input Track2MCTruth link collection not found - skipping event " << _nEvt << std::endl;
+      return;
+    }
+  }
+
+  int n_pfo = 0;
   if (_usePFOTracks)
   {
-    try { col_pfo = evt->getCollection( _PFOColName ); }
+    try {col_pfo    = evt->getCollection( _PFOColName );}
     catch(DataNotAvailableException &e)
     {
       streamlog_out(MESSAGE) << "Input PFO collection not found - skipping event " << _nEvt << std::endl;
       return;
     }
     n_pfo = col_pfo->getNumberOfElements();
+
+    if (_usePFOTruthLink)
+    {
+      try {col_t2trel = evt->getCollection( _tracktruthLinkName );}
+      catch(DataNotAvailableException &e)
+      {
+        streamlog_out(MESSAGE) << "Input PFO2MCTruth link collection not found - skipping event " << _nEvt << std::endl;
+        return;
+      }
+    }
   }
 
   _NTracksHist->Fill(n_track);
@@ -595,21 +616,37 @@ void dEdxAnalyser::processEvent( LCEvent * evt ) {
     }
     else track = dynamic_cast<Track*>(col_track->getElementAt(i));
 
-    const MCParticleVec& vec_mcpar = (MCParticleVec&) nav_t2trel.getRelatedToObjects(track);
-    const FloatVec& wei_mcpar = nav_t2trel.getRelatedToWeights(track);
+    //const MCParticleVec& vec_mcpar = (MCParticleVec&) nav_t2trel.getRelatedToObjects(track);
+    //const FloatVec& wei_mcpar = nav_t2trel.getRelatedToWeights(track);
     MCParticle* mcpar = NULL;
+
+    const MCParticleVec& vec_mcpar = _usePFOTruthLink ? (MCParticleVec&) nav_t2trel.getRelatedToObjects(pfo) : (MCParticleVec&) nav_t2trel.getRelatedToObjects(track);
+    const FloatVec& wei_mcpar = _usePFOTruthLink ? nav_t2trel.getRelatedToWeights(pfo) : nav_t2trel.getRelatedToWeights(track);
+
+    //streamlog_out(MESSAGE) << vec_mcpar.size() << std::endl;
+//    if (_usePFOTracks)
+//    {
+//      vec_mcpar = (MCParticleVec) (nav_t2trel.getRelatedToObjects(pfo));
+//      wei_mcpar = (nav_t2trel.getRelatedToWeights(pfo));
+//    }
+//    else
+//    {
+//      vec_mcpar = (MCParticleVec) (nav_t2trel.getRelatedToObjects(track));
+//      wei_mcpar = (nav_t2trel.getRelatedToWeights(track));
+//    }
 
     if(vec_mcpar.size()!=0)
     {
       for (unsigned int j=0; j<std::min(vec_mcpar.size(), wei_mcpar.size()); j++)
       {
-        if (wei_mcpar[j]>.6 && wei_mcpar[j]>maxweight)
+        double trackwgt = _usePFOTruthLink ? (int(wei_mcpar[j])%10000)/1000. : wei_mcpar[j];
+        if (trackwgt>.5 && trackwgt>maxweight)
         {
           mcpar = vec_mcpar[j];
           int mcpdg = abs(vec_mcpar[j]->getPDG());
           if(mcpdg==11 || mcpdg==13 || mcpdg==211 || mcpdg==321 || mcpdg==2212) pdg = mcpdg;
           else pdg = 10;  // flag: other particle
-          maxweight = wei_mcpar[j];
+          maxweight = trackwgt;
         }
       }
     }
@@ -802,7 +839,6 @@ void dEdxAnalyser::end()
   //const int nBinsX=100;
   double minBinX=-1, maxBinX=2; //, minBinX2=-3;
   //double maxBinY=1e-6;
-  //double histbinsX[nBinsX+1], histbinsX2[nBinsX+1];
   double* histbinsX = new double[_nBinsX+1];
   double* histbinsX2= new double[_nBinsX+1];
   double minBinX2 = _minBinX - 1;
@@ -893,7 +929,7 @@ void dEdxAnalyser::end()
         
         if (mom_t>1 && nHits>=200) _NormLambdaHist[i]    ->Fill(lambda,normMean);
         if (lambda<20)             _NormNHitHist[i]      ->Fill(nHits, normMean);
-	    if (1)		               _NormNHitHist[_nPart] ->Fill(nHits, normMean);
+        if (1)		                 _NormNHitHist[_nPart] ->Fill(nHits, normMean);
         
         if (1)                     _NormBothHist[i]      ->Fill(lambda,nHits,normMean);
         if (mom_t>1)               _NormBothHist_1GeV[i] ->Fill(lambda,nHits,normMean);
@@ -1043,6 +1079,16 @@ void dEdxAnalyser::end()
   _FitCosThFull_Res[_nPart]->Divide(FitCosThFull_sigma,FitCosThFull_mean);
   FitCosThFull_mean->Scale(1./FitCosThFull_mean->GetBinContent(1));
   angcorr->SetParameter(0,-.1);
+
+  double tot_diff=0, tot_weight=0;
+  for (int i_th=1; i_th<FitCosThFull_mean->GetNbinsX()+1; i_th++)
+  {
+    double diff = fabs(FitCosThFull_mean->GetBinContent(i_th) - 1);
+    double weight = 1./FitCosThFull_mean->GetBinError(i_th);
+    tot_diff += diff*weight;
+    tot_weight += weight;
+  }
+  double CosThDeviation = tot_diff/tot_weight;
 
   TFitResultPtr ptr_ac  = FitCosThFull_mean->Fit(angcorr, "+QS");
   //TFitResultPtr ptr_ac2 = FitCosThFull_mean->Fit(angcorr2,"+QS");
@@ -1205,6 +1251,8 @@ void dEdxAnalyser::end()
     PlotTH1(can, _NTracksUsedHist);
     PlotTH1(can, _NTracksMomHist);
 
+    PlotTH1(can, _MCmult);
+
     for (int i=0; i<_nPart+2; i++)
     {
       PlotTH1(can, _HitEnergySpectrum[i]);
@@ -1227,10 +1275,17 @@ void dEdxAnalyser::end()
 
 
   // Fit results for calibration
+  std::ofstream outfile;
+  outfile.open("dEdxAnalyser_CalibrationOutput.txt");
+
   if (ptr_fe.Get()){
-    streamlog_out(MESSAGE) << "\nFiducial electrons dE/dx resolution: " << ptr_fe->Parameter(2)*100 << " %" << std::endl;}
+    streamlog_out(MESSAGE) << "\nFiducial electrons dE/dx resolution: " << ptr_fe->Parameter(2)/ptr_fe->Parameter(1)*100 << " %" << std::endl;
+    outfile << "# Fiducial electrons dE/dx resolution:\n" << ptr_fe->Parameter(2)/ptr_fe->Parameter(1)<< std::endl;
+  }
   else {
-    streamlog_out(MESSAGE) << "\nFiducial electrons fit result pointer is empty!" << std::endl;}
+    streamlog_out(MESSAGE) << "\nFiducial electrons fit result pointer is empty!" << std::endl;
+    outfile << "# Fiducial electrons fit result pointer is empty!" << std::endl;
+  }
 
   if (ptr_lm_pol3.Get()){
     streamlog_out(MESSAGE) << "\nAngular dependence fit (poly3 vs. lambda) result:" << std::endl;
@@ -1238,13 +1293,29 @@ void dEdxAnalyser::end()
                            << ptr_lm_pol3->Parameter(1) << " "
                            << ptr_lm_pol3->Parameter(2) << " "
                            << ptr_lm_pol3->Parameter(3) << "\nwith a chi2/ndf of  "
-                           << ptr_lm_pol3->Chi2() << "/" << ptr_lm_pol3->Ndf() << std::endl;}
+                           << ptr_lm_pol3->Chi2() << "/" << ptr_lm_pol3->Ndf() << std::endl;
+    outfile << "# Angular dependence fit (poly3 vs. lambda) result:" << std::endl;
+    outfile << ptr_lm_pol3->Parameter(0) << " "
+                           << ptr_lm_pol3->Parameter(1) << " "
+                           << ptr_lm_pol3->Parameter(2) << " "
+                           << ptr_lm_pol3->Parameter(3) << "\n# with a chi2/ndf of\n"
+                           << ptr_lm_pol3->Chi2() << "/" << ptr_lm_pol3->Ndf() << std::endl;
+  }
   else {
-    streamlog_out(MESSAGE) << "\nAngular dependence fit result pointer is empty!" << std::endl;}
+    streamlog_out(MESSAGE) << "\nAngular dependence fit result pointer is empty!" << std::endl;
+    outfile << "# Angular dependence fit result pointer is empty!" << std::endl;
+  }
+
+  streamlog_out(MESSAGE) << "Remaining deviation from flat distribution: " << CosThDeviation*100 << " %" << std::endl;
+  streamlog_out(MESSAGE) << "  note: this should be below 1 %" << std::endl;
+  outfile << "# Remaining deviation from flat distribution (note: this should be below 0.01): \n" << CosThDeviation << std::endl;
 
   streamlog_out(MESSAGE) << "\nBethe-Bloch fit results, used as input for the LikelihoodPIDProcessor:" << std::endl;
   streamlog_out(MESSAGE) << "  note: par2 and par3 are redundant, so par3=1 is chosen" << std::endl;
   streamlog_out(MESSAGE) << "mass      chi2/ndf    parameters 1-5" << std::endl;
+  outfile << "# Bethe-Bloch fit results, used as input for the LikelihoodPIDProcessor:" << std::endl;
+  outfile << "#  note: par2 and par3 are redundant, so par3=1 is chosen" << std::endl;
+  outfile << "# mass    chi2/ndf    parameters 1-5" << std::endl;
   for (int i=0; i<_nPart; ++i)
   {
     if (ptr_BBfit[i].Get()){
@@ -1252,11 +1323,21 @@ void dEdxAnalyser::end()
                              << ptr_BBfit[i]->Parameter(1) << " "
                              << ptr_BBfit[i]->Parameter(2) << " 1 "
                              << ptr_BBfit[i]->Parameter(3) << " "
-                             << ptr_BBfit[i]->Parameter(4) << " " << std::endl;}
+                             << ptr_BBfit[i]->Parameter(4) << " " << std::endl;
+      outfile << _Masses[i] << "  " << ptr_BBfit[i]->Chi2() << "/" << ptr_BBfit[i]->Ndf() << "  "
+                             << ptr_BBfit[i]->Parameter(1) << " "
+                             << ptr_BBfit[i]->Parameter(2) << " 1 "
+                             << ptr_BBfit[i]->Parameter(3) << " "
+                             << ptr_BBfit[i]->Parameter(4) << " " << std::endl;
+    }
     else {
-      streamlog_out(MESSAGE) << _Masses[i] << " fit result pointer is empty!" << std::endl;}
+      streamlog_out(MESSAGE) << _Masses[i] << " fit result pointer is empty!" << std::endl;
+      outfile  << "# " << _Masses[i] << " fit result pointer is empty!" << std::endl;
+    }
   }
   streamlog_out(MESSAGE) << std::endl;
+
+  outfile.close();
 
 
   // some final debug output

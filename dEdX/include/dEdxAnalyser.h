@@ -29,7 +29,7 @@ using namespace marlin;
 
 
 /** dEdxAnalyser Processor <br>
- *  The dEdxAnalyser processor loops through tracks to collect their dE/dx, fills various histograms and calculates dE/dx resolution and separation power.
+ *  The dEdxAnalyser processor loops through tracks (directly or via PFOs) to collect their dE/dx, fills various histograms and calculates dE/dx resolution and separation power.
  *  Everything is stored in an AIDA-generated root-file.
  *  Various plots can be automatically produced in the current working directory.
  *
@@ -40,7 +40,7 @@ using namespace marlin;
  *  This version: _nPart = 5; species: electrons, muons, pions, kaon, protons.
  *
  *  First, in processEvent(), the dE/dx value of each track is filled in the corresponding histogram, resulting in Bethe-Bloch curves.
- *  The correct PDG is received from the MCParticle linked to the track.
+ *  The true PDG is received from the MCParticle linked to the track.
  *  In end(), these histograms are then fitted with FitSlices, and the resulting mean and sigma values for each momentum bin are used to calculate resolution and separation power.
  *  The separation power is calculated for each combination of the _nPart species.
  *  All histograms, including the auto-generated fit results, are stored via AIDA in a root file.
@@ -53,9 +53,9 @@ using namespace marlin;
  *  The Bethe-Bloch curves in BBHist are fitted to provide the parameters of the reference curves for the dEdxPID in the LikelihoodPIDProcessor.
  *  The fit results are stored with the histograms and also printed on the console at the end of the processor.
  *
- *  You can run this Analyser over any selection of tracks, e. g. only pion and kaon tracks.
+ *  You can run this Analyser over any selection of tracks, e.g. events that contain only pion and kaon tracks.
  *  In that case, only the pion and kaon resolution as well as only the pion-kaon separation would give sensible plots, but all other plots are be generated empty alongside.
- *  The Analyser has mostly been used to extract the dE/dx performance from single-particle random-momentum files, but also to check e. g. 6f-ttbar events.
+ *  The Analyser has mostly been used to extract the dE/dx performance from single-particle random-momentum files, but also to check e.g. 6f-ttbar events.
  *
  *  Note that the hit energy histograms will only be filled, if the track hits are available, which is usually only the case for REC-files.
  *  The hit number histograms are unaffected by this.
@@ -70,6 +70,8 @@ using namespace marlin;
  *  @param _usePFOTracks - Set to true to use tracks attached to charged PFO, instead of all tracks in the track collection. This should be used with events which are more busy than single particle files.
  *    bool, default: false.
  *  @param _useOneTrack - Set true if from every event only the first object in the selected collection (track or PFO) should be used. Usually, don't combine this with _usePFOTracks.
+ *    bool, default: false.
+ *  @param _usePFOTruthLink - Set true if the LCRelation from PFO to MCTruth instead of Track to MCTruth should be used to determine MC PDG. Caution: the name of this relation still needs to be given in TrackMCTruthLink.
  *    bool, default: false.
  *
  *  You can make a track selection via the optional parameters, e. g. to reduce 'contamination' from mis-linked Tracks and MCParticles.
@@ -113,7 +115,8 @@ using namespace marlin;
  *    double, default: 1e-6.
  *
  *  @author U. Einhaus, DESY
- *  @version $1.2$
+ *  @version $1.3$
+ *  @date 11/2022
  */
 
 
@@ -173,6 +176,7 @@ class dEdxAnalyser : public Processor {
 
   bool _usePFOTracks=false;
   bool _useOneTrack=false;
+  bool _usePFOTruthLink=false;
   bool _cutdEdx=false;
   bool _cutTrackPurity=false;
   bool _cutTrackPurityMom=false;
