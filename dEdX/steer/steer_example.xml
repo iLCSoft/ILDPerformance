@@ -1,26 +1,3 @@
-<!-- 
-  Top level Marlin steering file defining the ILD reconstruction chain.
-  
-  !! WARNING !! This file may have been generated from 'Marlin -n MarlinstdReco.xml'. 
-  In this case you will find that : 
-  - no <include ref="..."> element is present
-  - some values differ between the constants section and the actual values in the global section or the processor parameter (e.g the compact file).
-    In this case, please refer to values in the global section or the processor parameters and not the constants section ! 
-  
-  Mandatory parameters :
-    * global.LCIOInputFiles : The input lcio input file(s)
-    * constant.lcgeo_DIR : the lcgeo directory must point on the one sourced in your current ilcsoft
-  
-  Optional parameters :
-    * constant.DetectorModel : the detector model to use the pre-defined lcgeo_DIR as ${lcgeo_DIR}/ILD/compact/${DetectorModel}/${DetectorModel}.xml
-    * constant.RunOverlay250GeV (350, 500 or 1000 GeV) : whether to run the background overlay. If set to true, you must ensure that the overlay background files are correctly set 
-    * constant.PandoraSettingsFile : The pandora settings file to use
-    * constant.PidPDFFile : A single root file name for the PID likelihood processor
-    * constant.PidWeightFiles : A list (space separated) of XML files containing weights for low momentum pi/mu separation (from TMVA)
-
-  Author : Remi Ete, DESY
--->
-
 
 <marlin>
   <constants>
@@ -35,7 +12,8 @@
     <constant name="productionfolder" value="/cvmfs/ilc.desy.de/sw/ILDConfig/v02-00-01/StandardConfig/production" />
     <!-- ILD calibration file -->
     <constant name="CalibrationFile" value="${productionfolder}/Calibration/Calibration_${DetectorModel}.xml" />
-	<!-- location of input files -->
+	 
+	  <!-- location of input files -->
     <constant name="inputfolder" value="/pnfs/desy.de/ilc/prod/ilc/mc-opt-3/ild/dst-merged/1-calib/single/ILD_l5_o1_v02_nobg/v02-00-01" />
 	
   
@@ -140,6 +118,8 @@
     
     <parameter name="usePFOTracks" type="bool"> false </parameter>
     <parameter name="useOneTrack" type="bool"> false </parameter>
+    <parameter name="usePFOTruthLink" type="bool"> false </parameter>
+    
     <parameter name="cutdEdx" type="bool"> false </parameter>
     <parameter name="cutTrackPurity" type="bool"> false </parameter>
     <parameter name="cutTrackPurityMom" type="bool"> false </parameter>
@@ -147,13 +127,11 @@
     <parameter name="cutZ0" type="double"> 0 </parameter>
     <parameter name="cutMomMin" type="double"> 0 </parameter>
     <parameter name="cutMomMax" type="double"> 0 </parameter>
-    <parameter name="usePFOTracks" type="bool"> false </parameter>
-    <parameter name="usePFOTracks" type="bool"> false </parameter>
     
     <parameter name="plotStuff" type="bool"> false </parameter>
     <parameter name="fileFormat" type="string"> .png </parameter>
+    <parameter name="useLCTPCStyle" type="bool"> false </parameter>
     
   </processor>
-
   
 </marlin>

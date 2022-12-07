@@ -2,7 +2,7 @@
 
 Performance plots for dE/dx.
 
-- U. Einhaus, Apr 2021, v1.2
+- U. Einhaus, Dec 2022, v1.3
 
 ## Overview
 
@@ -34,7 +34,7 @@ The FiducialElectrons histograms collects electrons which are similar to electro
 The histogram NormLambdaFullAll_1 contains the mean dE/dx over |lambda| incl. a poly3 fit, which is used in the AngularCorrection_dEdxProcessor for correction of the angular dependence.
 The histogram NormCosThFullAll_1 contains the mean dE/dx over cos(theta), and shows the information of NormLambdaFullAll_1 over an alternative angular scale.
 The Bethe-Bloch curves in BBHist are fitted to provide the parameters of the reference curves for the dEdxPID in the LikelihoodPIDProcessor.
-The fit results are stored with the histograms and also printed on the console at the end of the processor.
+The fit results are stored with the histograms in the root file and also printed on the console at the end of the processor and in a file dEdxAnalyser_CalibrationOutput.txt in the current working directory.
 
 You can run this Analyser over any selection of tracks, e. g. only pion and kaon tracks.
 In that case, only the pion and kaon resolution as well as only the pion-kaon separation would give sensible plots, but all other plots would be generated empty alongside.
@@ -45,23 +45,27 @@ The hit number histograms are unaffected by this.
 
 General processor parameters:
 
-- **plotStuff** - Set to true to switch on automatic image generation of many histograms in the current working directory.
+- **plotStuff** - Set true to switch on automatic image generation of many histograms in the current working directory.
   bool, default: false.
 - **fileFormat** - Select the file extension to be used for the automatically generated images.
   Selection depends on root TPad::Print() capabilities, typically: [.ps, .eps, .pdf, .svg, .tex, .gif, .xpm, .png, .jpg, .tiff, .cxx, .xml, .json, .root].
   See https://root.cern.ch/doc/master/classTPad.html#ad2fc5f449e4cb5480b9fb05fda3a8307 for details.
   string, default: .png
 
-- **usePFOTracks** - Set to true to use tracks attached to charged PFO, instead of all tracks in the track collection. This should be used with events which are more busy than single particle files.
+- **usePFOTracks** - Set true to use tracks attached to charged PFO, instead of all tracks in the track collection. This should be used with events which are more busy than single particle files.
   bool, default: false.
 - **useOneTrack** - Set true if from every event only the first object in the selected collection (track or PFO) should be used. Usually, don't combine this with _usePFOTracks.
+  bool, default: false.
+- **usePFOTruthLink** - Set true if the LCRelation from PFO to MCTruth instead of Track to MCTruth should be used to determine MC PDG. The name of the LCRelation still needs to be set in the TrackMCTruthLink parameter.
   bool, default: false.
 
 You can make a track selection via the optional parameters, e. g. to reduce 'contamination' from mis-linked Tracks and MCParticles.
 
 - **cutdEdx** - Set true if particles with a very off dE/dx value (hard-coded) should be ignored.
   bool, default: false.
-- **cutTrackPurity** - Set true if particles should be ignored, where the MCParticle is connected to more than one track.
+- **cutTrackPurity** - Set true if particles should be ignored, where the dominating MCParticle is connected to more than one track.
+  bool, default: false.
+- **cutTrackPurityMom** - Set true if particles should be ignored, where the dominating MCParticle is connected to more than one track, but the track with the highest momentum should still be used.
   bool, default: false.
 - **cutD0** - Tracks with a d0 larger than the given value will be ignored. Set to 0 to accept all particles.
   double, default: 0.
@@ -73,6 +77,7 @@ You can make a track selection via the optional parameters, e. g. to reduce 'con
   double, default: 0.
  
 For calibration with beam test results, so-called fiducial electrons are selected, which ought to be similar to beam-test conditions, and their properties stored in separate histograms.
+lambda is the track angle with respect to the cathode.
 
 - **fidMomMin** - Fiducial minimum absolut momentum / GeV.
   double, default: 3.
