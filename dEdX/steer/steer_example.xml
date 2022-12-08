@@ -9,7 +9,7 @@
     <!-- The full compact file name -->
     <constant name="CompactFile" value="${lcgeo_DIR}/ILD/compact/${DetectorModel}/${DetectorModel}.xml" />
     <!-- location of ILDConfig production folder -->
-    <constant name="productionfolder" value="/cvmfs/ilc.desy.de/sw/ILDConfig/v02-00-01/StandardConfig/production" />
+    <constant name="productionfolder" value="/cvmfs/ilc.desy.de/sw/ILDConfig/v02-03/StandardConfig/production" />
     <!-- ILD calibration file -->
     <constant name="CalibrationFile" value="${productionfolder}/Calibration/Calibration_${DetectorModel}.xml" />
 	 
