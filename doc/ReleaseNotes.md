@@ -1,3 +1,16 @@
+# v01-11
+
+* 2022-12-09 Ulrich Einhaus ([PR#38](https://github.com/iLCSoft/ILDPerformance/pull/38))
+  add option to use RecoMCTruthLink instead of Trak2MCTruthLink
+    add plots and fits for angular correction and Bethe-Bloch reference curve for LikelihoodPIDProcessor
+    add command line output and text file output of above fit results for calibration
+
+* 2022-11-14 Thomas Madlener ([PR#37](https://github.com/iLCSoft/ILDPerformance/pull/37))
+  - Update CI to latest working nightly builds and use the same actions as everywhere else.
+
+* 2022-11-14 Zehvogel ([PR#36](https://github.com/iLCSoft/ILDPerformance/pull/36))
+  - fixed memory leak in PIDTree.cc
+
 # v01-10
 
 * 2021-05-06 Ulrich Einhaus ([PR#34](https://github.com/iLCSoft/ILDPerformance/pull/34))
