@@ -150,6 +150,17 @@ dEdxAnalyser::dEdxAnalyser() : Processor("dEdxAnalyser") {
                  _cutMomMax,
                  double(0));
 
+  registerProcessorParameter("cutLamMin",
+                 "Tracks with an angle lambda (relative to the cathode) smaller than the given value will be ignored. Set to 0 to accept all particles.",
+                 _cutLamMin,
+                 double(0));
+
+  registerProcessorParameter("cutLamMax",
+                 "Tracks with an angle lambda (relative to the cathode) larger than the given value will be ignored. Set to 0 to accept all particles.",
+                 _cutLamMax,
+                 double(0));
+
+
   registerProcessorParameter("fiducialMomMin",
                  "Fiducial minimum absolut momentum / GeV; default: 3.",
                  _fidMomMin,
@@ -175,10 +186,20 @@ dEdxAnalyser::dEdxAnalyser() : Processor("dEdxAnalyser") {
                  _fidNHitsMin,
                  int(200));
 
+  registerProcessorParameter("LikelihoodPIDMethod",
+                 "Name of PID algorithm in LikelihoodPIDProcessor to be used in PFO vs. truth comparison matrix; default: 'dEdxPID'.",
+                 _LikelihoodPIDMethod,
+                 std::string("dEdxPID"));
+
   registerProcessorParameter("plotStuff",
                  "Set true to automatically plot various histograms as .png in the current working directory. Default: false.",
                  _plotStuff,
                  bool(false));
+
+  registerProcessorParameter("plotFolder",
+                 "Specify the folder in which the automatically plotted images should be stored (if chosen). Needs to exist. Default: '.' [current working directory].",
+                 _plotFolder,
+                 std::string("."));
 
   registerProcessorParameter("useLCTPCStyle",
                  "Set true if you would like to use the LCTPCStyle.C from MarlinTPC/analysis/rootscripts as style for the plots. Default: false.",
@@ -674,6 +695,13 @@ void dEdxAnalyser::processEvent( LCEvent * evt ) {
       if (_cutMomMax) if (mom>_cutMomMax) continue;
       _CutAnaHist->Fill(icut); ++icut;
 
+      // Angular cuts
+      double lambda = fabs(atan(track->getTanLambda())) *180/M_PI;
+      if (_cutLamMin) if (lambda<_cutLamMin) continue;
+      if (_cutLamMax) if (lambda>_cutLamMax) continue;
+      _CutAnaHist->Fill(icut); ++icut;
+
+
       // If more other tracks are connected to the same MCParticle and this is not the track with the highest momentum among them, skip this track.
       if (_cutTrackPurityMom) if (n_rel_tracks>1)
       {
@@ -752,7 +780,7 @@ void dEdxAnalyser::processEvent( LCEvent * evt ) {
       // Fill histogram correlating MC and reco PDG
       if (_usePFOTracks)
       {
-        int PFO_pdg = pidh->getParticleID(pfo,pidh->getAlgorithmID("dEdxPID")).getPDG();
+        int PFO_pdg = pidh->getParticleID(pfo,pidh->getAlgorithmID(_LikelihoodPIDMethod)).getPDG();
 
         if (PFO_pdg==0) PFO_pdg=10;
         for (int j=0; j<_nPart+1; j++)
@@ -762,7 +790,7 @@ void dEdxAnalyser::processEvent( LCEvent * evt ) {
           {
             if (PFO_pdg!=_PDG[k]) continue;
             _PDGCheck->Fill(j,k);
-            _PDGCheck_weight->Fill(j,k,pidh->getParticleID(pfo,pidh->getAlgorithmID("dEdxPID")).getLikelihood());
+            _PDGCheck_weight->Fill(j,k,pidh->getParticleID(pfo,pidh->getAlgorithmID(_LikelihoodPIDMethod)).getLikelihood());
           }
         }
       }
@@ -1141,11 +1169,13 @@ void dEdxAnalyser::end()
 
       for (int j=0; j<4; j++)
       {
-        ((TH1D*) _FitHist[i]->At(j))->SetAxisRange(0,YMax[j],"Y");
-        ((TH1D*) _FitHist[i]->At(j))->Draw();
-        img->FromPad(can);
-        std::stringstream s; s << _BBHist[i]->GetName() << "_FitPar" << j << _fileFormat;
-        img->WriteImage(s.str().c_str());
+        TH1D* h = (TH1D*) _FitHist[i]->At(j);
+        h->SetAxisRange(0,YMax[j],"Y");
+        //((TH1D*) _FitHist[i]->At(j))->Draw();
+        //img->FromPad(can);
+        //std::stringstream s; s << _BBHist[i]->GetName() << "_FitPar" << j << _fileFormat;
+        //img->WriteImage(s.str().c_str());
+        PlotTH1_FPn(can, h, j);
       }
       if (ptr_BBfit[i].Get()) ptr_BBfit[i]->Print();
       else {streamlog_out(MESSAGE) << "Mass " << _Masses[i] << ": fit result pointer empty!" << std::endl;}
@@ -1166,11 +1196,13 @@ void dEdxAnalyser::end()
       //PlotTH2(can, _HEHist_bg[i]);
       for (int j=0; j<4; j++)
       {
-        ((TH1D*) _HEFitHist[i]->At(j))->SetAxisRange(0,YMaxHE[j],"Y");
-        ((TH1D*) _HEFitHist[i]->At(j))->Draw();
-        img->FromPad(can);
-        std::stringstream s; s << _HEHist[i]->GetName() << "_FitPar" << j << _fileFormat;
-        img->WriteImage(s.str().c_str());
+        TH1D* h = (TH1D*) _HEFitHist[i]->At(j);
+        h->SetAxisRange(0,YMaxHE[j],"Y");
+        //((TH1D*) _HEFitHist[i]->At(j))->Draw();
+        //img->FromPad(can);
+        //std::stringstream s; s << _HEHist[i]->GetName() << "_FitPar" << j << _fileFormat;
+        //img->WriteImage(s.str().c_str());
+        PlotTH1_FPn(can, h, j);
       }
     }
     PlotTH2(can, _HEHist[_nPart]);
@@ -1375,7 +1407,7 @@ void dEdxAnalyser::PlotTH1( TCanvas* can, TH1* hist )
 {
   hist->Draw();
   can->Update();
-  std::stringstream s; s << hist->GetName() << _fileFormat;
+  std::stringstream s; s << _plotFolder << "/" << hist->GetName() << _fileFormat;
   can->Print(s.str().c_str());
 }
 
@@ -1383,6 +1415,14 @@ void dEdxAnalyser::PlotTH2( TCanvas* can, TH2* hist )
 {
   hist->Draw("colz");
   can->Update();
-  std::stringstream s; s << hist->GetName() << _fileFormat;
+  std::stringstream s; s << _plotFolder << "/" << hist->GetName() << _fileFormat;
+  can->Print(s.str().c_str());
+}
+
+void dEdxAnalyser::PlotTH1_FPn( TCanvas* can, TH1* hist, int n )
+{
+  hist->Draw();
+  can->Update();
+  std::stringstream s; s << _plotFolder << "/" << hist->GetName() << "_FitPar" << n <<  _fileFormat;
   can->Print(s.str().c_str());
 }
