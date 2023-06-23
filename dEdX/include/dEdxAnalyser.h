@@ -148,7 +148,7 @@ class dEdxAnalyser : public Processor {
 
   virtual void PlotTH1( TCanvas* can, TH1* hist );
   virtual void PlotTH2( TCanvas* can, TH2* hist );
-  //virtual double BB_Fit( double* x, double* p );
+  virtual void PlotTH1_FPn( TCanvas* can, TH1* hist, int n );
 
 
  protected:
@@ -184,6 +184,8 @@ class dEdxAnalyser : public Processor {
   double _cutZ0=0;
   double _cutMomMin=0;
   double _cutMomMax=0;
+  double _cutLamMin=0;
+  double _cutLamMax=0;
 
   double _fidMomMin=0;
   double _fidMomMax=0;
@@ -191,8 +193,11 @@ class dEdxAnalyser : public Processor {
   double _fidLamMax=0;
   int _fidNHitsMin=0;
 
+  std::string _LikelihoodPIDMethod = "dEdxPID";
+
   bool _plotStuff=false;
   bool _useLCTPCStyle=false;
+  std::string _plotFolder = ".";
   std::string _fileFormat = ".png";
 
   // number of particle species to be separated
