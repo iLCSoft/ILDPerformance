@@ -1,3 +1,15 @@
+# v01-12
+
+* 2023-06-26 tmadlener ([PR#40](https://github.com/iLCSoft/ILDPerformance/pull/40))
+  - Fix the CI workflow by making sure that the DD4hep headers appear early enough to have precedence over any headers that might be picked up from the underlying environment.
+  - Add a workflow based on the key4hep nightly builds
+
+* 2023-06-26 Ulrich Einhaus ([PR#39](https://github.com/iLCSoft/ILDPerformance/pull/39))
+  New options:
+  - lambda cut
+  - PID algorithm for PDG MC-Reco plot
+  - plot folder
+
 # v01-11
 
 * 2022-12-09 Ulrich Einhaus ([PR#38](https://github.com/iLCSoft/ILDPerformance/pull/38))
