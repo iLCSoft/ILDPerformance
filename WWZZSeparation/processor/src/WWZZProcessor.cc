@@ -124,7 +124,7 @@ void WWZZProcessor::processEvent( LCEvent * evt ) {
   try{
     colIsoleps = evt->getCollection( _colIsoleps );
   }
-  catch( lcio::DataNotAvailableException e )
+  catch( lcio::DataNotAvailableException& e )
   {
     streamlog_out(WARNING) << _colIsoleps << " collection not available" << std::endl;
     colIsoleps = NULL;
