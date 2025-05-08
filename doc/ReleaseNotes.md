@@ -1,3 +1,14 @@
+# v01-12-01
+
+* 2025-01-07 Thomas Madlener ([PR#42](https://github.com/ilCSoft/ILDPerformance/pull/42))
+  - Use the `key4hep-build` github action to run CI on top of the Key4hep nightlies and releases
+  - Remove clicdp nightlies based CI workflows
+  - Fix some warnings
+    - **Keeping existing behavior even if that potentially was not the intended behavior**
+
+* 2025-01-07 jmcarcell ([PR#41](https://github.com/ilCSoft/ILDPerformance/pull/41))
+  - Require finding `MarlinTrk` to fail at configure time instead of at compile time if it isn't found
+
 # v01-12
 
 * 2023-06-26 tmadlener ([PR#40](https://github.com/iLCSoft/ILDPerformance/pull/40))
