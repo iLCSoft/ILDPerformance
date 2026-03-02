@@ -18,7 +18,7 @@
     <!-- ILD detector model -->
     <constant name="DetectorModel" value="ILD_s5_v02" />
     <!-- The full compact file name -->
-    <constant name="CompactFile" value="${k4geo_DIR}/ILD/compact/${DetectorModel}/${DetectorModel}.xml" />
+    <constant name="CompactFile" value="${lcgeo_DIR}/ILD/compact/${DetectorModel}/${DetectorModel}.xml" />
   </constants> 
 
   <execute>

@@ -43,7 +43,7 @@ do
 ddsim \
     --inputFiles Results/GenFiles/mcparticles_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio  \
     --outputFile ${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
-    --compactFile $k4geo_DIR/ILD/compact/${ILDMODEL}/${ILDMODEL}.xml \
+    --compactFile $lcgeo_DIR/ILD/compact/${ILDMODEL}/${ILDMODEL}.xml \
     --steeringFile ddsim_steer.py \
     --numberOfEvents 5000 &
 
@@ -67,7 +67,7 @@ Marlin MarlinStdReco.xml \
     --constant..DetectorModel=ILD_l5_o1_v02 \
     --global.LCIOInputFiles=Results/SimFiles/${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
     --constant.RunBeamCalReco=false \
-    --constant.lcgeo_DIR=$k4geo_DIR \
+    --constant.lcgeo_DIR=$lcgeo_DIR \
     --constant.OutputBaseName=${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
     --MyRecoMCTruthLinker.UsingParticleGun=true \
 > RECO_${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.out &
@@ -102,7 +102,7 @@ INFILE=Results/RecoFiles/${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_
 
 Marlin DDDiagnostics.xml \
     --global.LCIOInputFiles=$INFILE \
-    --InitDD4hep.DD4hepXMLFile=$k4geo_DIR/ILD/compact/ILD_l5_v02/ILD_l5_v02.xml \
+    --InitDD4hep.DD4hepXMLFile=$lcgeo_DIR/ILD/compact/ILD_l5_v02/ILD_l5_v02.xml \
     --MyAIDAProcessor.FileName=analysis_${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
     --MyDiagnostics.FillBigTTree=true \
     --MyDiagnostics.PhysSampleOn=false \

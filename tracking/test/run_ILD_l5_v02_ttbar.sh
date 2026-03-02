@@ -21,7 +21,7 @@ echo "NSkip ${NSkip}"
 ddsim \
     --inputFiles $INFILE  \
     --outputFile ${ILDMODEL}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_${i}_SIM.slcio \
-    --compactFile $k4geo_DIR/ILD/compact/${ILDMODEL}/${ILDMODEL}.xml \
+    --compactFile $lcgeo_DIR/ILD/compact/${ILDMODEL}/${ILDMODEL}.xml \
     --steeringFile ddsim_steer.py \
     --numberOfEvents 100  \
     --skipNEvents ${NSkip} &
@@ -42,7 +42,7 @@ Marlin MarlinStdReco.xml \
     --constant..DetectorModel=ILD_l5_o1_v02 \
     --global.LCIOInputFiles=Results/SimFiles/${ILDMODEL}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_${i}_SIM.slcio \
     --constant.RunBeamCalReco=false \
-    --constant.lcgeo_DIR=$k4geo_DIR \
+    --constant.lcgeo_DIR=$lcgeo_DIR \
     --constant.OutputBaseName=${ILDMODEL}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_${i} \
     --MyRecoMCTruthLinker.UsingParticleGun=false \
 > RECO_${ILDMODEL}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_${i}.out &
@@ -63,7 +63,7 @@ rm ${ILDMODEL}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05_
 # diagnostics
 
 Marlin Diagnostics_ILD_l5_v02_ttbar.xml \
-    --constant.lcgeo_DIR=$k4geo_DIR \
+    --constant.lcgeo_DIR=$lcgeo_DIR \
     --constant.ILCSoftVersion=${ILCSOFTVER} \
     --MyAIDAProcessor.FileName=analysis_${ILDMODEL}_${ILCSOFTVER}_E0500-TDR_ws.Pyycyyc.Gwhizard-1.95.eR.pL.I36919.05 \
     --MyDiagnostics.PhysSampleOn=true \
