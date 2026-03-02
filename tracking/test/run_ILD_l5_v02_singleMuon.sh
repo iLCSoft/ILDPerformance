@@ -5,9 +5,9 @@
 #==============================================================
 
 ILDMODEL=ILD_l5_v02
-ILCSOFTVER=HEAD-2019-06-04 # v01-19-06
+ILCSOFTVER=v02-03-04
 
-. /afs/desy.de/project/ilcsoft/sw/x86_64_gcc49_sl6/${ILCSOFTVER}/init_ilcsoft.sh
+. /afs/desy.de/project/ilcsoft/sw/x86_64_gcc131_el9/${ILCSOFTVER}/init_ilcsoft.sh
 
 
 PolarAngles=('10' '20' '40' '85')
