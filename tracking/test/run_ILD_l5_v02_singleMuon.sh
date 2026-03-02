@@ -45,7 +45,7 @@ ddsim \
     --outputFile ${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
     --compactFile $lcgeo_DIR/ILD/compact/${ILDMODEL}/${ILDMODEL}.xml \
     --steeringFile ddsim_steer.py \
-    --numberOfEvents 5000 &
+    --numberOfEvents -1 &
 
 done
 wait
