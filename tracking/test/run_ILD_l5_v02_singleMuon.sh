@@ -147,8 +147,7 @@ root -b -q PResolutionL5.C
 root -b -q meanL5.C
 root -b -q sigmaL5.C
 
-OUTPUTPATH=~/www/ILDPerformance_${ILCSOFTVER}
-mkdir -p ${OUTPUTPATH}
+OUTPUTPATH=../Results/MonitorPlots
 
 cp IPResolution_${ILDMODEL}.png ${OUTPUTPATH}/IPResolution_${ILDMODEL}_${ILCSOFTVER}.png
 cp D0_fit_${ILDMODEL}.pdf ${OUTPUTPATH}/D0_fit_${ILDMODEL}_${ILCSOFTVER}.pdf
