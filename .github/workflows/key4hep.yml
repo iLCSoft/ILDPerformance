@@ -1,9 +1,8 @@
-name: Key4hep build
-
+name: keyh4ep
 on:
   push:
     branches:
-    - master
+      - master
   pull_request:
   workflow_dispatch:
 
@@ -16,12 +15,19 @@ jobs:
     strategy:
       matrix:
         build_type: ["release", "nightly"]
-        image: ["alma9", "ubuntu22"]
+        image: ["alma9"]
+        stack: ["key4hep"]
+        include:
+          - build_type: nightly
+            image: ubuntu24
+            stack: key4hep
       fail-fast: false
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    - uses: key4hep/key4hep-actions/cache-external-data@main
     - uses: key4hep/key4hep-actions/key4hep-build@main
       with:
         build_type: ${{ matrix.build_type }}
         image: ${{ matrix.image }}
+        stack: ${{ matrix.stack }}
