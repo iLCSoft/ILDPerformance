@@ -5,9 +5,9 @@
 #==============================================================
 
 ILDMODEL=ILD_l5_v02
-ILCSOFTVER=HEAD-2019-06-04 # v01-19-06
+ILCSOFTVER=v02-03-04
 
-. /afs/desy.de/project/ilcsoft/sw/x86_64_gcc49_sl6/${ILCSOFTVER}/init_ilcsoft.sh
+. /afs/desy.de/project/ilcsoft/sw/x86_64_gcc131_el9/${ILCSOFTVER}/init_ilcsoft.sh
 
 
 PolarAngles=('10' '20' '40' '85')
@@ -45,7 +45,7 @@ ddsim \
     --outputFile ${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
     --compactFile $lcgeo_DIR/ILD/compact/${ILDMODEL}/${ILDMODEL}.xml \
     --steeringFile ddsim_steer.py \
-    --numberOfEvents 5000 &
+    --numberOfEvents -1 &
 
 done
 wait
@@ -147,8 +147,7 @@ root -b -q PResolutionL5.C
 root -b -q meanL5.C
 root -b -q sigmaL5.C
 
-OUTPUTPATH=~/www/ILDPerformance_${ILCSOFTVER}
-mkdir -p ${OUTPUTPATH}
+OUTPUTPATH=../Results/MonitorPlots
 
 cp IPResolution_${ILDMODEL}.png ${OUTPUTPATH}/IPResolution_${ILDMODEL}_${ILCSOFTVER}.png
 cp D0_fit_${ILDMODEL}.pdf ${OUTPUTPATH}/D0_fit_${ILDMODEL}_${ILCSOFTVER}.pdf

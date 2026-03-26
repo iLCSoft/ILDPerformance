@@ -1,107 +1,83 @@
-####################################################################
-#
-# ILDPerformance:
-#
-# collection of scripts and steering files for creating 
-# canonical ILD performance plots
-#
-# authors: Yorgos Voutsinas, Alonso Guerrero Llorente
-#
-###################################################################
+# ILDPerformance
 
+Collection of scripts and steering files for creating canonical ILD performance plots.
 
-BUILD instructions:
+**Authors:** Yorgos Voutsinas, Alonso Guerrero Llorente
 
+---
+
+## Build Instructions
+
+```bash
 mkdir build; cd build
-cmake -C $ILCSOFT/ILCSoft.cmake .. ; make install
+cmake -C $ILCSOFT/ILCSoft.cmake ..
+make install
+```
 
+## 0) DD4hep Framework (New Sim/Reco)
 
-0) For the DD4hep new framework sim and reco,
-Please go to folder "NewSimTest".
+For the new DD4hep framework simulation and reconstruction, please refer to the `NewSimTest` folder.
 
+```bash
 cd NewSimTest
-and try "runNewSim.sh"
+./runNewSim.sh
+```
 
+## 1) Resolution Plots
 
+Run the main execution script:
 
-1) Resolution plots
-
-Run the runAll.sh
-
+```bash
 ./tracking/scripts/runAll.sh
+```
 
-This scripts simulates single muon tracks, at 4 different polar angles and 8 different momenta
-using Mokka particle gun. Then it reconstructs them using the std reconstruction and then,
-runs a Diagnostics processor which writes down information to a root tree.
-The produced 32 root files are stored at tracking/Results/Analysis.
-Finally runs a root macro, which initiates a ROOT GUI where the user can plot IP and momentum
-resolution.
+### Process Overview
 
+1. **Simulation:** Simulates single muon tracks at 4 different polar angles and 8 different momenta using the Mokka particle gun.
+2. **Reconstruction:** Reconstructs tracks using the standard reconstruction chain.
+3. **Analysis:** Runs a `Diagnostics` processor to write information to a ROOT tree.
+4. **Output:** The 32 produced ROOT files are stored in `tracking/Results/Analysis`.
+5. **Visualization:** Runs a ROOT macro that initiates a GUI for plotting IP and momentum resolution.
 
-If one wants to modify the detector configuration, he has to edit the mokka section of the runAll.sh
+### Modifications
 
+- **Detector Configuration:** Edit the Mokka section of `runAll.sh`.
+- **Track Collections:** By default, full tracks (`MarlinTrkTrack` collection) are studied. To change this, edit `Diagnostics.xml`:
+  - Update the `TrackCollection` parameter in the `RecoMCTruthLinker` processor.
+  - Update the `StudiedTracks` parameter in the `Diagnostics` processor.
+  - _Note: These two parameters must remain consistent._
+- **Re-running Analysis:** You do not need to re-run the full simulation/reconstruction to examine a different track collection. Use `runAnalysis.sh` to read existing LCIO files (provided the collection was already reconstructed).
+- **Modular Execution:** Simulation, reconstruction, and analysis steps can be run separately using scripts in `tracking/scripts`.
 
-The user can reproduce the resolution plots by running
-the corresponding macros located at tracking/macros.
+## 2) Tracking Pattern Recognition
 
+The `Diagnostics` processor can be used to study efficiency and fake hit rates.
 
-By default is the full tracks (MarlinTrkTrack collection) which are studied.
-To change to another track collection, the Diagnostics.xml steerin file has to be edited.
-In particular, the parameter TrackCollection of the RecoMCTruthLinker processor and the parameter
-StudiedTracks of the Diagnostics processor need to be changed.
-These two parameters need to be consistent.
+### Running the Analysis
 
+1. Edit `PatRec.sh` and modify the `INFILE` variable to provide the path to your reconstructed LCIO file.
+2. Execute the script:
 
-It is not needed to run the whole simulation-reconstruction chain again in order to examine a different track collection.
-One can simply run the runAnalysis.sh scripts, which reads the already reconstructed lcio files
-(provided of course that the relevant track collection has been econstructed)
+   ```bash
+   ./PatRec.sh
+   ```
 
+3. This will initialize a ROOT session with a GUI for plotting. All plots and info are stored in the resulting ROOT file.
 
-One can separately run the simulation, reconstruction and analysis steps by using the scripts that are
-loated in directory tracking/scripts.
+### Settings
 
+- **Physics Samples:** For analysis on physics samples, set the processor parameter `PhysSampleOn` to `true`.
+- **Track Definition:** A track is considered "found" if $\ge 75\%$ of the hits belong to the dominant MCParticle.
+- **Silicon Tracking:** To focus on silicon tracking, set `SiTrkEffOn` to `true`. A track is then considered "found" if it meets the $75\%$ hit criteria **and** has at least 4 silicon hits (VXD - SIT).
+- **Customization:** Definitions for "found" tracks and MCParticle subsample compositions can be modified via processor parameters in `Diagnostics.xml`.
 
+## 3) Track Fitting
 
+`PatRec.sh` also provides information for track fitting. By assigning a single-track file to the `INFILE` variable, you can plot:
 
-2) Tracking pattern recognition
+- Track parameter residuals
+- Pulls
 
-The Diagnostics processor can be used in order to study the efficiency and fake hit rate of a tracking algorithm.
-Script PatRec.sh runs the Diagnostics processor over a reconstructed lcio file. 
-The user has to provide the name and path of the reconstructed file by editing the PatRec.sh and modifying the
-INFILE variable.
+## 4) Track-Hit Residuals
 
-To run analysis on a physics sample, the processor parameter PhysSampleOn should be set to true.
-
-Again, are the full tracks the ones that are studied by default. To change that, the user needs to follow same the instructions
-given above.
-
-
-The track is considered as found if >= 75% of the track hits belong to the dominant MC particle. If one wants to focus on Silicon tracking, one 
-needs to set the processor parameter SiTrkEffOn as true. Then the track is considered as found if >= 75% of the track hits belong to the dominant MC 
-particle && the track has at least 4 silicon (VXD - SIT) hits. The user can change the definiton of found track, as well as the composition of the 
-studied MCParticle subsample by modifying the corresponding processor parameters in the steering file Diagnostics.xml
-
-
-The PatRec.sh will initialise a root session where with the help of a GUI the user can plot what he wants.
-All plots and relevant info is stored in the root file.
-
-
-
-
-3) Track fitting
-
-
-The PatRec.sh script can provide useful information for track fitting as well.
-Assigning a single tracks file to the INFILE variable, the user can plot the track parameter
-residuals and pulls.
-
-
-
-4) Track - hit residuals
-
-
-On going... 
-
-
- 
-
+_On-going..._
