@@ -125,7 +125,8 @@ mv analysis_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_*_Mom_*.root ../Results/Ana
 
 cd ../macros
 
-root -b -q D0ResolutionL5.C
+root -b -q "D0ResolutionL5.C(\"${ILDMODELRECO}\")"
+# root -b -q D0ResolutionL5.C
 root -b -q PResolutionL5.C
 root -b -q meanL5.C
 root -b -q sigmaL5.C
