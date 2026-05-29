@@ -2,71 +2,62 @@
 #define validatePilotProcessor_h 1
 #include "marlin/Processor.h"
 
-#include "UTIL/CellIDDecoder.h"
+#include "EVENT/CalorimeterHit.h"
 #include "EVENT/SimCalorimeterHit.h"
 #include "EVENT/SimTrackerHit.h"
-#include "EVENT/CalorimeterHit.h"
 #include "EVENT/TrackerHit.h"
-#include "valStruct.h"
 #include "TFile.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "UTIL/CellIDDecoder.h"
+#include "valStruct.h"
 
-using namespace marlin ;
-
-
+using namespace marlin;
 
 class validatePilotProcessor : public Processor {
-  
- public:
-  
-  virtual Processor*  newProcessor() { return new validatePilotProcessor ; }
 
-  validatePilotProcessor(const validatePilotProcessor&) = delete ;
-  validatePilotProcessor& operator=(const validatePilotProcessor& ) = delete ;
+public:
+  virtual Processor* newProcessor() { return new validatePilotProcessor; }
 
-  validatePilotProcessor() ;
-  
+  validatePilotProcessor(const validatePilotProcessor&) = delete;
+  validatePilotProcessor& operator=(const validatePilotProcessor&) = delete;
+
+  validatePilotProcessor();
+
   /** Called at the begin of the job before anything is read.
    * Use to initialize the processor, e.g. book histograms.
    */
-  virtual void init() ;
-  
+  virtual void init();
+
   /** Called for every run.
    */
-  virtual void processRunHeader( LCRunHeader* run ) ;
-    
+  virtual void processRunHeader(LCRunHeader* run);
+
   /** Called for every event - the working horse.
    */
-  virtual void processEvent( LCEvent * evt ) ; 
+  virtual void processEvent(LCEvent* evt);
 
-  virtual void check( LCEvent * evt ) ; 
-  
+  virtual void check(LCEvent* evt);
+
   /** Called after data processing for clean up.
    */
-  virtual void end() ;
+  virtual void end();
 
- protected:
-
+protected:
   std::string _outfile{};
 
-  std::map < std::string , std::vector < std::pair < std::string, std::pair<int, int> > > > _indxCode{};
+  std::map<std::string, std::vector<std::pair<std::string, std::pair<int, int>>>> _indxCode{};
 
-  CellIDDecoder <SimCalorimeterHit> * _SimCalorimeterHitDecoder{};
-  CellIDDecoder <SimTrackerHit> *     _SimTrackerHitDecoder{};
-  CellIDDecoder <CalorimeterHit> *    _CalorimeterHitDecoder{};
-  CellIDDecoder <TrackerHit> *        _TrackerHitDecoder{};
+  CellIDDecoder<SimCalorimeterHit>* _SimCalorimeterHitDecoder{};
+  CellIDDecoder<SimTrackerHit>* _SimTrackerHitDecoder{};
+  CellIDDecoder<CalorimeterHit>* _CalorimeterHitDecoder{};
+  CellIDDecoder<TrackerHit>* _TrackerHitDecoder{};
 
-  std::map < std::string , validatePilotProcessor_maxMin > _allranges{};
+  std::map<std::string, validatePilotProcessor_maxMin> _allranges{};
 
-  std::map < std::string , int > _colTypes{};
+  std::map<std::string, int> _colTypes{};
 
-  enum {SIMCALO=0, SIMTRK, CALO, TRK};
-
+  enum { SIMCALO = 0, SIMTRK, CALO, TRK };
 };
 
-
 #endif
-
-
-

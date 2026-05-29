@@ -1,49 +1,49 @@
 #ifndef DDDiagnostics_h
 #define DDDiagnostics_h 1
 
-#include <marlin/Processor.h>
 #include <marlin/Global.h>
+#include <marlin/Processor.h>
 #include <marlinutil/HelixClass.h>
 
+#include "UTIL/LCIterator.h"
+#include "UTIL/LCRelationNavigator.h"
+#include "UTIL/LCTrackerConf.h"
+#include "UTIL/Operators.h"
 #include <EVENT/LCCollection.h>
-#include <EVENT/TrackerHit.h>
-#include <EVENT/SimTrackerHit.h>
-#include <EVENT/Track.h>
 #include <EVENT/LCRelation.h>
 #include <EVENT/MCParticle.h>
-#include "UTIL/LCRelationNavigator.h"
-#include "UTIL/LCIterator.h"
-#include "UTIL/Operators.h"
+#include <EVENT/SimTrackerHit.h>
+#include <EVENT/Track.h>
+#include <EVENT/TrackerHit.h>
 #include <UTIL/BitField64.h>
-#include "UTIL/LCTrackerConf.h"
-#include <UTIL/ILDConf.h>
 #include <UTIL/BitSet32.h>
+#include <UTIL/ILDConf.h>
 
-#include "DD4hep/Detector.h"
 #include "DD4hep/DD4hepUnits.h"
 #include "DD4hep/DetType.h"
-#include "DDRec/DetectorData.h"
+#include "DD4hep/Detector.h"
 #include "DD4hep/DetectorSelector.h"
+#include "DDRec/DetectorData.h"
 
 #include "TROOT.h"
-#include <TTree.h>
-#include <TVector3.h>
-#include <TMath.h>
-#include <TH1F.h>
-#include <TH2F.h>
+#include "lcio.h"
+#include <TCanvas.h>
 #include <TF1.h>
 #include <TGraphAsymmErrors.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TMath.h>
 #include <TStyle.h>
-#include <TCanvas.h>
-#include <vector>
-#include "lcio.h"
-#include <string>
-#include <iostream>
+#include <TTree.h>
+#include <TVector3.h>
 #include <algorithm>
+#include <iostream>
+#include <string>
+#include <vector>
 
-using namespace lcio ;
-using namespace marlin ;
-using namespace std ;
+using namespace lcio;
+using namespace marlin;
+using namespace std;
 
 /** DDDiagnostics processor
  * feels a ROOT tree with track - mcparticle info
@@ -51,21 +51,17 @@ using namespace std ;
  * creates canvases with finding efficiency - pulls
  * authors: Yorgos Voutsinas, Alonso Guerrero Llorente
  * update: to get DD4hep geometry information
-*/
+ */
 
 class DDDiagnostics : public Processor {
-  
- public:
- 
 
-  virtual Processor*  newProcessor() { return new DDDiagnostics ; }
-  
-  
-  DDDiagnostics() ;
+public:
+  virtual Processor* newProcessor() { return new DDDiagnostics; }
+
+  DDDiagnostics();
   DDDiagnostics(const DDDiagnostics&) = delete;
   DDDiagnostics& operator=(const DDDiagnostics&) = delete;
 
-  
   /** Called at the begin of the job before anything is read.
    * Use to initialize the processor, e.g. book histograms.
    */
@@ -73,48 +69,45 @@ class DDDiagnostics : public Processor {
 
   /** Called for every run.
    */
-  virtual void processRunHeader( LCRunHeader* run ) ;
-  
+  virtual void processRunHeader(LCRunHeader* run);
+
   /** Called for every event - the working horse.
    */
-  virtual void processEvent( LCEvent * evt ) ; 
-  
-  
-  virtual void check( LCEvent * evt ) ; 
-  
-  
+  virtual void processEvent(LCEvent* evt);
+
+  virtual void check(LCEvent* evt);
+
   /** Called after data processing for clean up.
    */
-  virtual void end() ;
+  virtual void end();
 
   /** Initialise the ROOT TTRee.
    */
-  void initTree(void) ;
+  void initTree(void);
 
   /** Initialise the ROOT TH1F and so on ...
    */
-  void initHist(void) ;
+  void initHist(void);
 
   /** Finalise the ROOT, and fill the TCanvas.
    */
-  void fillCanvas(void) ;
+  void fillCanvas(void);
 
   /** Initialise the all the vectors.
    */
-  void clearVec(void) ;
+  void clearVec(void);
 
   /** Initialise the all the parameters for marlin.
    */
-  void initParameters(void) ;
+  void initParameters(void);
 
- protected:
-
+protected:
   /** Input collection name.
    */
   std::string _trueToReco = "";
   std::string _recoToTrue = "";
   std::string _mcParticleCollectionName = "";
-  StringVec   _simTrkHitCollectionNames = {};
+  StringVec _simTrkHitCollectionNames = {};
   std::string _trackColName = "";
   std::string _sitTrackerHits = "";
   std::string _sitTrkHitRelations = "";
@@ -141,18 +134,17 @@ class DDDiagnostics : public Processor {
   bool _reqInnVXDHit = false;
   bool _fillBigTTree = false;
 
- private:
-
+private:
   // declaration of trees
-  TTree *EvalTree = NULL;
+  TTree* EvalTree = NULL;
   vector<int> foundTrk = {};
   vector<int> TrackSiHits = {};
-  vector<int> MarlinTrkHits  = {};
-  vector<int> VXDHits  = {};
-  vector<int> SITHits  = {};
-  vector<int> FTDHits  = {};
-  vector<int> TPCHits  = {};
-  vector<float> foundTrkChi2OverNdof  = {};
+  vector<int> MarlinTrkHits = {};
+  vector<int> VXDHits = {};
+  vector<int> SITHits = {};
+  vector<int> FTDHits = {};
+  vector<int> TPCHits = {};
+  vector<float> foundTrkChi2OverNdof = {};
   vector<float> PtReco = {};
   vector<float> CosThetaReco = {};
   vector<float> PtMCP = {};
@@ -177,52 +169,49 @@ class DDDiagnostics : public Processor {
 
   int MarlinTracks = 0;
 
-  TH1F *OmegaPull = NULL;
-  TH1F *PhiPull = NULL;
-  TH1F *TanLambdaPull = NULL;
-  TH1F *d0pull = NULL;
-  TH1F *z0pull = NULL;
+  TH1F* OmegaPull = NULL;
+  TH1F* PhiPull = NULL;
+  TH1F* TanLambdaPull = NULL;
+  TH1F* d0pull = NULL;
+  TH1F* z0pull = NULL;
 
-  TH1F *OmegaResidual = NULL;
-  TH1F *PhiResidual = NULL;
-  TH1F *TanLambdaResidual = NULL;
-  TH1F *d0Residual = NULL;
-  TH1F *z0Residual = NULL;
+  TH1F* OmegaResidual = NULL;
+  TH1F* PhiResidual = NULL;
+  TH1F* TanLambdaResidual = NULL;
+  TH1F* d0Residual = NULL;
+  TH1F* z0Residual = NULL;
 
-  static const int nBins = 13 ;
+  static const int nBins = 13;
 
-  TH1F *hist_pt_t  = NULL;
-  TH1F *hist_pt_f  = NULL;
-  TH1F *hist_p_t  = NULL;
-  TH1F *hist_p_f  = NULL;
-  TH1F *hist_th_t  = NULL;
-  TH1F *hist_th_f  = NULL;
-  TH1F *hist_thm_t  = NULL;
-  TH1F *hist_thm_f  = NULL;
-  TH2F *hist_2d_t  = NULL;
-  TH2F *hist_2d_f  = NULL;
-  TH2F *hist_2d  = NULL;
-  
+  TH1F* hist_pt_t = NULL;
+  TH1F* hist_pt_f = NULL;
+  TH1F* hist_p_t = NULL;
+  TH1F* hist_p_f = NULL;
+  TH1F* hist_th_t = NULL;
+  TH1F* hist_th_f = NULL;
+  TH1F* hist_thm_t = NULL;
+  TH1F* hist_thm_f = NULL;
+  TH2F* hist_2d_t = NULL;
+  TH2F* hist_2d_f = NULL;
+  TH2F* hist_2d = NULL;
 
-  TCanvas *pulls = NULL;
-  TCanvas *residuals = NULL;
-  TCanvas *eff = NULL;
-  TCanvas *effPM = NULL;
-  TCanvas *eff2d = NULL;
-  TCanvas *eff2d_t = NULL;
-  TCanvas *eff2d_f = NULL;
+  TCanvas* pulls = NULL;
+  TCanvas* residuals = NULL;
+  TCanvas* eff = NULL;
+  TCanvas* effPM = NULL;
+  TCanvas* eff2d = NULL;
+  TCanvas* eff2d_t = NULL;
+  TCanvas* eff2d_f = NULL;
 
-  TF1 *myfunc  = NULL;
+  TF1* myfunc = NULL;
 
-  TGraphAsymmErrors *gpt = NULL;
-  TGraphAsymmErrors *gp = NULL;
-  TGraphAsymmErrors *gth = NULL;
-  TGraphAsymmErrors *gthm = NULL;
+  TGraphAsymmErrors* gpt = NULL;
+  TGraphAsymmErrors* gp = NULL;
+  TGraphAsymmErrors* gth = NULL;
+  TGraphAsymmErrors* gthm = NULL;
 
-  double PI    = 3.1415926535897;
+  double PI = 3.1415926535897;
   double TWOPI = 6.2831853071794;
-
-} ;
-
+};
 
 #endif

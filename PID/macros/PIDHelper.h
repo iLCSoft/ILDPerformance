@@ -12,13 +12,13 @@
 std::string getPathPrefix(const std::string& fileName) {
 
   char sep = '/';
-  
-  std::string path = "./" ;
+
+  std::string path = "./";
 
   size_t i = fileName.rfind(sep, fileName.length());
   if (i != std::string::npos) {
-    path = fileName.substr(0, i+1 ) ;
+    path = fileName.substr(0, i + 1);
   }
-  
-  return path ;
+
+  return path;
 }

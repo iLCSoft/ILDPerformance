@@ -1,52 +1,41 @@
 #ifndef Skim_h
-#define Skim_h 
+#define Skim_h
 
 #include "marlin/Processor.h"
 
+#include "lcio.h"
 #include <EVENT/MCParticle.h>
 #include <IMPL/LCCollectionVec.h>
-#include "lcio.h"
 
-
-
-using namespace lcio ;
-
+using namespace lcio;
 
 class Skim : public marlin::Processor {
-  
 
 public:
-  
-  virtual Processor*  newProcessor() { return new Skim ; }
-  
-  
-  Skim() ;
-  
+  virtual Processor* newProcessor() { return new Skim; }
+
+  Skim();
+
   /** Called at the begin of the job before anything is read.
    * Use to initialize the processor, e.g. book histograms.
    */
-  virtual void init() ;
-  
+  virtual void init();
+
   /** Called for every run.
    */
-  virtual void processRunHeader( LCRunHeader* run ) ;
+  virtual void processRunHeader(LCRunHeader* run);
 
-  
   /** Called for every event - the working horse.
    */
-  virtual void processEvent( LCEvent * evt ) ; 
-  virtual void check( LCEvent * evt ) ; 
-  
+  virtual void processEvent(LCEvent* evt);
+  virtual void check(LCEvent* evt);
+
   /** Called after data processing for clean up.
    */
-  virtual void end() ;
-  
-  
-  
-protected:
-  
-  void keepMCParticle( MCParticle* mcp, bool save_parents=true ) ; 
+  virtual void end();
 
+protected:
+  void keepMCParticle(MCParticle* mcp, bool save_parents = true);
 
   std::string _mcpColName = "";
   std::string _mcpSkimColName = "";
@@ -56,9 +45,6 @@ protected:
 
   double _thetaMin = 0.0;
   double _thetaMax = 0.0;
-
-} ;
-
-
+};
 
 #endif
