@@ -28,7 +28,7 @@ int PA[SIZE_PA] = {10, 20, 40, 85};
 float LimAxis;
 int color, marker;
 
-void sigmaL5() {
+void sigmaL5(const char* modelName = "ILD_l5_v02") {
   for (int ll = 0; ll < SIZE_M; ll++) {
     zeros[ll] = 0;
   }
@@ -77,7 +77,7 @@ void sigmaL5() {
   for (int ii = 0; ii < SIZE_PA; ii++) {
     for (int i = 0; i < SIZE_M; i++) {
       TFile* f1 =
-          new TFile(Form("../Results/Analysis/analysis_ILD_l5_v02_MuonsAngle_%d_Mom_%d.root", PA[ii], Mom[i]), "read");
+          new TFile(Form("../Results/Analysis/analysis_%s_MuonsAngle_%d_Mom_%d.root", modelName, PA[ii], Mom[i]), "read");
       // TDirectory *d1 = (TDirectory*) f1->Get("MyRecoMCTruthLinker");
 
       TH1F* hOmega = (TH1F*)f1->Get("OmegaPull");
@@ -400,5 +400,5 @@ void sigmaL5() {
   leg->AddEntry(Muon_plot_z085, "#theta = 85^{o}", "p");
   leg->Draw();
 
-  c_two->SaveAs("pull_sigma_ILD_l5_v02.png");
+  c_two->SaveAs(Form("pull_sigma_%s.png", modelName));
 }
