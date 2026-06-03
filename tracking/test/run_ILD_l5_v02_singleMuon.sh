@@ -56,6 +56,12 @@ for i in {0..3}; do
 
 	for j in {0..8}; do
 
+		EXTRA_FLAGS=()
+		if [[ "${ILDMODELRECO}" == "ILD_FCCee_v01" ||
+			"${ILDMODELRECO}" == "ILD_FCCee_v02" ]]; then
+			EXTRA_FLAGS=(--trackMerge --doHLR)
+		fi
+
 		k4run ILDReconstruction.py \
 			--detectorModel ${ILDMODELRECO} \
 			--inputFiles Results/SimFiles/${ILDMODELSIM}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
@@ -63,6 +69,7 @@ for i in {0..3}; do
 			--outputFileBase Results/RecoFiles/${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
 			--lcioOutput only \
 			--usingParticleGun \
+			"${EXTRA_FLAGS[@]}" \
 			-n -1
 		>${LOGFILEPATH}/RECO_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.out &
 
@@ -98,7 +105,16 @@ for i in {0..3}; do
 
 		INFILE=Results/RecoFiles/${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_REC.slcio
 
-		Marlin DDDiagnostics.xml \
+		# default steering file
+		STEERING_FILE="DDDiagnostics.xml"
+
+		# override for FCCee models
+		if [[ "${ILDMODELRECO}" == ILD_FCCee_v01 ||
+			"${ILDMODELRECO}" == ILD_FCCee_v02 ]]; then
+			STEERING_FILE="DDDiagnostics_FCCee.xml"
+		fi
+
+		Marlin "${STEERING_FILE}" \
 			--global.LCIOInputFiles=$INFILE \
 			--InitDD4hep.DD4hepXMLFile=$lcgeo_DIR/ILD/compact/${ILDMODELRECO}/${ILDMODELRECO}.xml \
 			--MyAIDAProcessor.FileName=analysis_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
