@@ -4,8 +4,8 @@
 # Running shell script in parallel over multiple cores
 #==============================================================
 
-ILDMODELRECO=ILD_l5_o1_v02
-ILDMODELSIM=ILD_l5_v02
+ILDMODELRECO=ILD_FCCee_v01 # ILD_l5_o1_v02
+ILDMODELSIM=ILD_FCCee_v01 # ILD_l5_v02
 ILCSOFTVER=key4hep_night
 
 . /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh
