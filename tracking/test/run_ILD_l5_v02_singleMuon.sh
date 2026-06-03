@@ -13,13 +13,23 @@ ILCSOFTVER=key4hep_night
 PolarAngles=('10' '20' '40' '85')
 Mom=('1' '3' '5' '10' '15' '25' '50' '100' '200')
 
+# --- DEBUG MODE ---
+# Set to 'true' to run only one angle/momentum combination and stop after DDDiagnostics
+DEBUG=true
+if [[ "${DEBUG}" == "true" ]]; then
+	echo ">>> DEBUG MODE: running single angle=${PolarAngles[0]}, momentum=${Mom[0]} only <<<"
+	PolarAngles=("${PolarAngles[0]}")
+	Mom=("${Mom[0]}")
+fi
+# ------------------
+
 OUTPUTPATH=../Results/MonitorPlots
 LOGFILEPATH=logFiles
 #==================================================
 # GENERATION - particle gun
-for i in {0..3}; do
+for i in "${!PolarAngles[@]}"; do
 
-	for j in {0..8}; do
+	for j in "${!Mom[@]}"; do
 
 		python lcio_particle_gun.py ${Mom[j]} ${PolarAngles[i]} Results/GenFiles/mcparticles_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio 13 -1. &
 
@@ -32,9 +42,9 @@ wait
 
 #==================================================
 # SIMULATION
-for i in {0..3}; do
+for i in "${!PolarAngles[@]}"; do
 
-	for j in {0..8}; do
+	for j in "${!Mom[@]}"; do
 
 		ddsim \
 			--inputFiles Results/GenFiles/mcparticles_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio \
@@ -52,9 +62,9 @@ wait
 
 #==================================================
 # RECONSTRUCTION
-for i in {0..3}; do
+for i in "${!PolarAngles[@]}"; do
 
-	for j in {0..8}; do
+	for j in "${!Mom[@]}"; do
 
 		EXTRA_FLAGS=()
 		if [[ "${ILDMODELRECO}" == "ILD_FCCee_v01" ||
@@ -97,9 +107,9 @@ rm ${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_*_Mom_*_PfoAnalysis.root
 
 #==================================================
 # start Diagnostics
-for i in {0..3}; do
+for i in "${!PolarAngles[@]}"; do
 
-	for j in {0..8}; do
+	for j in "${!Mom[@]}"; do
 
 		# diagnostics
 
@@ -127,10 +137,17 @@ for i in {0..3}; do
 done
 wait
 
-# copy output by removing the "${ILCSOFTVER}"
-for i in {0..3}; do
+# --- DEBUG MODE early exit ---
+if [[ "${DEBUG}" == "true" ]]; then
+	echo ">>> DEBUG MODE: stopping after DDDiagnostics. Skipping analysis file copies and ROOT macros. <<<"
+	exit 0
+fi
+# ----------------------------
 
-	for j in {0..8}; do
+# copy output by removing the "${ILCSOFTVER}"
+for i in "${!PolarAngles[@]}"; do
+
+	for j in "${!Mom[@]}"; do
 
 		cp analysis_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.root ../Results/Analysis/analysis_${ILDMODELRECO}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.root
 
