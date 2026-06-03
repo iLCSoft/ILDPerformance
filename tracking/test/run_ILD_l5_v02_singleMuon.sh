@@ -10,6 +10,14 @@ ILCSOFTVER=key4hep_night
 
 . /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh
 
+# Set compact file root directory depending on detector model
+if [[ "${ILDMODELRECO}" == ILD_FCCee_v01 ||
+      "${ILDMODELRECO}" == ILD_FCCee_v02 ]]; then
+    COMPACTFILEDIR=$K4GEO/FCCee/ILD_FCCee/compact
+else
+    COMPACTFILEDIR=$lcgeo_DIR/ILD/compact
+fi
+
 PolarAngles=('10' '20' '40' '85')
 Mom=('1' '3' '5' '10' '15' '25' '50' '100' '200')
 
@@ -49,7 +57,7 @@ for i in "${!PolarAngles[@]}"; do
 		ddsim \
 			--inputFiles Results/GenFiles/mcparticles_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio \
 			--outputFile Results/SimFiles/${ILDMODELSIM}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
-			--compactFile $lcgeo_DIR/ILD/compact/${ILDMODELSIM}/${ILDMODELSIM}.xml \
+			--compactFile ${COMPACTFILEDIR}/${ILDMODELSIM}/${ILDMODELSIM}.xml \
 			--steeringFile ddsim_steer.py \
 			--numberOfEvents -1 &
 
@@ -126,7 +134,7 @@ for i in "${!PolarAngles[@]}"; do
 
 		Marlin "${STEERING_FILE}" \
 			--global.LCIOInputFiles=$INFILE \
-			--InitDD4hep.DD4hepXMLFile=$lcgeo_DIR/ILD/compact/${ILDMODELRECO}/${ILDMODELRECO}.xml \
+			--InitDD4hep.DD4hepXMLFile=${COMPACTFILEDIR}/${ILDMODELRECO}/${ILDMODELRECO}.xml \
 			--MyAIDAProcessor.FileName=analysis_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
 			--MyDiagnostics.FillBigTTree=true \
 			--MyDiagnostics.PhysSampleOn=false \
