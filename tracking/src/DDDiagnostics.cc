@@ -443,7 +443,9 @@ void DDDiagnostics::processEvent(LCEvent* evt) {
         streamlog_out(DEBUG4) << " We examine collection " << _simTrkHitCollectionNames[i] << " with "
                               << col->getNumberOfElements() << " hits " << std::endl;
 
-        if (_simTrkHitCollectionNames[i] == "VXDCollection") {
+        if (_simTrkHitCollectionNames[i] == "VXDCollection" ||
+            _simTrkHitCollectionNames[i] == "VertexBarrelCollection" ||
+            _simTrkHitCollectionNames[i] == "VertexEndcapCollection") {
           for (int j = 0, jN = col->getNumberOfElements(); j < jN; ++j) {
             SimTrackerHit* simHit = (SimTrackerHit*)col->getElementAt(j);
             MCParticle* mcp = simHit->getMCParticle();
@@ -464,7 +466,8 @@ void DDDiagnostics::processEvent(LCEvent* evt) {
           }
         }
 
-        if (_simTrkHitCollectionNames[i] == "FTDCollection") {
+        if (_simTrkHitCollectionNames[i] == "FTDCollection" ||
+            _simTrkHitCollectionNames[i] == "InnerTrackerEndcapCollection") {
           for (int j = 0, jN = col->getNumberOfElements(); j < jN; ++j) {
             SimTrackerHit* simHit = (SimTrackerHit*)col->getElementAt(j);
             MCParticle* mcp = simHit->getMCParticle();
@@ -485,7 +488,8 @@ void DDDiagnostics::processEvent(LCEvent* evt) {
           }
         }
 
-        if (_simTrkHitCollectionNames[i] == "SITCollection") {
+        if (_simTrkHitCollectionNames[i] == "SITCollection" ||
+            _simTrkHitCollectionNames[i] == "InnerTrackerBarrelCollection") {
           for (int j = 0, jN = col->getNumberOfElements(); j < jN; ++j) {
             SimTrackerHit* simHit = (SimTrackerHit*)col->getElementAt(j);
             MCParticle* mcp = simHit->getMCParticle();
