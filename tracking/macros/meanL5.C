@@ -76,8 +76,8 @@ void meanL5(const char* modelName = "ILD_l5_v02") {
 
   for (int ii = 0; ii < SIZE_PA; ii++) {
     for (int i = 0; i < SIZE_M; i++) {
-      TFile* f1 =
-          new TFile(Form("../Results/Analysis/analysis_%s_MuonsAngle_%d_Mom_%d.root", modelName, PA[ii], Mom[i]), "read");
+      TFile* f1 = new TFile(
+          Form("../Results/Analysis/analysis_%s_MuonsAngle_%d_Mom_%d.root", modelName, PA[ii], Mom[i]), "read");
       // TDirectory *d1 = (TDirectory*) f1->Get("MyRecoMCTruthLinker");
 
       TH1F* hOmega = (TH1F*)f1->Get("OmegaPull");

@@ -7,27 +7,26 @@
 std::vector<MCParticle*> WWZZProcessor::checkMCFinalState(LCCollection* AllMC) {
   std::vector<MCParticle*> FS_all;
   int nMC = AllMC->getNumberOfElements();
-  for( int i = 0; i < nMC; i++ ){
-    MCParticle* MC = dynamic_cast< MCParticle* >( AllMC->getElementAt(i) );
+  for (int i = 0; i < nMC; i++) {
+    MCParticle* MC = dynamic_cast<MCParticle*>(AllMC->getElementAt(i));
     FS_all.push_back(MC);
   }
-  return(FS_all);
+  return (FS_all);
 }
-
 
 std::vector<ReconstructedParticle*> WWZZProcessor::checkPOFinalState(LCCollection* AllPOs) {
   std::vector<ReconstructedParticle*> FS;
   int npo;
-  try{
+  try {
     npo = AllPOs->getNumberOfElements();
-  } catch(...) {
+  } catch (...) {
     npo = 0;
   }
-  if ( npo != 0 ){
-    for( int i = 0; i < npo; i++ ){
-      ReconstructedParticle* po= dynamic_cast< ReconstructedParticle* >( AllPOs->getElementAt(i) );
+  if (npo != 0) {
+    for (int i = 0; i < npo; i++) {
+      ReconstructedParticle* po = dynamic_cast<ReconstructedParticle*>(AllPOs->getElementAt(i));
       FS.push_back(po);
     }
   }
-  return(FS);
+  return (FS);
 }

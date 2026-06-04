@@ -35,8 +35,8 @@ void PResolutionL5(const char* modelName = "ILD_l5_v02") {
   }
   for (int ii = 0; ii < SIZE_PA; ii++) {
     for (int i = 0; i < SIZE_M; i++) {
-      TFile* f =
-          new TFile(Form("../Results/Analysis/analysis_%s_MuonsAngle_%d_Mom_%d.root", modelName, PA[ii], Mom[i]), "read");
+      TFile* f = new TFile(Form("../Results/Analysis/analysis_%s_MuonsAngle_%d_Mom_%d.root", modelName, PA[ii], Mom[i]),
+                           "read");
       // TTree *EvalTree = (TTree*)f->Get("EvalTree");
       TTree* EvalTree;
       f->GetObject("EvalTree", EvalTree);

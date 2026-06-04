@@ -1,105 +1,71 @@
 #include "WWZZProcessor.h"
 
-WWZZProcessor aWWZZProcessor ;
+WWZZProcessor aWWZZProcessor;
 
 WWZZProcessor::WWZZProcessor() : Processor("WWZZProcessor") {
 
-  _description = "WWZZProcessor: Search for e+e- -> vvWW/vvZZ -> vvqqqq at the ILD detector" ;
-
+  _description = "WWZZProcessor: Search for e+e- -> vvWW/vvZZ -> vvqqqq at the ILD detector";
 
   // Standard input collections
-  registerInputCollection( LCIO::RECONSTRUCTEDPARTICLE,
-      "InputAllPFOsCollection",  
-      "Name of the PFOs collection", 
-      _colAllPFOs,   
-      std::string("PandoraPFOs") 
-  );      
+  registerInputCollection(LCIO::RECONSTRUCTEDPARTICLE, "InputAllPFOsCollection", "Name of the PFOs collection",
+                          _colAllPFOs, std::string("PandoraPFOs"));
 
-  registerInputCollection( LCIO::MCPARTICLE,
-      "MCParticleCollection",
-      "Name of the MC particle collection",
-      _colMC,
-      std::string("MCParticle") 
-  );
-
+  registerInputCollection(LCIO::MCPARTICLE, "MCParticleCollection", "Name of the MC particle collection", _colMC,
+                          std::string("MCParticle"));
 
   // Process specific input collections
-  registerInputCollection( LCIO::RECONSTRUCTEDPARTICLE,
-      "InputFastJetsCollection",  
-      "Name of the jet collection", 
-      _colFastJets,   
-      std::string("FastJets") 
-  );      
+  registerInputCollection(LCIO::RECONSTRUCTEDPARTICLE, "InputFastJetsCollection", "Name of the jet collection",
+                          _colFastJets, std::string("FastJets"));
 
-  registerInputCollection( LCIO::RECONSTRUCTEDPARTICLE,
-      "InputIsolepsCollection",
-      "Name of the isolated lepton collection",
-      _colIsoleps,
-      std::string("Isoleps") 
-  );
-
+  registerInputCollection(LCIO::RECONSTRUCTEDPARTICLE, "InputIsolepsCollection",
+                          "Name of the isolated lepton collection", _colIsoleps, std::string("Isoleps"));
 
   // Name of output root file
-  registerProcessorParameter( "RootFileName",
-      "Name of Root file (default: output.root)",
-      _rootfilename,
-      std::string("/nfs/dust/ilc/group/ild/beyerjac/VBS/nunu_hadrons/output/root_files/output.root") 
-  );
+  registerProcessorParameter(
+      "RootFileName", "Name of Root file (default: output.root)", _rootfilename,
+      std::string("/nfs/dust/ilc/group/ild/beyerjac/VBS/nunu_hadrons/output/root_files/output.root"));
 
   // Cross section of sample
-  registerProcessorParameter( "CrossSection",
-      "Cross section of sample stdhep file",
-      _cross_section,
-      float(0.0)
-  );
-			
-
+  registerProcessorParameter("CrossSection", "Cross section of sample stdhep file", _cross_section, float(0.0));
 }
 
+void WWZZProcessor::init() {
+  streamlog_out(DEBUG) << "Initializing." << std::endl;
 
+  _otfile = new TFile(_rootfilename.c_str(), "RECREATE");
+  _tree = new TTree("eventinfo", "events");
 
-void WWZZProcessor::init() { 
-  streamlog_out(DEBUG) << "Initializing." << std::endl ;
-
-  _otfile = new TFile( _rootfilename.c_str() , "RECREATE" );   
-  _tree = new TTree( "eventinfo" , "events" );
-
-  streamlog_out(DEBUG) << "Created file and tree." << std::endl ;
+  streamlog_out(DEBUG) << "Created file and tree." << std::endl;
 
   // Create tree branches and link them to the variables in the info classes
   //
-  _tree->Branch("N_evt",	&_info.evtN,	"N_evt/I");	
+  _tree->Branch("N_evt", &_info.evtN, "N_evt/I");
 
-  _tree->Branch("cross_section",	&_info.process.cross_section,	"cross_section/F");
-  _tree->Branch("e_pol",			&_info.process.e_pol,			"e_pol/I");
-  _tree->Branch("p_pol",			&_info.process.p_pol,			"p_pol/I");
+  _tree->Branch("cross_section", &_info.process.cross_section, "cross_section/F");
+  _tree->Branch("e_pol", &_info.process.e_pol, "e_pol/I");
+  _tree->Branch("p_pol", &_info.process.p_pol, "p_pol/I");
 
-  _tree->Branch("true_event_type",		&_info.true_event_type,		"true_event_type/I");
-  _tree->Branch("passed_preselection",	&_info.passed_preselection,	"passed_preselection/I");
+  _tree->Branch("true_event_type", &_info.true_event_type, "true_event_type/I");
+  _tree->Branch("passed_preselection", &_info.passed_preselection, "passed_preselection/I");
 
-  _tree->Branch("pair1_mass",	&_info.observ.pair1_mass,	"pair1_mass/F");	
-  _tree->Branch("pair2_mass",	&_info.observ.pair2_mass,	"pair2_mass/F");	
+  _tree->Branch("pair1_mass", &_info.observ.pair1_mass, "pair1_mass/F");
+  _tree->Branch("pair2_mass", &_info.observ.pair2_mass, "pair2_mass/F");
 
-  streamlog_out(DEBUG) << "Created tree branches." << std::endl ;
+  streamlog_out(DEBUG) << "Created tree branches." << std::endl;
 
-  _nRun = 0 ;
-  _nEvt = 0 ;
+  _nRun = 0;
+  _nEvt = 0;
 }
 
+void WWZZProcessor::processRunHeader(LCRunHeader* /*run*/) { _nRun++; }
 
-void WWZZProcessor::processRunHeader( LCRunHeader* /*run*/) { 
-    _nRun++ ;
-} 
+void WWZZProcessor::processEvent(LCEvent* evt) {
 
-
-
-void WWZZProcessor::processEvent( LCEvent * evt ) { 
-
-  // this gets called for every event 
+  // this gets called for every event
   // usually the working horse ...
-  
-  streamlog_out(DEBUG) << "Starting to process event " << evt->getEventNumber() 
-     << " in run " << evt->getRunNumber() << std::endl;
+
+  streamlog_out(DEBUG) << "Starting to process event " << evt->getEventNumber() << " in run " << evt->getRunNumber()
+                       << std::endl;
 
   // Reset event variables to default, will be set within processor
   _info.init();
@@ -109,35 +75,33 @@ void WWZZProcessor::processEvent( LCEvent * evt ) {
   // (Get information from the event header (e.g. cross-section))
   // -> Currently unavailable from stdhep file -> Use manual input
   _info.process.cross_section = _cross_section; // evt->getParameters().getFloatVal("CrossSection_fb");
-  _info.process.e_pol = -1; //evt->getParameters().getFloatVal("Pol_em");
-  _info.process.p_pol = +1; //evt->getParameters().getFloatVal("Pol_ep");
+  _info.process.e_pol = -1;                     // evt->getParameters().getFloatVal("Pol_em");
+  _info.process.p_pol = +1;                     // evt->getParameters().getFloatVal("Pol_ep");
 
   streamlog_out(DEBUG) << "Start reading input collections." << std::endl;
 
-	// All of these collections should always be non-empty
-  LCCollection* colAllPFOs   = evt->getCollection( _colAllPFOs ) ;
-  LCCollection* colFastJets  = evt->getCollection( _colFastJets ) ;
-  LCCollection* colMC 			 = evt->getCollection( _colMC ) ;
+  // All of these collections should always be non-empty
+  LCCollection* colAllPFOs = evt->getCollection(_colAllPFOs);
+  LCCollection* colFastJets = evt->getCollection(_colFastJets);
+  LCCollection* colMC = evt->getCollection(_colMC);
 
   // Isoleps could be empty (ideally)
   LCCollection* colIsoleps = NULL;
-  try{
-    colIsoleps = evt->getCollection( _colIsoleps );
-  }
-  catch( lcio::DataNotAvailableException& e )
-  {
+  try {
+    colIsoleps = evt->getCollection(_colIsoleps);
+  } catch (lcio::DataNotAvailableException& e) {
     streamlog_out(WARNING) << _colIsoleps << " collection not available" << std::endl;
     colIsoleps = NULL;
   }
 
   // Call analysis script on event
-  streamlog_out(DEBUG) << "Analysing event." << std::endl ;
+  streamlog_out(DEBUG) << "Analysing event." << std::endl;
 
-  analyseEvent( colMC, colAllPFOs, colFastJets, colIsoleps, _info );
+  analyseEvent(colMC, colAllPFOs, colFastJets, colIsoleps, _info);
 
   streamlog_out(DEBUG) << "Running event selection." << std::endl;
 
-  eventSelection( _info );		
+  eventSelection(_info);
 
   streamlog_out(DEBUG) << "Writing to tree." << std::endl;
 
@@ -146,20 +110,17 @@ void WWZZProcessor::processEvent( LCEvent * evt ) {
 
   streamlog_out(DEBUG) << "Done with event." << std::endl;
 
-  _nEvt ++ ;
+  _nEvt++;
 }
 
-
-void WWZZProcessor::check( LCEvent * /*evt*/ ) { 
+void WWZZProcessor::check(LCEvent* /*evt*/) {
   // nothing to check here - could be used to fill checkplots in reconstruction processor
 }
 
-
-void WWZZProcessor::end(){ 
+void WWZZProcessor::end() {
 
   _otfile->cd();
   _tree->Write();
   _otfile->Close();
   delete _otfile;
 }
-
