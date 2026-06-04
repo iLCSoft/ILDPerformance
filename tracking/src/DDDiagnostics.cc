@@ -399,6 +399,7 @@ void DDDiagnostics::processEvent(LCEvent* evt) {
 
       Track* MarlinRecoTrack = dynamic_cast<Track*>(MarlinTrks->getElementAt(ii));
       MarlinTrkMap[MarlinRecoTrack]++;
+      // TODO: Adapt for FCC
       MarlinTrkHits.push_back(MarlinRecoTrack->getTrackerHits().size());
       FTDHits.push_back(MarlinRecoTrack->getSubdetectorHitNumbers()[4]);
       VXDHits.push_back(MarlinRecoTrack->getSubdetectorHitNumbers()[0]);
@@ -630,6 +631,7 @@ void DDDiagnostics::processEvent(LCEvent* evt) {
 
         FloatVec testWgt = nav.getRelatedToWeights(mcpTracks[ii]);
 
+        // TODO: Adapt for FCC
         int SiHits = ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[0] +
                      ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[2]; // *2 cause there are spacepoints
 
@@ -671,6 +673,7 @@ void DDDiagnostics::processEvent(LCEvent* evt) {
           det_id = encoder[lcio::LCTrackerCellID::subdet()];
 
           // Checking propagation from SIT to VXD
+          // TODO: Adapt for FCC
           if (det_id == lcio::ILDDetID::VXD && layer == 0) {
 
             streamlog_out(DEBUG4) << " Hit on the innermost layer found " << std::endl;
