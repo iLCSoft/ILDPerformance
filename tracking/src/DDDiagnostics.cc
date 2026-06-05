@@ -328,6 +328,12 @@ void DDDiagnostics::initParameters(void) {
 
   registerProcessorParameter("FillBigTTree", "Fill the more detail information into TTree for DEBUG.", _fillBigTTree,
                              bool(false));
+  registerOptionalParameter("DD4hepXMLFile",
+                            "Path to the DD4hep compact XML file. "
+                            "If set, used to determine the detector model family "
+                            "(FCCee vs ILC) for subdetector hit index mapping. "
+                            "If absent, ILC indices are used (legacy behaviour).",
+                            _dd4hepXMLFile, std::string(""));
 }
 
 DDDiagnostics::DDDiagnostics() : Processor("DDDiagnostics") {
@@ -350,6 +356,17 @@ void DDDiagnostics::init() {
 
   PI = (double)acos((double)(-1.0));
   TWOPI = (double)(2.0) * PI;
+
+  // Determine detector model family from the compact XML path.
+  // FCCee models live under a "FCCee/" subfolder; ILC models do not.
+  if (!_dd4hepXMLFile.empty()) {
+    _isFCCee = (_dd4hepXMLFile.find("/FCCee/") != std::string::npos);
+    streamlog_out(MESSAGE) << " DDDiagnostics: detector model family: " << (_isFCCee ? "ILD@FCCee" : "ILD@ILC")
+                           << "  (from DD4hepXMLFile = \"" << _dd4hepXMLFile << "\")" << std::endl;
+  } else {
+    streamlog_out(WARNING) << " DDDiagnostics: DD4hepXMLFile not set, " << "assuming ILD@ILC subdetector hit indices."
+                           << std::endl;
+  }
 }
 
 void DDDiagnostics::processRunHeader(LCRunHeader* run) {
@@ -399,12 +416,20 @@ void DDDiagnostics::processEvent(LCEvent* evt) {
 
       Track* MarlinRecoTrack = dynamic_cast<Track*>(MarlinTrks->getElementAt(ii));
       MarlinTrkMap[MarlinRecoTrack]++;
-      // TODO: Adapt for FCC
-      MarlinTrkHits.push_back(MarlinRecoTrack->getTrackerHits().size());
-      FTDHits.push_back(MarlinRecoTrack->getSubdetectorHitNumbers()[4]);
-      VXDHits.push_back(MarlinRecoTrack->getSubdetectorHitNumbers()[0]);
-      TPCHits.push_back(MarlinRecoTrack->getSubdetectorHitNumbers()[6]);
-      SITHits.push_back(MarlinRecoTrack->getSubdetectorHitNumbers()[2]);
+
+      // --- per-track subdetector hits filled into the TTree branches ---
+      if (_isFCCee) {
+        VXDHits.push_back(MarlinRecoTrack->getSubdetectorHitNumbers()[FCC_IDX_VXD_B] +
+                          MarlinRecoTrack->getSubdetectorHitNumbers()[FCC_IDX_VXD_E]);
+        SITHits.push_back(MarlinRecoTrack->getSubdetectorHitNumbers()[FCC_IDX_IT_B]);
+        FTDHits.push_back(MarlinRecoTrack->getSubdetectorHitNumbers()[FCC_IDX_IT_E]);
+        TPCHits.push_back(MarlinRecoTrack->getSubdetectorHitNumbers()[FCC_IDX_TPC]);
+      } else {
+        VXDHits.push_back(MarlinRecoTrack->getSubdetectorHitNumbers()[ILC_IDX_VXD]);
+        SITHits.push_back(MarlinRecoTrack->getSubdetectorHitNumbers()[ILC_IDX_SIT]);
+        FTDHits.push_back(MarlinRecoTrack->getSubdetectorHitNumbers()[ILC_IDX_FTD]);
+        TPCHits.push_back(MarlinRecoTrack->getSubdetectorHitNumbers()[ILC_IDX_TPC]);
+      }
     }
   }
 
@@ -631,16 +656,30 @@ void DDDiagnostics::processEvent(LCEvent* evt) {
 
         FloatVec testWgt = nav.getRelatedToWeights(mcpTracks[ii]);
 
-        // TODO: Adapt for FCC
-        int SiHits = ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[0] +
-                     ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[2]; // *2 cause there are spacepoints
+        int SiHits = 0;
+        int TotalHits = 0;
+        int TotalHitsInFit = 0;
 
-        int TotalHits = ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[0] +
-                        ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[2] +
-                        ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[6];
-        int TotalHitsInFit = ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[1] +
-                             ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[3] +
-                             ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[7];
+        if (_isFCCee) {
+          SiHits = ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[FCC_IDX_VXD_B] +
+                   ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[FCC_IDX_VXD_E] +
+                   ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[FCC_IDX_IT_B] +
+                   ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[FCC_IDX_IT_E];
+          TotalHits = SiHits + ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[FCC_IDX_TPC];
+          TotalHitsInFit = ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[FCC_IDX_VXD_B + 1] +
+                           ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[FCC_IDX_VXD_E + 1] +
+                           ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[FCC_IDX_IT_B + 1] +
+                           ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[FCC_IDX_IT_E + 1] +
+                           ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[FCC_IDX_TPC + 1];
+        } else {
+          SiHits = ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[ILC_IDX_VXD] +
+                   ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[ILC_IDX_SIT];
+          TotalHits = SiHits + ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[ILC_IDX_FTD] +
+                      ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[ILC_IDX_TPC];
+          TotalHitsInFit = ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[ILC_IDX_VXD + 1] +
+                           ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[ILC_IDX_SIT + 1] +
+                           ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[ILC_IDX_TPC + 1];
+        }
 
         streamlog_out(DEBUG4) << " MCParticle " << mcpTracks[ii] << " index " << jj << " track " << trkvec[jj]
                               << " purity " << testFromWgt[jj] << " Silicon hits " << SiHits << " total hits "

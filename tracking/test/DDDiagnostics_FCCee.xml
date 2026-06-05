@@ -10,6 +10,11 @@
 
 <marlin>
 
+  <constants>
+    <constant name="DetectorCompactFile"
+              value="FCCee/ILD_FCCee/compact/ILD_FCCee_v01/ILD_FCCee_v01.xml"/>
+  </constants>
+
   <execute>
     <processor name="MyAIDAProcessor"/>
     <processor name="InitDD4hep"/>
@@ -41,10 +46,16 @@
   <processor name="InitDD4hep" type="InitializeDD4hep">
     <!--InitializeDD4hep reads a compact xml file and initializes the DD4hep::LCDD object-->
     <!--Name of the DD4hep compact xml file to load-->
-    <parameter name="DD4hepXMLFile" type="string"> $K4GEO/FCCee/ILD_FCCee/compact/ILD_FCCee_v01/ILD_FCCee_v01.xml </parameter>
+    <parameter name="DD4hepXMLFile" type="string">
+      $K4GEO/${DetectorCompactFile}
+    </parameter>
   </processor>
 
   <processor name="MyDiagnostics" type="DDDiagnostics">
+    <!--Name of the DD4hep compact xml file to load-->
+    <parameter name="DD4hepXMLFile" type="string">
+      $K4GEO/${DetectorCompactFile}
+    </parameter>
     <!--Fill the more detail information into TTree for DEBUG.-->
     <parameter name="FillBigTTree" type="bool">false </parameter>
     <!--Name of the studied track collection-->
