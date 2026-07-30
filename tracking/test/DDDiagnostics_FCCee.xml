@@ -59,11 +59,11 @@
     <!--Fill the more detail information into TTree for DEBUG.-->
     <parameter name="FillBigTTree" type="bool">false </parameter>
     <!--Name of the studied track collection-->
-    <parameter name="StudiedTracks" type="string" lcioInType="Track"> RefittedCluWithSiTracks </parameter>
+    <parameter name="StudiedTracks" type="string" lcioInType="Track"> MarlinTrkTracks </parameter>
     <!--true - reco relation collection-->
-    <parameter name="MCTracksTruthLinkCollectionName" type="string" lcioInType="Track"> MCTruthRefittedCluWithSiTracksLink </parameter>
+    <parameter name="MCTracksTruthLinkCollectionName" type="string" lcioInType="Track"> MCTruthMarlinTrkTracksLink </parameter>
     <!--reco - true relation collection-->
-    <parameter name="TracksMCTruthLinkCollectionName" type="string" lcioInType="Track"> LinkerCluWithSiTrackRelations </parameter>
+    <parameter name="TracksMCTruthLinkCollectionName" type="string" lcioInType="Track"> MarlinTrkTracksMCTruthLink </parameter>
     <!--Name of the MCParticle input collection-->
     <parameter name="MCParticleCollection" type="string" lcioInType="MCParticle"> MCParticle </parameter>
     <!--Enables cuts to define the examined track sample-->
