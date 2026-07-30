@@ -29,7 +29,7 @@ Mom=('1' '3' '5' '10' '15' '25' '50' '100' '200')
 # Set to 'true' to run only one angle/momentum combination and stop after DDDiagnostics
 DEBUG=true
 if [[ "${DEBUG}" == "true" ]]; then
-	echo ">>> DEBUG MODE: running single angle=${PolarAngles[0]}, momentum=${Mom[0]} only <<<"
+	echo ">>> DEBUG MODE: running single angle=${PolarAngles[3]}, momentum=${Mom[6]} only <<<"
 	PolarAngles=("${PolarAngles[3]}")
 	Mom=("${Mom[6]}")
 fi
