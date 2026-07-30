@@ -10,6 +10,10 @@ ILCSOFTVER=key4hep_night
 
 . /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh
 
+ILDCONFIGDIR=$codeDir/ILDConfig/StandardConfig/production
+ILDRECO=${ILDCONFIGDIR}/ILDReconstruction.py
+export PYTHONPATH=${ILDCONFIGDIR}:${PYTHONPATH}
+
 # Set compact file root directory depending on detector model
 if [[ "${ILDMODELRECO}" == ILD_FCCee_v01 ||
       "${ILDMODELRECO}" == ILD_FCCee_v02 ]]; then
@@ -58,7 +62,7 @@ for i in "${!PolarAngles[@]}"; do
 			--inputFiles Results/GenFiles/mcparticles_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio \
 			--outputFile Results/SimFiles/${ILDMODELSIM}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
 			--compactFile ${COMPACTFILEDIR}/${ILDMODELSIM}/${ILDMODELSIM}.xml \
-			--steeringFile ddsim_steer.py \
+			--steeringFile ${ILDCONFIGDIR}/ddsim_steer.py \
 			--numberOfEvents -1 &
 
 	done
@@ -80,16 +84,16 @@ for i in "${!PolarAngles[@]}"; do
 			EXTRA_FLAGS=(--trackMerge --doHLR)
 		fi
 
-		k4run ILDReconstruction.py \
+        k4run ${ILDRECO} \
 			--detectorModel ${ILDMODELRECO} \
 			--inputFiles Results/SimFiles/${ILDMODELSIM}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
 			--noBeamCalReco \
 			--outputFileBase Results/RecoFiles/${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
 			--lcioOutput only \
 			--usingParticleGun \
-			"${EXTRA_FLAGS[@]}" \
-			-n -1
-		>${LOGFILEPATH}/RECO_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.out &
+                        "${EXTRA_FLAGS[@]}" \
+			-n -1 \
+		>${TESTDIR}/${LOGFILEPATH}/RECO_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.out &
 
 		#		Marlin MarlinStdReco.xml \
 		#			--constant..DetectorModel=ILD_l5_o1_v02 \
