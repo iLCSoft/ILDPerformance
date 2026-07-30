@@ -37,6 +37,7 @@ fi
 
 OUTPUTPATH=../Results/MonitorPlots
 LOGFILEPATH=logFiles
+TESTDIR=$(pwd)
 #==================================================
 # GENERATION - particle gun
 for i in "${!PolarAngles[@]}"; do
@@ -74,6 +75,7 @@ wait
 
 #==================================================
 # RECONSTRUCTION
+cd "${ILDCONFIGDIR}"
 for i in "${!PolarAngles[@]}"; do
 
 	for j in "${!Mom[@]}"; do
@@ -86,9 +88,9 @@ for i in "${!PolarAngles[@]}"; do
 
         k4run ${ILDRECO} \
 			--detectorModel ${ILDMODELRECO} \
-			--inputFiles Results/SimFiles/${ILDMODELSIM}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
+			--inputFiles ${TESTDIR}/Results/SimFiles/${ILDMODELSIM}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
 			--noBeamCalReco \
-			--outputFileBase Results/RecoFiles/${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
+			--outputFileBase ${TESTDIR}/Results/RecoFiles/${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
 			--lcioOutput only \
 			--usingParticleGun \
                         "${EXTRA_FLAGS[@]}" \
@@ -108,6 +110,7 @@ for i in "${!PolarAngles[@]}"; do
 	wait
 done
 wait
+cd "${TESTDIR}"
 
 # move all to folder RecoFiles
 # mv ${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_*_Mom_*_REC.slcio Results/RecoFiles
