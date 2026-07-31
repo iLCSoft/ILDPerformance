@@ -1,5 +1,13 @@
 #!/bin/bash
-#
+
+# --- Setup Environment ---
+if [ -z "${KEY4HEP_STACK:-}" ]; then
+    source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh
+fi
+
+# Enable strict error tracking for production/pipeline safety
+set -euo pipefail
+
 #==============================================================
 # Running shell script in parallel over multiple cores
 #==============================================================
@@ -7,8 +15,6 @@
 ILDMODELRECO=ILD_FCCee_v01 # ILD_l5_o1_v02
 ILDMODELSIM=ILD_FCCee_v01 # ILD_l5_v02
 ILCSOFTVER=key4hep_night
-
-. /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh
 
 ILDCONFIGDIR=$codeDir/ILDConfig/StandardConfig/production
 ILDRECO=${ILDCONFIGDIR}/ILDReconstruction.py
