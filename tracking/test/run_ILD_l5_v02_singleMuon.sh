@@ -60,7 +60,7 @@ for i in "${!PolarAngles[@]}"; do
 	for j in "${!Mom[@]}"; do
 
 		GENFILE="Results/GenFiles/mcparticles_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio"
-		if [[ -s "${GENFILE}" && "${RERUN_GEN}"!="true" ]]; then
+		if [[ -s "${GENFILE}" && "${RERUN_GEN}" != "true" ]]; then
 			echo "${GENFILE} exists, skipping generation."
 			continue
 		fi
@@ -81,7 +81,7 @@ for i in "${!PolarAngles[@]}"; do
 	for j in "${!Mom[@]}"; do
 
 		SIMFILE="Results/SimFiles/${ILDMODELSIM}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio"
-		if [[ -s "${SIMFILE}" && "${RERUN_SIM}"!="true" ]]; then
+		if [[ -s "${SIMFILE}" && "${RERUN_SIM}" != "true" ]]; then
 			echo "${SIMFILE} exists, skipping simulation."
 			continue
 		fi
@@ -109,7 +109,7 @@ for i in "${!PolarAngles[@]}"; do
 
 		RECOBASE="${TESTDIR}/Results/RecoFiles/${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}"
 		RECOFILE="${RECOBASE}_REC.slcio"
-		if [[ -s "${RECOFILE}" && "${RERUN_RECO}"!="true" ]]; then
+		if [[ -s "${RECOFILE}" && "${RERUN_RECO}" != "true" ]]; then
 			echo "${RECOFILE} exists, skipping reconstruction."
 			continue
 		fi
