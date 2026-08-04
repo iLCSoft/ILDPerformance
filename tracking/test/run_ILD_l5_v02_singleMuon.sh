@@ -12,6 +12,18 @@ set -euo pipefail
 # Running shell script in parallel over multiple cores
 #==============================================================
 
+# ------------------
+# Set 'true' to recreate the corresponding files even if they exist
+RERUN_GEN=false
+RERUN_SIM=false
+RERUN_RECO=false
+# ------------------
+
+# --- DEBUG MODE ---
+# Set to 'true' to run only one angle/momentum combination and stop after DDDiagnostics
+DEBUG=true
+# ------------------
+
 ILDMODELRECO=ILD_FCCee_v01 # ILD_l5_o1_v02
 ILDMODELSIM=ILD_FCCee_v01  # ILD_l5_v02
 ILCSOFTVER=key4hep_night
@@ -19,6 +31,19 @@ ILCSOFTVER=key4hep_night
 ILDCONFIGDIR=$codeDir/ILDConfig/StandardConfig/production
 ILDRECO=${ILDCONFIGDIR}/ILDReconstruction.py
 export PYTHONPATH=${ILDCONFIGDIR}:${PYTHONPATH}
+
+PolarAngles=('10' '20' '40' '85')
+Mom=('1' '3' '5' '10' '15' '25' '50' '100' '200')
+
+OUTPUTPATH=../Results/MonitorPlots
+LOGFILEPATH=logFiles
+TESTDIR=$(pwd)
+
+if [[ "${DEBUG}" == "true" ]]; then
+	echo ">>> DEBUG MODE: running single angle=${PolarAngles[3]}, momentum=${Mom[6]} only <<<"
+	PolarAngles=("${PolarAngles[3]}")
+	Mom=("${Mom[6]}")
+fi
 
 # Set compact file root directory depending on detector model
 if [[ "${ILDMODELRECO}" == ILD_FCCee_v01 ||
@@ -28,27 +53,6 @@ else
 	COMPACTFILEDIR=$lcgeo_DIR/ILD/compact
 fi
 
-PolarAngles=('10' '20' '40' '85')
-Mom=('1' '3' '5' '10' '15' '25' '50' '100' '200')
-
-# --- DEBUG MODE ---
-# Set to 'true' to run only one angle/momentum combination and stop after DDDiagnostics
-DEBUG=true
-if [[ "${DEBUG}" == "true" ]]; then
-	echo ">>> DEBUG MODE: running single angle=${PolarAngles[3]}, momentum=${Mom[6]} only <<<"
-	PolarAngles=("${PolarAngles[3]}")
-	Mom=("${Mom[6]}")
-fi
-# ------------------
-# Set 'true' to recreate the corresponding files even if they exist
-RERUN_GEN=false
-RERUN_SIM=false
-RERUN_RECO=false
-# ------------------
-
-OUTPUTPATH=../Results/MonitorPlots
-LOGFILEPATH=logFiles
-TESTDIR=$(pwd)
 #==================================================
 # GENERATION - particle gun
 for i in "${!PolarAngles[@]}"; do
