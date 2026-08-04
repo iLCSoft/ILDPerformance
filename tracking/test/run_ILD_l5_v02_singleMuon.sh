@@ -77,7 +77,7 @@ for i in "${!PolarAngles[@]}"; do
 	for j in "${!Mom[@]}"; do
 
 		SIMFILE="Results/SimFiles/${ILDMODELSIM}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio"
-		if [[ -s "${SIMFILE}" && "${RERUN_SIM}"!="true"]]; then
+		if [[ -s "${SIMFILE}" && "${RERUN_SIM}"!="true" ]]; then
 			echo "${SIMFILE} exists, skipping simulation."
 			continue
 		fi
