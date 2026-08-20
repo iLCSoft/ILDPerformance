@@ -351,6 +351,7 @@ void DDDiagnostics::init() {
   nEvt = 0;
 
   _bField = MarlinUtil::getBzAtOrigin();
+  streamlog_out(DEBUG4) << "bField: " << _bField << std::endl;
 
   gROOT->ProcessLine("#include <vector>");
 
