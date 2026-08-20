@@ -40,9 +40,9 @@ LOGFILEPATH=logFiles
 TESTDIR=$(pwd)
 
 if [[ "${DEBUG}" == "true" ]]; then
-	echo ">>> DEBUG MODE: running single angle=${PolarAngles[3]}, momentum=${Mom[6]} only <<<"
 	PolarAngles=("${PolarAngles[3]}")
 	Mom=("${Mom[6]}")
+	echo ">>> DEBUG MODE: running single angle=${PolarAngles}, momentum=${Mom} only <<<"
 fi
 
 # Set compact file root directory depending on detector model
