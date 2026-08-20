@@ -713,8 +713,14 @@ void DDDiagnostics::processEvent(LCEvent* evt) {
 
           // Checking propagation from SIT to VXD
           // TODO: Adapt for FCC
-          if (det_id == lcio::ILDDetID::VXD && layer == 0) {
+          bool isInnermostVXDHit = false;
+          if (_isFCCee) {
+            isInnermostVXDHit = ((det_id == FCC_DETID_VXD_B || det_id == FCC_DETID_VXD_E) && layer == 0);
+          } else {
+            isInnermostVXDHit = (det_id == lcio::ILDDetID::VXD && layer == 0);
+          }
 
+          if (isInnermostVXDHit) {
             streamlog_out(DEBUG4) << " Hit on the innermost layer found " << std::endl;
             IPFlag = 1;
           }

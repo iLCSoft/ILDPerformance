@@ -125,6 +125,10 @@ protected:
   // detector model flag (set in init() from DD4hepXMLFile path)
   bool _isFCCee = false;
 
+  // --- FCC-ee subdet() (cellID) IDs, distinct from the standard lcio::ILDDetID enum ---
+  static constexpr int FCC_DETID_VXD_B = 1; // matches lcio::ILDDetID::VXD numerically, but FCC-specific
+  static constexpr int FCC_DETID_VXD_E = 2; // NOT the same detector as lcio::ILDDetID::SIT, despite same int value
+
   // --- subdetector hit number indices: index = 2*(ILDDetID-1) ---
   // ILD@ILC
   static constexpr int ILC_IDX_VXD = 0; // ILDDetID_VXD = 1
