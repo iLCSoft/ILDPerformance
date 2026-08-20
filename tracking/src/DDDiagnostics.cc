@@ -418,15 +418,6 @@ void DDDiagnostics::processEvent(LCEvent* evt) {
       Track* MarlinRecoTrack = dynamic_cast<Track*>(MarlinTrks->getElementAt(ii));
       MarlinTrkMap[MarlinRecoTrack]++;
 
-      // --- TEMPORARY: dump the full subdetector hit-number array ---
-      IntVec allHitNumbers = MarlinRecoTrack->getSubdetectorHitNumbers();
-      std::stringstream ss;
-      for (size_t k = 0; k < allHitNumbers.size(); ++k) {
-        ss << "[" << k << "]=" << allHitNumbers[k] << " ";
-      }
-      streamlog_out(MESSAGE) << "DEBUG full getSubdetectorHitNumbers(): " << ss.str() << std::endl;
-      // --- END TEMPORARY ---
-
       // --- per-track subdetector hits filled into the TTree branches ---
       if (_isFCCee) {
         VXDHits.push_back(MarlinRecoTrack->getSubdetectorHitNumbers()[FCC_IDX_VXD_B] +
@@ -451,18 +442,6 @@ void DDDiagnostics::processEvent(LCEvent* evt) {
     LCCollection* mcpToTrk = evt->getCollection(_trueToReco);
     LCRelationNavigator nav(mcpToTrk);
     LCIterator<MCParticle> mcpIt(evt, _mcParticleCollectionName);
-
-    // --- TEMPORARY DEBUG INSTRUMENTATION ---
-    streamlog_out(MESSAGE) << "DEBUG: _mcParticleCollectionName = '" << _mcParticleCollectionName << "' (length "
-                           << _mcParticleCollectionName.size() << ")" << std::endl;
-    try {
-      LCCollection* mcpColDirect = evt->getCollection(_mcParticleCollectionName);
-      streamlog_out(MESSAGE) << "DEBUG: direct getCollection() succeeded, " << mcpColDirect->getNumberOfElements()
-                             << " elements, type='" << mcpColDirect->getTypeName() << "'" << std::endl;
-    } catch (DataNotAvailableException& e) {
-      streamlog_out(MESSAGE) << "DEBUG: direct getCollection() THREW: " << e.what() << std::endl;
-    }
-    // --- END TEMPORARY DEBUG INSTRUMENTATION ---
 
     //-----------------------------------------------------------------------------------------------------
     // Creating the MCParticle hitmaps for VXD, SIT and TPC
@@ -732,10 +711,6 @@ void DDDiagnostics::processEvent(LCEvent* evt) {
           int det_id = 0;
           layer = encoder[lcio::LCTrackerCellID::layer()];
           det_id = encoder[lcio::LCTrackerCellID::subdet()];
-
-          // TEMPORARY: confirm subdet ID scheme for FCC-ee
-          streamlog_out(MESSAGE) << "DEBUG det_id=" << det_id << " (lcio::ILDDetID::VXD=" << lcio::ILDDetID::VXD << ")"
-                                 << " layer=" << layer << std::endl;
 
           // Checking propagation from SIT to VXD
           // TODO: Adapt for FCC
