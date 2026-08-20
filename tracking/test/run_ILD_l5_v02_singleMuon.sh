@@ -131,14 +131,14 @@ for i in "${!PolarAngles[@]}"; do
 			-n -1 \
 			>${TESTDIR}/${LOGFILEPATH}/RECO_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.out &
 
-		#		Marlin MarlinStdReco.xml \
-		#			--constant..DetectorModel=ILD_l5_o1_v02 \
-		#			--global.LCIOInputFiles=Results/SimFiles/${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
-		#			--constant.RunBeamCalReco=false \
-		#			--constant.lcgeo_DIR=$lcgeo_DIR \
-		#			--constant.OutputBaseName=${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
-		#			--MyRecoMCTruthLinker.UsingParticleGun=true \
-		#			>${LOGFILEPATH}/RECO_${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.out &
+		#        Marlin ${ILDCONFIGDIR}/MarlinStdReco.xml \
+		#            --constant.DetectorModel=${ILDMODELRECO} \
+		#            --global.LCIOInputFiles=${TESTDIR}/Results/SimFiles/${ILDMODELSIM}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
+		#            --constant.RunBeamCalReco=false \
+		#            --constant.lcgeo_DIR=$lcgeo_DIR \
+		#            --constant.OutputBaseName=${RECOBASE} \
+		#            --MyRecoMCTruthLinker.UsingParticleGun=true \
+		#            >${TESTDIR}/${LOGFILEPATH}/RECO_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.out &
 
 	done
 	wait
