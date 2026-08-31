@@ -46,7 +46,16 @@ outfile = sys.argv[3]
 # "file_{}.dat".format(i)
 # "file_%s.dat" % i
 
-wrt.open(outfile, EVENT.LCIO.WRITE_NEW)
+try:
+    wrt.open(str(outfile), EVENT.LCIO.WRITE_NEW)
+except Exception as e:
+    print(
+        f"Error opening output file '{outfile}'.\n"
+        "Have you executed >prepareWorkingFolders.sh<?\n"
+        "Error: {e}",
+        file=sys.stderr,
+    )
+    sys.exit(1)
 
 genstat = 1
 pdg = sys.argv[4]

@@ -122,6 +122,27 @@ protected:
 
   float _bField = 0.0;
 
+  // detector model flag (set in init() from DD4hepXMLFile path)
+  bool _isFCCee = false;
+
+  // --- FCC-ee subdet() (cellID) IDs, distinct from the standard lcio::ILDDetID enum ---
+  static constexpr int FCC_DETID_VXD_B = 1; // matches lcio::ILDDetID::VXD numerically, but FCC-specific
+  static constexpr int FCC_DETID_VXD_E = 2; // NOT the same detector as lcio::ILDDetID::SIT, despite same int value
+
+  // --- subdetector hit number indices: index = 2*(ILDDetID-1) ---
+  // ILD@ILC
+  static constexpr int ILC_IDX_VXD = 0; // ILDDetID_VXD = 1
+  static constexpr int ILC_IDX_SIT = 2; // ILDDetID_SIT = 2
+  static constexpr int ILC_IDX_FTD = 4; // ILDDetID_FTD = 3
+  static constexpr int ILC_IDX_TPC = 6; // ILDDetID_TPC = 4
+
+  // ILD@FCCee (CLD silicon detectors)
+  static constexpr int FCC_IDX_VXD_B = 0; // DetID_VXD_Barrel = 1
+  static constexpr int FCC_IDX_VXD_E = 2; // DetID_VXD_Endcap = 2
+  static constexpr int FCC_IDX_IT_B = 4;  // DetID_IT_Barrel  = 3
+  static constexpr int FCC_IDX_TPC = 6;   // ILDDetID_TPC     = 4 (unchanged)
+  static constexpr int FCC_IDX_IT_E = 8;  // DetID_IT_Endcap  = 5
+
   bool _trkEffOn = false;
   bool _siTrkEffOn = false;
   bool _physSampleOn = false;
@@ -133,6 +154,7 @@ protected:
   int _minSiHits = 0;
   bool _reqInnVXDHit = false;
   bool _fillBigTTree = false;
+  std::string _dd4hepXMLFile = "";
 
 private:
   // declaration of trees

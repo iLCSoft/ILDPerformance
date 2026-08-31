@@ -1,27 +1,71 @@
 #!/bin/bash
-#
+
+# --- Setup Environment ---
+if [ -z "${KEY4HEP_STACK:-}" ]; then
+	source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh
+fi
+
+# Enable strict error tracking for production/pipeline safety
+set -euo pipefail
+
 #==============================================================
 # Running shell script in parallel over multiple cores
 #==============================================================
 
-ILDMODELRECO=ILD_l5_o1_v02
-ILDMODELSIM=ILD_l5_v02
+# ------------------
+# Set 'true' to recreate the corresponding files even if they exist
+RERUN_GEN=false
+RERUN_SIM=false
+RERUN_RECO=false
+# ------------------
+
+# --- DEBUG MODE ---
+# Set to 'true' to run only one angle/momentum combination and stop after DDDiagnostics
+DEBUG=true
+# ------------------
+
+ILDMODELRECO=ILD_FCCee_v01 # ILD_l5_o1_v02
+ILDMODELSIM=ILD_FCCee_v01  # ILD_l5_v02
 ILCSOFTVER=key4hep_night
 
-. /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh
+ILDCONFIGDIR=$codeDir/ILDConfig/StandardConfig/production
+ILDRECO=${ILDCONFIGDIR}/ILDReconstruction.py
+export PYTHONPATH=${ILDCONFIGDIR}:${PYTHONPATH}
 
 PolarAngles=('10' '20' '40' '85')
 Mom=('1' '3' '5' '10' '15' '25' '50' '100' '200')
 
 OUTPUTPATH=../Results/MonitorPlots
 LOGFILEPATH=logFiles
+TESTDIR=$(pwd)
+
+if [[ "${DEBUG}" == "true" ]]; then
+	PolarAngles=("${PolarAngles[3]}")
+	Mom=("${Mom[6]}")
+	echo ">>> DEBUG MODE: running single angle=${PolarAngles}, momentum=${Mom} only <<<"
+fi
+
+# Set compact file root directory depending on detector model
+if [[ "${ILDMODELRECO}" == ILD_FCCee_v01 ||
+	"${ILDMODELRECO}" == ILD_FCCee_v02 ]]; then
+	COMPACTFILEDIR=$K4GEO/FCCee/ILD_FCCee/compact
+else
+	COMPACTFILEDIR=$lcgeo_DIR/ILD/compact
+fi
+
 #==================================================
 # GENERATION - particle gun
-for i in {0..3}; do
+for i in "${!PolarAngles[@]}"; do
 
-	for j in {0..8}; do
+	for j in "${!Mom[@]}"; do
 
-		python lcio_particle_gun.py ${Mom[j]} ${PolarAngles[i]} Results/GenFiles/mcparticles_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio 13 -1. &
+		GENFILE="Results/GenFiles/mcparticles_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio"
+		if [[ -s "${GENFILE}" && "${RERUN_GEN}" != "true" ]]; then
+			echo "${GENFILE} exists, skipping generation."
+			continue
+		fi
+
+		python lcio_particle_gun.py ${Mom[j]} ${PolarAngles[i]} ${GENFILE} 13 -1. &
 
 	done
 
@@ -32,15 +76,21 @@ wait
 
 #==================================================
 # SIMULATION
-for i in {0..3}; do
+for i in "${!PolarAngles[@]}"; do
 
-	for j in {0..8}; do
+	for j in "${!Mom[@]}"; do
+
+		SIMFILE="Results/SimFiles/${ILDMODELSIM}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio"
+		if [[ -s "${SIMFILE}" && "${RERUN_SIM}" != "true" ]]; then
+			echo "${SIMFILE} exists, skipping simulation."
+			continue
+		fi
 
 		ddsim \
 			--inputFiles Results/GenFiles/mcparticles_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.slcio \
-			--outputFile Results/SimFiles/${ILDMODELSIM}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
-			--compactFile $lcgeo_DIR/ILD/compact/${ILDMODELSIM}/${ILDMODELSIM}.xml \
-			--steeringFile ddsim_steer.py \
+			--outputFile ${SIMFILE} \
+			--compactFile ${COMPACTFILEDIR}/${ILDMODELSIM}/${ILDMODELSIM}.xml \
+			--steeringFile ${ILDCONFIGDIR}/ddsim_steer.py \
 			--numberOfEvents -1 &
 
 	done
@@ -52,55 +102,75 @@ wait
 
 #==================================================
 # RECONSTRUCTION
-for i in {0..3}; do
+cd "${ILDCONFIGDIR}"
+for i in "${!PolarAngles[@]}"; do
 
-	for j in {0..8}; do
+	for j in "${!Mom[@]}"; do
 
-		k4run ILDReconstruction.py \
+		RECOBASE="${TESTDIR}/Results/RecoFiles/${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}"
+		RECOFILE="${RECOBASE}_REC.slcio"
+		if [[ -s "${RECOFILE}" && "${RERUN_RECO}" != "true" ]]; then
+			echo "${RECOFILE} exists, skipping reconstruction."
+			continue
+		fi
+
+		EXTRA_FLAGS=()
+		if [[ "${ILDMODELRECO}" == "ILD_FCCee_v01" ||
+			"${ILDMODELRECO}" == "ILD_FCCee_v02" ]]; then
+			EXTRA_FLAGS=(--trackMerge --doHLR)
+		fi
+
+		k4run ${ILDRECO} \
 			--detectorModel ${ILDMODELRECO} \
-			--inputFiles Results/SimFiles/${ILDMODELSIM}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
+			--inputFiles ${TESTDIR}/Results/SimFiles/${ILDMODELSIM}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
 			--noBeamCalReco \
-			--outputFileBase Results/RecoFiles/${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
+			--outputFileBase ${RECOBASE} \
 			--lcioOutput only \
 			--usingParticleGun \
-			-n -1
-		>${LOGFILEPATH}/RECO_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.out &
+			"${EXTRA_FLAGS[@]}" \
+			-n -1 \
+			>${TESTDIR}/${LOGFILEPATH}/RECO_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.out &
 
-		#		Marlin MarlinStdReco.xml \
-		#			--constant..DetectorModel=ILD_l5_o1_v02 \
-		#			--global.LCIOInputFiles=Results/SimFiles/${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
-		#			--constant.RunBeamCalReco=false \
-		#			--constant.lcgeo_DIR=$lcgeo_DIR \
-		#			--constant.OutputBaseName=${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
-		#			--MyRecoMCTruthLinker.UsingParticleGun=true \
-		#			>${LOGFILEPATH}/RECO_${ILDMODEL}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.out &
+		#        Marlin ${ILDCONFIGDIR}/MarlinStdReco.xml \
+		#            --constant.DetectorModel=${ILDMODELRECO} \
+		#            --global.LCIOInputFiles=${TESTDIR}/Results/SimFiles/${ILDMODELSIM}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
+		#            --constant.RunBeamCalReco=false \
+		#            --constant.lcgeo_DIR=$lcgeo_DIR \
+		#            --constant.OutputBaseName=${RECOBASE} \
+		#            --MyRecoMCTruthLinker.UsingParticleGun=true \
+		#            >${TESTDIR}/${LOGFILEPATH}/RECO_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.out &
 
 	done
 	wait
 done
 wait
+cd "${TESTDIR}"
 
 # move all to folder RecoFiles
 # mv ${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_*_Mom_*_REC.slcio Results/RecoFiles
 
-# cleanup
-rm ${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_*_Mom_*_DST.slcio
-rm ${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_*_Mom_*_AIDA.root
-rm ${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_*_Mom_*_PfoAnalysis.root
-
 #==================================================
 # start Diagnostics
-for i in {0..3}; do
+for i in "${!PolarAngles[@]}"; do
 
-	for j in {0..8}; do
+	for j in "${!Mom[@]}"; do
 
 		# diagnostics
 
 		INFILE=Results/RecoFiles/${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_REC.slcio
 
-		Marlin DDDiagnostics.xml \
+		# default steering file
+		STEERING_FILE="DDDiagnostics.xml"
+
+		# override for FCCee models
+		if [[ "${ILDMODELRECO}" == ILD_FCCee_v01 ||
+			"${ILDMODELRECO}" == ILD_FCCee_v02 ]]; then
+			STEERING_FILE="DDDiagnostics_FCCee.xml"
+		fi
+
+		Marlin "${STEERING_FILE}" \
 			--global.LCIOInputFiles=$INFILE \
-			--InitDD4hep.DD4hepXMLFile=$lcgeo_DIR/ILD/compact/${ILDMODELRECO}/${ILDMODELRECO}.xml \
+			--InitDD4hep.DD4hepXMLFile=${COMPACTFILEDIR}/${ILDMODELRECO}/${ILDMODELRECO}.xml \
 			--MyAIDAProcessor.FileName=analysis_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
 			--MyDiagnostics.FillBigTTree=true \
 			--MyDiagnostics.PhysSampleOn=false \
@@ -111,10 +181,17 @@ for i in {0..3}; do
 done
 wait
 
-# copy output by removing the "${ILCSOFTVER}"
-for i in {0..3}; do
+# --- DEBUG MODE early exit ---
+if [[ "${DEBUG}" == "true" ]]; then
+	echo ">>> DEBUG MODE: stopping after DDDiagnostics. Skipping analysis file copies and ROOT macros. <<<"
+	exit 0
+fi
+# ----------------------------
 
-	for j in {0..8}; do
+# copy output by removing the "${ILCSOFTVER}"
+for i in "${!PolarAngles[@]}"; do
+
+	for j in "${!Mom[@]}"; do
 
 		cp analysis_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.root ../Results/Analysis/analysis_${ILDMODELRECO}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.root
 
@@ -140,7 +217,6 @@ root -b -q "D0ResolutionL5.C(\"${ILDMODELRECO}\")"
 root -b -q "PResolutionL5.C(\"${ILDMODELRECO}\")"
 root -b -q "meanL5.C(\"${ILDMODELRECO}\")"
 root -b -q "sigmaL5.C(\"${ILDMODELRECO}\")"
-
 
 cp IPResolution_${ILDMODELRECO}.png ${OUTPUTPATH}/IPResolution_${ILDMODELRECO}_${ILCSOFTVER}.png
 cp D0_fit_${ILDMODELRECO}.pdf ${OUTPUTPATH}/D0_fit_${ILDMODELRECO}_${ILCSOFTVER}.pdf
