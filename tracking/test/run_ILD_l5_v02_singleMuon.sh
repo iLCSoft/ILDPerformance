@@ -117,7 +117,7 @@ for i in "${!PolarAngles[@]}"; do
 		EXTRA_FLAGS=()
 		if [[ "${ILDMODELRECO}" == "ILD_FCCee_v01" ||
 			"${ILDMODELRECO}" == "ILD_FCCee_v02" ]]; then
-			EXTRA_FLAGS=(--trackMerge --doHLR)
+			EXTRA_FLAGS=(--trackingOnly)
 		fi
 
 		k4run ${ILDRECO} \
