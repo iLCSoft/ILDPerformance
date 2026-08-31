@@ -18,7 +18,7 @@ from array import array
 from pyLCIO import EVENT, IMPL, IOIMPL
 
 # ---- number of events per momentum bin -----
-nevt = 18
+nevt = 1000
 
 # outfile = "mcparticles.slcio"
 
