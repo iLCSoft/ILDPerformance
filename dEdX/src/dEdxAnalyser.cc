@@ -878,17 +878,7 @@ void dEdxAnalyser::processEvent(LCEvent* evt) {
         }
       }
 
-      // check which hits are inside the TPC
       TrackerHitVec trkHits = track->getTrackerHits();
-      int nHitsTPC = 0;
-      for (unsigned int iHit = 0; iHit < trkHits.size(); iHit++) {
-        if (trkHits[iHit]->getType() == 0) {
-          double x = trkHits[iHit]->getPosition()[0];
-          double y = trkHits[iHit]->getPosition()[1];
-          if (sqrt(x * x + y * y) >= _TPC_inner && sqrt(x * x + y * y) <= _TPC_outer)
-            nHitsTPC++;
-        }
-      }
 
       // If hits exist (REC files), fill hit energy histograms
       for (unsigned int h = 0; h < trkHits.size(); ++h) {
