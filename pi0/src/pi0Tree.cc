@@ -293,7 +293,6 @@ void Pi0Tree::processEvent(LCEvent* evt) {
     double sumTrueP[3] = {0, 0, 0};
     double sumE = 0;
     double sumP[3] = {0, 0, 0};
-    double sumWeight = 0;
     MCParticle* mcgps[2];
 
     for (unsigned int igamma = 0; igamma < gammas.size(); igamma++) {
@@ -389,7 +388,6 @@ void Pi0Tree::processEvent(LCEvent* evt) {
 
       // found a correct photon or a conversion
       ntruephoton++;
-      sumWeight += maxweight;
       sumTrueE += mcg->getEnergy();
       for (int i = 0; i < 3; i++)
         sumTrueP[i] += mcg->getMomentum()[i];

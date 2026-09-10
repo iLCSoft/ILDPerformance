@@ -28,14 +28,14 @@ TCanvas* can1D = new TCanvas("Canvas1D", "Canvas1D", 800, 700);
 TCanvas* can2D = new TCanvas("Canvas2D", "Canvas2D", 900, 700);
 TImage* img = TImage::Create();
 
-const char* namepart(string name, int fl, unsigned int n) {
+string namepart(string name, int fl, unsigned int n) {
   if (name.size() >= n) {
     if (fl == 1)
-      return (string(name, 0, n)).c_str();
+      return string(name, 0, n);
     if (fl == -1)
-      return (string(name, name.size() - n, name.size())).c_str();
+      return string(name, name.size() - n, name.size());
   }
-  return (const char*)("");
+  return "";
 }
 
 void PlotHist(TObject* obj, string outpath) {
@@ -64,22 +64,22 @@ void PlotHist(TObject* obj, string outpath) {
   // bool MargR = false;
   // bool MargL = false;
 
-  if ((!strcmp(namepart(name, 1, 2), "BB") && strcmp(namepart(name, -1, 3), "Sum"))) {
+  if ((!strcmp(namepart(name, 1, 2).c_str(), "BB") && strcmp(namepart(name, -1, 3).c_str(), "Sum"))) {
     gStyle->SetPadTopMargin(0.12);
     log = true;
   }
 
-  if (!strcmp(namepart(name, 1, 2), "SP")) {
+  if (!strcmp(namepart(name, 1, 2).c_str(), "SP")) {
     log = true;
     ymax = 10;
     cap_sp = true;
   }
 
-  if (!strcmp(namepart(name, 1, 3), "Res")) {
+  if (!strcmp(namepart(name, 1, 3).c_str(), "Res")) {
     gStyle->SetOptStat("mr");
     gROOT->ForceStyle();
 
-    if (!strcmp(namepart(name, -1, 5), "_Norm") || !strcmp(namepart(name, -1, 5), "_1GeV")) {
+    if (!strcmp(namepart(name, -1, 5).c_str(), "_Norm") || !strcmp(namepart(name, -1, 5).c_str(), "_1GeV")) {
       gStyle->SetPadTopMargin(0.12);
 
     } else {
