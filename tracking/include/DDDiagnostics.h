@@ -38,6 +38,7 @@
 #include <TVector3.h>
 #include <algorithm>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -124,6 +125,8 @@ protected:
 
   // detector model flag (set in init() from DD4hepXMLFile path)
   bool _isFCCee = false;
+
+  std::unique_ptr<UTIL::BitField64> _trkCellIDDecoder = nullptr;
 
   // --- FCC-ee subdet() (cellID) IDs, distinct from the standard lcio::ILDDetID enum ---
   static constexpr int FCC_DETID_VXD_B = 1; // matches lcio::ILDDetID::VXD numerically, but FCC-specific

@@ -358,6 +358,8 @@ void DDDiagnostics::init() {
   PI = (double)acos((double)(-1.0));
   TWOPI = (double)(2.0) * PI;
 
+  _trkCellIDDecoder = std::make_unique<UTIL::BitField64>(lcio::LCTrackerCellID::encoding_string());
+
   // Determine detector model family from the compact XML path.
   // FCCee models live under a "FCCee/" subfolder; ILC models do not.
   if (!_dd4hepXMLFile.empty()) {
@@ -477,8 +479,7 @@ void DDDiagnostics::processEvent(LCEvent* evt) {
             SimTrackerHit* simHit = (SimTrackerHit*)col->getElementAt(j);
             MCParticle* mcp = simHit->getMCParticle();
 
-            UTIL::BitField64 encoder(lcio::LCTrackerCellID::encoding_string());
-            encoder.reset();
+            UTIL::BitField64& encoder = *_trkCellIDDecoder;
             encoder.setValue(simHit->getCellID0());
 
             int layer = 0;
@@ -499,8 +500,7 @@ void DDDiagnostics::processEvent(LCEvent* evt) {
             SimTrackerHit* simHit = (SimTrackerHit*)col->getElementAt(j);
             MCParticle* mcp = simHit->getMCParticle();
 
-            UTIL::BitField64 encoder(lcio::LCTrackerCellID::encoding_string());
-            encoder.reset();
+            UTIL::BitField64& encoder = *_trkCellIDDecoder;
             encoder.setValue(simHit->getCellID0());
 
             int layer = 0;
@@ -703,8 +703,7 @@ void DDDiagnostics::processEvent(LCEvent* evt) {
 
           EVENT::TrackerHit* TestHit = *it;
 
-          UTIL::BitField64 encoder(lcio::LCTrackerCellID::encoding_string());
-          encoder.reset();
+          UTIL::BitField64& encoder = *_trkCellIDDecoder;
           encoder.setValue(TestHit->getCellID0());
 
           int layer = 0;
