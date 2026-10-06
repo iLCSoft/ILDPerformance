@@ -372,8 +372,28 @@ void DDDiagnostics::init() {
   // cellID encoding is defined per readout in DD4hep; all tracker readouts share the system/layer bit layout,
   // so take it from the vertex barrel readout as a representative (geometry loaded by InitializeDD4hep)
   const std::string vxdReadout = _isFCCee ? "VertexBarrelCollection" : "VXDCollection";
-  _trkCellIDDecoder = std::make_unique<UTIL::BitField64>(
-      dd4hep::Detector::getInstance().readout(vxdReadout).idSpec().fieldDescription());
+  dd4hep::Detector& detector = dd4hep::Detector::getInstance();
+  _trkCellIDDecoder = std::make_unique<UTIL::BitField64>(detector.readout(vxdReadout).idSpec().fieldDescription());
+
+  // check that assumption: the readouts of all SimTrackerHit collections must agree on the system/layer bits
+  for (const auto& colName : _simTrkHitCollectionNames) {
+    if (detector.readouts().count(colName) == 0) {
+      streamlog_out(WARNING) << " DDDiagnostics: no readout " << colName
+                             << " in the geometry, cannot check its cellID encoding" << std::endl;
+      continue;
+    }
+    const UTIL::BitField64 colDecoder(detector.readout(colName).idSpec().fieldDescription());
+    for (const size_t idx : {lcio::LCTrackerCellID::subdet(), lcio::LCTrackerCellID::layer()}) {
+      const UTIL::BitFieldValue& ref = (*_trkCellIDDecoder)[idx];
+      const UTIL::BitFieldValue& col = colDecoder[idx];
+      if (col.offset() != ref.offset() || col.width() != ref.width()) {
+        throw std::runtime_error("DDDiagnostics: cellID field " + col.name() + " of readout " + colName +
+                                 " has a different bit layout than " + ref.name() + " of readout " + vxdReadout +
+                                 " (" + colDecoder.fieldDescription() + " vs " +
+                                 _trkCellIDDecoder->fieldDescription() + ")");
+      }
+    }
+  }
 }
 
 void DDDiagnostics::processRunHeader(LCRunHeader* run) {
