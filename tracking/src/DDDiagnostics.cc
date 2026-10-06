@@ -675,8 +675,7 @@ void DDDiagnostics::processEvent(LCEvent* evt) {
         } else {
           SiHits = ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[ILC_IDX_VXD] +
                    ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[ILC_IDX_SIT];
-          TotalHits = SiHits + ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[ILC_IDX_FTD] +
-                      ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[ILC_IDX_TPC];
+          TotalHits = SiHits + ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[ILC_IDX_TPC];
           TotalHitsInFit = ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[ILC_IDX_VXD + 1] +
                            ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[ILC_IDX_SIT + 1] +
                            ((Track*)trkvec[jj])->getSubdetectorHitNumbers()[ILC_IDX_TPC + 1];
