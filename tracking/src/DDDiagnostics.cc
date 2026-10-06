@@ -358,8 +358,6 @@ void DDDiagnostics::init() {
   PI = (double)acos((double)(-1.0));
   TWOPI = (double)(2.0) * PI;
 
-  _trkCellIDDecoder = std::make_unique<UTIL::BitField64>(lcio::LCTrackerCellID::encoding_string());
-
   // Determine detector model family from the compact XML path.
   // FCCee models live under a "FCCee/" subfolder; ILC models do not.
   if (!_dd4hepXMLFile.empty()) {
@@ -370,6 +368,12 @@ void DDDiagnostics::init() {
     streamlog_out(WARNING) << " DDDiagnostics: DD4hepXMLFile not set, " << "assuming ILD@ILC subdetector hit indices."
                            << std::endl;
   }
+
+  // cellID encoding is defined per readout in DD4hep; all tracker readouts share the system/layer bit layout,
+  // so take it from the vertex barrel readout as a representative (geometry loaded by InitializeDD4hep)
+  const std::string vxdReadout = _isFCCee ? "VertexBarrelCollection" : "VXDCollection";
+  _trkCellIDDecoder = std::make_unique<UTIL::BitField64>(
+      dd4hep::Detector::getInstance().readout(vxdReadout).idSpec().fieldDescription());
 }
 
 void DDDiagnostics::processRunHeader(LCRunHeader* run) {
