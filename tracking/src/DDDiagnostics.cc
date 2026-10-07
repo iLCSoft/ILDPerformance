@@ -460,6 +460,16 @@ void DDDiagnostics::processEvent(LCEvent* evt) {
     }
   }
 
+  // tracks without any truth link point to a missing truth linking in the reconstruction
+  if (flagTrack == 1 && evt->getCollection(_trackColName)->getNumberOfElements() > 0) {
+    ++_nEvtWithTracks;
+    if (flagRecoToTrue == 0 || flagTrueToReco == 0 ||
+        evt->getCollection(_recoToTrue)->getNumberOfElements() == 0 ||
+        evt->getCollection(_trueToReco)->getNumberOfElements() == 0) {
+      ++_nEvtWithTracksNoLinks;
+    }
+  }
+
   if (flagRecoToTrue == 1 && flagTrueToReco == 1) { // condition for the existence of the relation collections
 
     LCCollection* trkToMcp = evt->getCollection(_recoToTrue);
@@ -895,4 +905,14 @@ void DDDiagnostics::check(LCEvent* evt) {
   streamlog_out(DEBUG4) << " DDDiagnostics::check event " << evt->getEventNumber() << std::endl;
 }
 
-void DDDiagnostics::end() { fillCanvas(); }
+void DDDiagnostics::end() {
+  if (_nEvtWithTracks > 0 && _nEvtWithTracksNoLinks == _nEvtWithTracks) {
+    streamlog_out(ERROR) << " DDDiagnostics: the truth link collections (" << _recoToTrue << ", " << _trueToReco
+                         << ") are missing or empty in all " << _nEvtWithTracks << " events with tracks in "
+                         << _trackColName << ", so no track is matched to an MCParticle and the found-track and"
+                         << " resolution histograms stay empty."
+                         << " Was the RecoMCTruthLinker run in the reconstruction?" << std::endl;
+  }
+
+  fillCanvas();
+}

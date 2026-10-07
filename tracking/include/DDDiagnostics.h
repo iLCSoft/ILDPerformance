@@ -116,6 +116,11 @@ protected:
   std::string _vxdTrkHitRelations = "";
 
   int nEvt = 0;
+
+  // sanity check of the input: events with tracks, and those among them without truth links (checked in end())
+  int _nEvtWithTracks = 0;
+  int _nEvtWithTracksNoLinks = 0;
+
   int OutSitBkgHit = 0;
   int OutSitPhysHit = 0;
   int OutVxdBkgHit = 0;
