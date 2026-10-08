@@ -168,10 +168,17 @@ for i in "${!PolarAngles[@]}"; do
 			STEERING_FILE="DDDiagnostics_FCCee.xml"
 		fi
 
+		ANALYSISFILE=analysis_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}
+		# in debug mode, tag the output with the studied track collection (taken from the steering file)
+		if [[ "${DEBUG}" == "true" ]]; then
+			TRACKCOL=$(sed -n 's|.*name="StudiedTracks"[^>]*>[[:space:]]*\([^[:space:]<]*\)[[:space:]]*<.*|\1|p' "${STEERING_FILE}")
+			ANALYSISFILE=${ANALYSISFILE}_${TRACKCOL}
+		fi
+
 		Marlin "${STEERING_FILE}" \
 			--global.LCIOInputFiles=$INFILE \
 			--InitDD4hep.DD4hepXMLFile=${COMPACTFILEDIR}/${ILDMODELRECO}/${ILDMODELRECO}.xml \
-			--MyAIDAProcessor.FileName=analysis_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
+			--MyAIDAProcessor.FileName=${ANALYSISFILE} \
 			--MyDiagnostics.FillBigTTree=true \
 			--MyDiagnostics.PhysSampleOn=false \
 			>${LOGFILEPATH}/DIAG_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.out &
