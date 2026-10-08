@@ -114,10 +114,10 @@ for i in "${!PolarAngles[@]}"; do
 			continue
 		fi
 
-		EXTRA_FLAGS=()
+		EXTRA_FLAGS=(--trackingOnly)
 		if [[ "${ILDMODELRECO}" == "ILD_FCCee_v01" ||
 			"${ILDMODELRECO}" == "ILD_FCCee_v02" ]]; then
-			EXTRA_FLAGS=(--trackingOnly)
+			EXTRA_FLAGS=()
 		fi
 
 		k4run ${ILDRECO} \
