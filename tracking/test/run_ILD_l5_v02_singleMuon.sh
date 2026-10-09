@@ -172,6 +172,10 @@ for i in "${!PolarAngles[@]}"; do
 		# in debug mode, tag the output with the studied track collection (taken from the steering file)
 		if [[ "${DEBUG}" == "true" ]]; then
 			TRACKCOL=$(sed -n 's|.*name="StudiedTracks"[^>]*>[[:space:]]*\([^[:space:]<]*\)[[:space:]]*<.*|\1|p' "${STEERING_FILE}")
+			# resolve a steering file constant, e.g. ${TrackCollection}
+			if [[ "${TRACKCOL}" =~ ^\$\{(.+)\}$ ]]; then
+				TRACKCOL=$(sed -n "s|.*<constant name=\"${BASH_REMATCH[1]}\" value=\"\([^\"]*\)\".*|\1|p" "${STEERING_FILE}")
+			fi
 			ANALYSISFILE=${ANALYSISFILE}_${TRACKCOL}
 		fi
 

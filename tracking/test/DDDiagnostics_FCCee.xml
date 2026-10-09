@@ -13,6 +13,8 @@
   <constants>
     <constant name="DetectorCompactFile"
               value="FCCee/ILD_FCCee/compact/ILD_FCCee_v01/ILD_FCCee_v01.xml"/>
+    <!--Track collection to study; the truth link names below are derived from it-->
+    <constant name="TrackCollection" value="MarlinTrkTracks"/>
   </constants>
 
   <execute>
@@ -59,11 +61,11 @@
     <!--Fill the more detail information into TTree for DEBUG.-->
     <parameter name="FillBigTTree" type="bool">false </parameter>
     <!--Name of the studied track collection-->
-    <parameter name="StudiedTracks" type="string" lcioInType="Track"> MarlinTrkTracks </parameter>
+    <parameter name="StudiedTracks" type="string" lcioInType="Track"> ${TrackCollection} </parameter>
     <!--true - reco relation collection-->
-    <parameter name="MCTracksTruthLinkCollectionName" type="string" lcioInType="Track"> MCTruthMarlinTrkTracksLink </parameter>
+    <parameter name="MCTracksTruthLinkCollectionName" type="string" lcioInType="Track"> MCTruth${TrackCollection}Link </parameter>
     <!--reco - true relation collection-->
-    <parameter name="TracksMCTruthLinkCollectionName" type="string" lcioInType="Track"> MarlinTrkTracksMCTruthLink </parameter>
+    <parameter name="TracksMCTruthLinkCollectionName" type="string" lcioInType="Track"> ${TrackCollection}MCTruthLink </parameter>
     <!--Name of the MCParticle input collection-->
     <parameter name="MCParticleCollection" type="string" lcioInType="MCParticle"> MCParticle </parameter>
     <!--Enables cuts to define the examined track sample-->
