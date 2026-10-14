@@ -27,6 +27,7 @@ DEBUG=false
 ILDMODELRECO=ILD_FCCee_v01 # ILD_l5_o1_v02
 ILDMODELSIM=ILD_FCCee_v01  # ILD_l5_v02
 ILCSOFTVER=key4hep_night
+GEO_DIR=${k4geo_DIR}
 
 ILDCONFIGDIR=$codeDir/ILDConfig/StandardConfig/production
 ILDRECO=${ILDCONFIGDIR}/ILDReconstruction.py
@@ -48,9 +49,9 @@ fi
 # Set compact file root directory depending on detector model
 if [[ "${ILDMODELRECO}" == ILD_FCCee_v01 ||
 	"${ILDMODELRECO}" == ILD_FCCee_v02 ]]; then
-	COMPACTFILEDIR=$K4GEO/FCCee/ILD_FCCee/compact
+	COMPACTFILEDIR=${GEO_DIR}/FCCee/ILD_FCCee/compact
 else
-	COMPACTFILEDIR=$lcgeo_DIR/ILD/compact
+	COMPACTFILEDIR=${GEO_DIR}/ILD/compact
 fi
 
 #==================================================
@@ -136,7 +137,7 @@ for i in "${!PolarAngles[@]}"; do
 		#            --constant.DetectorModel=${ILDMODELRECO} \
 		#            --global.LCIOInputFiles=${TESTDIR}/Results/SimFiles/${ILDMODELSIM}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
 		#            --constant.RunBeamCalReco=false \
-		#            --constant.lcgeo_DIR=$k4geo_DIR \
+		#            --constant.lcgeo_DIR=${GEO_DIR} \
 		#            --constant.OutputBaseName=${RECOBASE}_Marlin \
 		#            --MyRecoMCTruthLinker.UsingParticleGun=true \
 		#            >${TESTDIR}/${LOGFILEPATH}/Marlin_RECO_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.out &
