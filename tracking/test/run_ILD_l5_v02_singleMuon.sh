@@ -27,6 +27,7 @@ DEBUG=false
 ILDMODELRECO=ILD_FCCee_v01 # ILD_l5_o1_v02
 ILDMODELSIM=ILD_FCCee_v01  # ILD_l5_v02
 ILCSOFTVER=key4hep_night
+GEO_DIR=${k4geo_DIR}
 
 ILDCONFIGDIR=$codeDir/ILDConfig/StandardConfig/production
 ILDRECO=${ILDCONFIGDIR}/ILDReconstruction.py
@@ -48,9 +49,9 @@ fi
 # Set compact file root directory depending on detector model
 if [[ "${ILDMODELRECO}" == ILD_FCCee_v01 ||
 	"${ILDMODELRECO}" == ILD_FCCee_v02 ]]; then
-	COMPACTFILEDIR=$K4GEO/FCCee/ILD_FCCee/compact
+	COMPACTFILEDIR=${GEO_DIR}/FCCee/ILD_FCCee/compact
 else
-	COMPACTFILEDIR=$lcgeo_DIR/ILD/compact
+	COMPACTFILEDIR=${GEO_DIR}/ILD/compact
 fi
 
 #==================================================
@@ -114,10 +115,10 @@ for i in "${!PolarAngles[@]}"; do
 			continue
 		fi
 
-		EXTRA_FLAGS=()
+		EXTRA_FLAGS=(--trackingOnly)
 		if [[ "${ILDMODELRECO}" == "ILD_FCCee_v01" ||
 			"${ILDMODELRECO}" == "ILD_FCCee_v02" ]]; then
-			EXTRA_FLAGS=(--trackingOnly)
+			EXTRA_FLAGS=()
 		fi
 
 		k4run ${ILDRECO} \
@@ -131,14 +132,15 @@ for i in "${!PolarAngles[@]}"; do
 			-n -1 \
 			>${TESTDIR}/${LOGFILEPATH}/RECO_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.out &
 
+
 		#        Marlin ${ILDCONFIGDIR}/MarlinStdReco.xml \
 		#            --constant.DetectorModel=${ILDMODELRECO} \
 		#            --global.LCIOInputFiles=${TESTDIR}/Results/SimFiles/${ILDMODELSIM}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_SIM.slcio \
 		#            --constant.RunBeamCalReco=false \
-		#            --constant.lcgeo_DIR=$lcgeo_DIR \
-		#            --constant.OutputBaseName=${RECOBASE} \
+		#            --constant.lcgeo_DIR=${GEO_DIR} \
+		#            --constant.OutputBaseName=${RECOBASE}_Marlin \
 		#            --MyRecoMCTruthLinker.UsingParticleGun=true \
-		#            >${TESTDIR}/${LOGFILEPATH}/RECO_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.out &
+		#            >${TESTDIR}/${LOGFILEPATH}/Marlin_RECO_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.out &
 
 	done
 	wait
@@ -157,6 +159,7 @@ for i in "${!PolarAngles[@]}"; do
 
 		# diagnostics
 
+		# INFILE=Results/RecoFiles/${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_Marlin_REC.slcio
 		INFILE=Results/RecoFiles/${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}_REC.slcio
 
 		# default steering file
@@ -168,10 +171,21 @@ for i in "${!PolarAngles[@]}"; do
 			STEERING_FILE="DDDiagnostics_FCCee.xml"
 		fi
 
+		ANALYSISFILE=analysis_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}
+		# in debug mode, tag the output with the studied track collection (taken from the steering file)
+		if [[ "${DEBUG}" == "true" ]]; then
+			TRACKCOL=$(sed -n 's|.*name="StudiedTracks"[^>]*>[[:space:]]*\([^[:space:]<]*\)[[:space:]]*<.*|\1|p' "${STEERING_FILE}")
+			# resolve a steering file constant, e.g. ${TrackCollection}
+			if [[ "${TRACKCOL}" =~ ^\$\{(.+)\}$ ]]; then
+				TRACKCOL=$(sed -n "s|.*<constant name=\"${BASH_REMATCH[1]}\" value=\"\([^\"]*\)\".*|\1|p" "${STEERING_FILE}")
+			fi
+			ANALYSISFILE=${ANALYSISFILE}_${TRACKCOL}
+		fi
+
 		Marlin "${STEERING_FILE}" \
 			--global.LCIOInputFiles=$INFILE \
 			--InitDD4hep.DD4hepXMLFile=${COMPACTFILEDIR}/${ILDMODELRECO}/${ILDMODELRECO}.xml \
-			--MyAIDAProcessor.FileName=analysis_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]} \
+			--MyAIDAProcessor.FileName=${ANALYSISFILE} \
 			--MyDiagnostics.FillBigTTree=true \
 			--MyDiagnostics.PhysSampleOn=false \
 			>${LOGFILEPATH}/DIAG_${ILDMODELRECO}_${ILCSOFTVER}_MuonsAngle_${PolarAngles[i]}_Mom_${Mom[j]}.out &
