@@ -1,3 +1,67 @@
+# v01-13
+
+* 2026-11-11 Juan Miguel Carceller ([PR#55](https://github.com/iLCSoft/ILDPerformance/pull/55))
+  - Require CMake 3.10 to fix `Compatibility with CMake < 3.5 has been removed from CMake.`
+
+* 2026-10-15 Victor Schwan ([PR#54](https://github.com/iLCSoft/ILDPerformance/pull/54))
+  - `DDDiagnostics_FCCee.xml`: one `TrackCollection` constant sets studied tracks and both truth link names (SSOT)
+  - Debug mode appends the studied track collection to the `DDDiagnostics` output file name
+  - `Gaudi` reconstruction runs always with `--trackingOnly`
+  - Commented Marlin reco writes `_Marlin`-tagged outputs to keep them apart from `Gaudi` ones
+  - SSOT for geometry directory
+
+* 2026-10-08 Victor Schwan ([PR#53](https://github.com/iLCSoft/ILDPerformance/pull/53))
+  - Tracking: `DDDiagnostics`: new error message if the truth link collection is empty in all events
+
+* 2026-10-07 Victor Schwan ([PR#51](https://github.com/iLCSoft/ILDPerformance/pull/51))
+  - `run_[...]_singleMuon`
+    - navigates to `ILDConfig` -> no need to copy entire repo
+    - does not hardcode number of angles and momenta to test
+    - optional reuse of particle_gun, sim and reco files
+    - adds a debug mode
+  - `DDDiagnostics` supports ILD@FCC `detID`s
+  - Introduces new ILD@FCC steering file
+  - Adds script that removes everything created by `prepareWorkingFolders`
+
+* 2026-09-10 Thomas Madlener ([PR#52](https://github.com/iLCSoft/ILDPerformance/pull/52))
+  - Switch to the latest version of the key4hep-build workflow
+  - Fix `-Werror` build failures on the nightly alma9 (gcc16/C++23) CI job: a dangling-pointer bug in `dEdxHistPlotter.cc`'s `namepart()` and two unused-but-set variables in `pi0Tree.cc` and `dEdxAnalyser.cc`
+
+* 2026-08-31 Victor Schwan ([PR#45](https://github.com/iLCSoft/ILDPerformance/pull/45))
+  - Migrated ILD reconstruction steering from ILCSOFT to Key4HEP, replacing `Marlin MarlinStdReco.xml` with `k4run ILDReconstruction.py`
+  - Added a `.gitignore` file to the repository
+
+* 2026-06-04 Victor Schwan ([PR#50](https://github.com/iLCSoft/ILDPerformance/pull/50))
+  - Format all `.cc` files
+  - Add formatting commit hash to `.git-blame-ignore-revs`
+
+* 2026-06-01 Victor Schwan ([PR#49](https://github.com/iLCSoft/ILDPerformance/pull/49))
+  - Fix a bug introduced by #47: var `ILDMODELRECO` is different from assumed name in macros
+  - Macros support any model name while being backwards compatible with default legacy value
+
+* 2026-06-01 Victor Schwan ([PR#48](https://github.com/iLCSoft/ILDPerformance/pull/48))
+  - Add a `.clang-format` file using the LLVM style
+  - Format all `.cpp`, `.C` and `.h` files
+  - Add formatting commit hashes to `.git-blame-ignore-revs`
+
+* 2026-05-20 Victor Schwan ([PR#47](https://github.com/iLCSoft/ILDPerformance/pull/47))
+  - Distinguish properly between simulation and reconstruction detector models
+  - Use the reconstruction detector model name for files which are based on a reconstruction with the reconstruction detector model
+  - Minor: fix extra dots
+
+* 2026-05-20 Victor Schwan ([PR#46](https://github.com/iLCSoft/ILDPerformance/pull/46))
+  - Format the tracking performance shell scripts to ensure consistent indentation, particularly for nested loops
+  - Add a `.git-blame-ignore-revs` file including this and recent formatting commit hashes
+
+* 2026-05-13 Victor Schwan ([PR#43](https://github.com/iLCSoft/ILDPerformance/pull/43))
+  - Update to `RHEL 9` and `ILCSOFT v02-03-04`
+  - Put final plots also in `Results` folder and not somewhere in the home dir
+  - Translate READMEs to Markdown
+  - Format Python script
+
+* 2026-03-25 Thomas Madlener ([PR#44](https://github.com/iLCSoft/ILDPerformance/pull/44))
+  - Switch to latest available Key4hep builds for CI
+
 # v01-12-01
 
 * 2025-01-07 Thomas Madlener ([PR#42](https://github.com/ilCSoft/ILDPerformance/pull/42))
